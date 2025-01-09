@@ -65,47 +65,50 @@ const commentsController = {
   },
   //detail/:postId/comment
   getComments: async (req, res) => {
-  try {
-    const postId = new mongoose.Types.ObjectId(req.params.postId);
-    const userId = new mongoose.Types.ObjectId(req.user.id);
-    const orders = req.query.orders || "descending";
-    const limit = parseInt(req.query.limit) || 5; // Số comment mỗi lần tải
-    const lastCommentId = req.query.cursor; // Cursor để xác định vị trí
+    try {
+      const postId = new mongoose.Types.ObjectId(req.params.postId);
+      const userId = new mongoose.Types.ObjectId(req.user.id);
+      const orders = req.query.orders || "descending";
+      const limit = parseInt(req.query.limit) || 5; // Số comment mỗi lần tải
+      const lastCommentId = req.query.cursor; // Cursor để xác định vị trí
 
-    // Định nghĩa thứ tự sắp xếp
-    const sortOrder = orders === "ascending" ? 1 : -1;
+      // Định nghĩa thứ tự sắp xếp
+      const sortOrder = orders === "ascending" ? 1 : -1;
 
-    // Điều kiện để lấy comment tiếp theo
-    let matchCondition = { postId };
-    if (lastCommentId) {
-      const operator = sortOrder === 1 ? "$gt" : "$lt";
-      matchCondition._id = { [operator]: new mongoose.Types.ObjectId(lastCommentId) };
-    }
+      // Điều kiện để lấy comment tiếp theo
+      let matchCondition = { postId };
+      if (lastCommentId) {
+        const operator = sortOrder === 1 ? "$gt" : "$lt";
+        matchCondition._id = {
+          [operator]: new mongoose.Types.ObjectId(lastCommentId),
+        };
+      }
 
-    // Query với phân trang dựa trên cursor
-    const comments = await Comments.aggregate([
-      { $match: matchCondition },
-      { $sort: { _id: sortOrder } },
-      { $limit: limit },
-      {
-        $addFields: {
-          isAuthor: { $eq: ["$author", userId] },
+      // Query với phân trang dựa trên cursor
+      const comments = await Comments.aggregate([
+        { $match: matchCondition },
+        { $sort: { _id: sortOrder } },
+        { $limit: limit },
+        {
+          $addFields: {
+            isAuthor: { $eq: ["$author", userId] },
+          },
         },
-      },
-    ]);
+      ]);
 
-    // Xác định cursor cho lần gọi tiếp theo
-    const nextCursor = comments.length > 0 ? comments[comments.length - 1]._id : null;
+      // Xác định cursor cho lần gọi tiếp theo
+      const nextCursor =
+        comments.length > 0 ? comments[comments.length - 1]._id : null;
 
-    return res.status(200).json({
-      comments,
-      nextCursor,
-      hasMore: comments.length === limit,
-    });
-  } catch (error) {
-    return res.status(500).json(error);
-  }
-},
+      return res.status(200).json({
+        comments,
+        nextCursor,
+        hasMore: comments.length === limit,
+      });
+    } catch (error) {
+      return res.status(500).json(error);
+    }
+  },
 };
 
 export default commentsController;

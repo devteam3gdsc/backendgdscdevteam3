@@ -1,66 +1,72 @@
-import mongoose from "mongoose"
-
-const postSchema = new mongoose.Schema({
+import mongoose from "mongoose";
+const fileSchema = new mongoose.Schema(
+  {
+    fileUrl: { type: String },
+    fileName: { type: String },
+  },
+  { _id: false }
+);
+const postSchema = new mongoose.Schema(
+  {
     title: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
     content: {
-        type: String,
-        required: true,
+      type: String,
+      required: true,
     },
-    tags: [
-        String
-    ],
+    tags: [String],
     author: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        require: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      require: true,
     },
-    authorname:{
-        type:String
+    authorname: {
+      type: String,
     },
-    avatar:{
-        type:String
+    avatar: {
+      type: String,
     },
     // comments: [
     //     {type: mongoose.Schema.Types.ObjectId,
     //     ref: 'Comments'}
     // ],
-    likes: [{
+    likes: [
+      {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        default:[]
-    }],
-    totalLikes:{
-        type:Number,
-        default:0
+        ref: "User",
+        default: [],
+      },
+    ],
+    totalLikes: {
+      type: Number,
+      default: 0,
     },
-    files: [{
-        type: String,
-    }],
+    files: [fileSchema],
     visibility: {
-        type: String,
-        enum: ['public', 'private'],
-        default: 'public'
+      type: String,
+      enum: ["public", "private"],
+      default: "public",
     },
-    stored:[{
+    stored: [
+      {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        default:[]
-    }],
+        ref: "User",
+        default: [],
+      },
+    ],
     totalComments: {
-        type:Number,
-        default: 0
-    }
-},
-{ timestamps: true }
+      type: Number,
+      default: 0,
+    },
+  },
+  { timestamps: true }
 );
 
 postSchema.pre("save", function (next) {
-
-    this.updatedAt = Date.now();
-    next();
+  this.updatedAt = Date.now();
+  next();
 });
-const Post = mongoose.model('Post', postSchema);
+const Post = mongoose.model("Post", postSchema);
 export default Post;

@@ -111,8 +111,7 @@ const postController = {
   // /post/create
   createPost: async (req, res) => {
     try {
-      const { title, content, visibility, stored, authorname, avatar } =
-        req.body;
+      const { title, content, visibility, stored } = req.body;
       // if (!req.files || req.files.length === 0) {
       //     return res.status(400).json({ message: 'No files uploaded' });
       // }
@@ -127,7 +126,12 @@ const postController = {
         return res.status(500).json("Invalid user!");
       }
       const codeFiles = req.files["code_files"];
-      const files = codeFiles.map((file) => file.path);
+      const files = codeFiles.map((file) => {
+        return {
+          fileUrl: file.path,
+          fileName: file.originalname,
+        };
+      });
       const newPost = new Post({
         title: title,
         content: content,
@@ -361,7 +365,7 @@ const postController = {
       }
       const urls = post.files;
       const publicIds = urls.map((url) => {
-        const URLparts = url.split("/");
+        const URLparts = url.fileUrl.split("/");
         const URLlastPart = URLparts[URLparts.length - 1].split(".");
         const anotherURL = URLlastPart[0];
         const publicId = URLparts[URLparts.length - 2] + "/" + anotherURL;

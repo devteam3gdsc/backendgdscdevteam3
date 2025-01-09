@@ -112,41 +112,53 @@ const postController = {
   createPost: async (req, res) => {
     try {
       const { title, content, visibility, stored } = req.body;
-      // if (!req.files || req.files.length === 0) {
-      //     return res.status(400).json({ message: 'No files uploaded' });
-      // }
+      
+      // Check if tags are passed and ensure it's a string before splitting
+      let tags = [];
       if (req.body.tags) {
-        var tags = req.body.tags.split(",");
-      } else {
-        var tags = [];
+        if (typeof req.body.tags === 'string') {
+          tags = req.body.tags.split(","); // Split string into array of tags
+        } else if (Array.isArray(req.body.tags)) {
+          tags = req.body.tags; // If tags are already an array, use it directly
+        }
       }
+  
+      // Lấy thông tin user
       const userId = req.user.id;
       const user = await User.findById(userId);
       if (!user) {
         return res.status(500).json("Invalid user!");
       }
-      const codeFiles = req.files["code_files"];
-      const files = codeFiles.map((file) => {
-        return {
-          fileUrl: file.path,
-          fileName: file.originalname,
-        };
-      });
+  
+      // Xử lý files từ req.files["code_files"]
+      const codeFiles = req.files?.["code_files"] || [];
+      const files = codeFiles.map((file) => ({
+        fileUrl: file.path, // Đường dẫn file trên Cloudinary
+        fileName: file.originalname, // Tên gốc của file
+      }));
+  
+      // Xử lý stored nếu có
+      const storedIds = (stored || []).map((id) => new mongoose.Types.ObjectId(id)); // Use 'new' here
+  
+      // Tạo bài viết mới
       const newPost = new Post({
-        title: title,
-        content: content,
+        title,
+        content,
         author: userId,
-        tags: tags,
+        tags,
         authorname: user.displayname,
         avatar: user.avatar,
-        visibility: visibility,
-        files: files || [],
-        stored: stored || [],
+        visibility,
+        files, // Lưu danh sách file vào post
+        stored: storedIds,
       });
+  
+      // Lưu bài viết vào database
       await newPost.save();
       return res.status(200).json("Post created successfully!");
     } catch (error) {
-      res.status(500).json(error);
+      console.error("Error creating post:", error);
+      res.status(500).json({ error: error.message });
     }
   },
   // /community?page=...&limit=...&search=...

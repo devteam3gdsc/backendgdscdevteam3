@@ -63,6 +63,34 @@ const commentsController = {
       return res.status(500).json(error);
     }
   },
+  //detail/:postId/comment
+  getComments: async (req, res) => {
+    try {
+      const postId = new mongoose.Types.ObjectId(`${req.params.postId}`);
+      const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
+      const orders = req.body.orders || "descending";
+      switch (orders) {
+        case "descending": {
+          var sortOrder = -1;
+          break;
+        }
+        case "ascending": {
+          var sortOrder = 1;
+          break;
+        }
+      }
+      const comments = await Comments.aggregate([
+        { $match: { postId: postId } },
+        { $sort: { createdAt: sortOrder } },
+        { $addFields: { isAuthor: { $eq: ["$author", userId] } } },
+      ]);
+      return res.status(200).json({
+        comments,
+      });
+    } catch (error) {
+      return res.status(500).json(error);
+    }
+  },
 };
 
 export default commentsController;

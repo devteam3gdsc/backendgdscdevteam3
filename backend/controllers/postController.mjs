@@ -332,27 +332,19 @@ const postController = {
     //thieu gioi han comment
     try {
       const postId = new mongoose.Types.ObjectId(`${req.params.postId}`);
-      const userId = req.user.id;
-      const post = await Post.findOne({ _id: postId });
-      const orders = req.body.orders || "descending";
-      switch (orders) {
-        case "descending": {
-          var sortOrder = -1;
-          break;
-        }
-        case "ascending": {
-          var sortOrder = 1;
-          break;
-        }
-      }
-      const comments = await Comments.aggregate([
-        { $match: { postId: postId } },
-        { $sort: { createdAt: orders } },
-        { $addFields: { isAuthor: { $eq: ["$author", userId] } } },
+      const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
+      const post = await Post.aggregate([
+        { $match: { _id: postId } },
+        {
+          $addFields: {
+            Stored: { $in: [userId, "$stored"] },
+            Liked: { $in: [userId, "$likes"] },
+            isAuthor: { $eq: ["$author", userId] },
+          },
+        },
       ]);
       return res.status(200).json({
         post,
-        comments,
       });
     } catch (error) {
       return res.status(500).json(error);

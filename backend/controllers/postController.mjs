@@ -392,7 +392,12 @@ const postController = {
       const postId = req.params.postId;
       const { title, content } = req.body;
       const codeFiles = req.files["code_files"];
-      const files = codeFiles.map((file) => file.path);
+      const files = codeFiles.map((file) => {
+        return {
+          fileName: file.originalname,
+          fileUrl: file.path,
+        };
+      });
       const post = await Post.updateOne(
         { author: userId, _id: postId },
         { $set: { title: title, content: content, files: files } }

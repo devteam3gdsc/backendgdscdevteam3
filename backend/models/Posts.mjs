@@ -17,25 +17,42 @@ const postSchema = new mongoose.Schema({
         ref: 'User',
         require: true,
     },
-    comments: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Comment'
-    }],
-
+    authorname:{
+        type:String
+    },
+    avatar:{
+        type:String
+    },
+    // comments: [
+    //     {type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'Comments'}
+    // ],
     likes: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default:[]
     }],
+    totalLikes:{
+        type:Number,
+        default:0
+    },
     files: [{
-        url: String,
-        name: String,
+        type: String,
     }],
     visibility: {
         type: String,
         enum: ['public', 'private'],
         default: 'public'
     },
-
+    stored:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        default:[]
+    }],
+    totalComments: {
+        type:Number,
+        default: 0
+    }
 },
 { timestamps: true }
 );

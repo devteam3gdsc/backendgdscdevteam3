@@ -1,11 +1,14 @@
 import { Router } from "express";
-import authcontroller from "../controllers/authcontroller.mjs";
+import authController from "../controllers/authcontroller.mjs";
 import authMidleware from "../middlewares/authMidleware.mjs";
-const authrouter = Router();
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import { v2 } from "cloudinary";
+import multer from "multer";
 
-authrouter.post("/login", authcontroller.login);
-authrouter.post("/signup", authcontroller.signup);
-authrouter.post("/logout", authMidleware.verifyToken, authcontroller.logout);
-authrouter.post("/refresh", authcontroller.requestRefreshToken);
+const authRouter = Router();
+authRouter.post("/login", authController.login);
+authRouter.post("/signup", authController.signup);
+authRouter.post("/logout", authMidleware.verifyToken, authController.logout);
+authRouter.post("/refresh", authController.requestRefreshToken);
 
-export default authrouter;
+export default authRouter;

@@ -21,35 +21,18 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 6,
     },
-    posts: [
-      {
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: 'Post'
-      }
-    ],
-    storedPost: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Post'
-      }
-    ],
-
-    // avatar: {
-    //   type: String, 
-    //   default: "",
-    // },
-
-    // bio: {
-    //   type: String,
-    //   default: "",
-    // },
-    
-    admin: {
-      type: Boolean,
-      default: false,
+    avatar:{
+      type: String,
+    },
+    displayname:{
+      type:String
     },
     refreshTokens: { type: [String], default: [] },
-    
+    // admin: {
+    //   type: Boolean,
+    //   default: false,
+    // },
+    // refreshTokens: { type: [String], default: [] },
   },
   { timestamps: true }
 );

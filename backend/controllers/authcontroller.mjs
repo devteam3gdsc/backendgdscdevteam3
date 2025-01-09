@@ -1,7 +1,8 @@
 import bcrypt from "bcrypt";
 import User from "../models/Users.mjs";
 import jwt from "jsonwebtoken";
-
+import { v2 } from "cloudinary";
+import Post from "../models/Posts.mjs";
 const authController = {
   // [POST] /auth/sigup
   signup: async (req, res) => {
@@ -20,6 +21,7 @@ const authController = {
         username: req.body.username,
         email: req.body.email,
         password: hashed,
+        displayname:req.body.username
       });
       res.status(201).json({ message: "Sign up successfully!" });
     } catch (err) {
@@ -83,7 +85,7 @@ const authController = {
     try{
         const refreshToken = req.cookies.refreshToken;
         console.log("Received refreshToken:", req.cookies.refreshToken);
-
+      console.log(refreshToken);
     if (!refreshToken) {
         return res.status(400).json("No Refresh Token provided");
     }
@@ -164,6 +166,47 @@ const authController = {
       return res
         .status(500)
        .json("Error in refreshing token: " + error.message);
+    }
+  },
+   // GET /auth/user/detail/:userId
+  getUserInfo: async (req,res)=>{
+    try {
+      const userId = req.params.userId;
+      const user = await User.findById(userId)
+      const displayname = user.displayname;
+      const avatar = user.avatar;
+      return res.status(200).json({
+        displayname:displayname,
+        avatar:avatar
+      })
+    } catch (error) {
+      res.status(500).json(error)
+    }
+  },
+
+  // PUT /auth/user/detail/:userId
+  updateUserInfo: async (req,res)=>{
+    try {
+      const userId = req.params.userId;
+      const displayname = req.body.displayname;
+      const avatarURL = req.file.path;
+      console.log(avatarURL);
+      const user = await User.findById(userId);
+      if (user.avatar){
+        const URLparts = user.avatar.split('/');
+        const URLlastPart = URLparts[URLparts.length - 1].split('.')
+        const anotherURL = URLlastPart[0];
+        const publicId = URLparts[URLparts.length - 2] + '/' + anotherURL;
+        await v2.uploader.destroy(publicId,{resource_type:"raw"})
+      };
+
+      await user.updateOne({$set:{displayname:displayname,avatar:avatarURL}});
+      await Post.updateMany({author:userId},{authorname:displayname,avatar:avatarURL});
+      console.log(1);
+      await Comment.updateMany({author:userId},{authorname:displayname,avatar:avatarURL});
+      return res.status(200).json("Updated success!")
+    } catch (error) {
+      res.status(500).json(error)
     }
   } 
 };

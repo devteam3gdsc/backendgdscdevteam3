@@ -1,9 +1,7 @@
 import { Router } from "express";
 import authController from "../controllers/authcontroller.mjs";
 import authMidleware from "../middlewares/authMidleware.mjs";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
-import { v2 } from "cloudinary";
-import multer from "multer";
+
 
 const authRouter = Router();
 authRouter.post("/login", authController.login);

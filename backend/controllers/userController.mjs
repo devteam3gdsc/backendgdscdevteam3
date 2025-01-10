@@ -1,6 +1,7 @@
 import User from "../models/Users.mjs";
 import { v2 } from "cloudinary";
 import Comments from "../models/Comments.mjs";
+import bcrypt from "bcrypt";
 import Post from "../models/Posts.mjs";
 const userController = {
   // GET /user/publicInfo

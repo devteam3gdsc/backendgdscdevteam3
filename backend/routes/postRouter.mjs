@@ -42,8 +42,8 @@ postRouter.get(
   authMiddleware.verifyToken,
   postController.likePost
 );
-postRouter.get("/unlike/:postId", postController.unLikePost);
-postRouter.get("/detail/:postId", postController.detailPost);
+postRouter.get("/unlike/:postId",authMiddleware.verifyToken, postController.unLikePost);
+postRouter.get("/detail/:postId",authMiddleware.verifyToken, postController.detailPost);
 postRouter.delete(
   "/delete/:postId",
   authMiddleware.verifyToken,

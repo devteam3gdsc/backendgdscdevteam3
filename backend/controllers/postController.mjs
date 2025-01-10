@@ -5,7 +5,7 @@ import User from "../models/Users.mjs";
 import mongoose from "mongoose";
 import { v2 } from "cloudinary";
 const postController = {
-  //[GET] /me/:id?page=...&limit=...&search=...
+  //[GET] /me/:id?page=...&limit=...&search=...&type=...
   getUserPost: async (req, res) => {
     try {
       const page = parseInt(req.query.page) || 1;
@@ -17,9 +17,27 @@ const postController = {
       } else {
         var tags = [];
       }
-      const userId = new mongoose.Types.ObjectId(`${req.params.id}`);
-      const orders = req.body.orders || "descending";
-      const criteria = req.body.criteria || "date";
+      const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
+      const type = req.query.type||"all";
+      const order = req.query.order || "descending";
+      const criteria = req.query.criteria || "date";
+      switch (type){
+        case "all":{
+          var userIdForStore = userId; 
+          var userIdForAuthor = userId; 
+          break;
+        }
+        case "stored":{
+          var userIdForStore = userId; 
+          var userIdForAuthor = null; 
+          break;
+        }
+        case "me":{
+          var userIdForStore = null; 
+          var userIdForAuthor = userId; 
+          break;
+        }
+      }
       switch (criteria) {
         case "date": {
           var sortValue = "updatedAt";
@@ -34,7 +52,7 @@ const postController = {
           break;
         }
       }
-      switch (orders) {
+      switch (order) {
         case "descending": {
           var sortOrder = -1;
           break;
@@ -48,7 +66,7 @@ const postController = {
         {
           $match: {
             $and: [
-              { $or: [{ author: userId }, { stored: userId }] },
+              { $or: [{ author: userIdForAuthor }, { stored: userIdForStore }] },
               { title: { $regex: search, $options: "i" } },
             ],
           },
@@ -98,11 +116,13 @@ const postController = {
         : Data[0].countingPostsNoTags[0].totalPosts;
       const totalPages = Math.ceil(totalPosts / limit);
       const posts = tags[0] ? Data[0].postsWithTags : Data[0].posts;
+      const hasMore = (totalPages-page)?true:false
       res.status(200).json({
         posts,
         currentPage: page,
         totalPages,
         totalPosts,
+        hasMore
       });
     } catch (error) {
       res.status(500).json(error);
@@ -112,7 +132,6 @@ const postController = {
   createPost: async (req, res) => {
     try {
       const { title, content, visibility, stored } = req.body;
-      
       // Check if tags are passed and ensure it's a string before splitting
       let tags = [];
       if (req.body.tags) {
@@ -155,7 +174,10 @@ const postController = {
   
       // Lưu bài viết vào database
       await newPost.save();
-      return res.status(200).json("Post created successfully!");
+      return res.status(200).json({
+          message:"Post created successfully!",
+          postId:newPost._id
+      });
     } catch (error) {
       console.error("Error creating post:", error);
       res.status(500).json({ error: error.message });
@@ -164,7 +186,7 @@ const postController = {
   // /community?page=...&limit=...&search=...
   getCommunityPosts: async (req, res) => {
     try {
-      const userId = new mongoose.Types.ObjectId(`${req.body.userId}`);
+      const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
       const search = req.query.search || "";
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 5;
@@ -174,8 +196,8 @@ const postController = {
       } else {
         var tags = [];
       }
-      const orders = req.body.orders || "descending";
-      const criteria = req.body.criteria || "date";
+      const order = req.query.order || "descending";
+      const criteria = req.query.criteria || "date";
       switch (criteria) {
         case "date": {
           var sortValue = "updatedAt";
@@ -190,7 +212,7 @@ const postController = {
           break;
         }
       }
-      switch (orders) {
+      switch (order) {
         case "descending": {
           var sortOrder = -1;
           break;
@@ -254,11 +276,13 @@ const postController = {
         : Data[0].countingPostsNoTags[0].totalPosts;
       const totalPages = Math.ceil(totalPosts / limit);
       const posts = tags[0] ? Data[0].postsWithTags : Data[0].posts;
+      const hasMore = (totalPages-page)?true:false
       res.status(200).json({
         posts,
         currentPage: page,
         totalPages,
         totalPosts,
+        hasMore
       });
     } catch (error) {
       res.status(500).json(error);
@@ -366,7 +390,7 @@ const postController = {
       return res.status(500).json(error);
     }
   },
-  // /post/:postId
+  // /post/delete/:postId
   deletePost: async (req, res) => {
     try {
       const userId = req.user.id;

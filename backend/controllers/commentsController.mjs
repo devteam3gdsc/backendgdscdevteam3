@@ -23,7 +23,10 @@ const commentsController = {
       });
       await newComment.save();
       await Post.findByIdAndUpdate(postId, { $inc: { totalComments: 1 } });
-      return res.status(200).json("comment created successfully!");
+      return res.status(200).json({
+        message:"comment created successfully!",
+        commentId:newComment._id
+      });
     } catch (error) {
       res.status(500).json(error);
     }
@@ -68,19 +71,19 @@ const commentsController = {
     try {
       const postId = new mongoose.Types.ObjectId(req.params.postId);
       const userId = new mongoose.Types.ObjectId(req.user.id);
-      const orders = req.query.orders || "descending";
+      const order = req.query.order || "descending";
       const limit = parseInt(req.query.limit) || 5; // Số comment mỗi lần tải
       const lastCommentId = req.query.cursor; // Cursor để xác định vị trí
 
       // Định nghĩa thứ tự sắp xếp
-      const sortOrder = orders === "ascending" ? 1 : -1;
+      const sortOrder = order === "ascending" ? 1 : -1;
 
       // Điều kiện để lấy comment tiếp theo
       let matchCondition = { postId };
       if (lastCommentId) {
         const operator = sortOrder === 1 ? "$gt" : "$lt";
         matchCondition._id = {
-          [operator]: new mongoose.Types.ObjectId(lastCommentId),
+          [operator]: new mongoose.Types.ObjectId(`${lastCommentId}`),
         };
       }
 

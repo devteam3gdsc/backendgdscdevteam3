@@ -1,9 +1,10 @@
 import { Router } from "express";
 import postController from "../controllers/postController.mjs"
+import authMiddleware from "../middlewares/authMidleware.mjs";
 const pageRouter = Router();
 
 // postRouter.get("/",)
-pageRouter.get("/:id",postController.getUserPost);
-pageRouter.get("/",postController.getCommunityPosts)
+pageRouter.get("/me",authMiddleware.verifyToken,postController.getUserPost);
+pageRouter.get("/community",authMiddleware.verifyToken,postController.getCommunityPosts)
 
 export default pageRouter;

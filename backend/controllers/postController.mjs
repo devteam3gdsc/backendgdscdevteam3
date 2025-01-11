@@ -12,29 +12,29 @@ const postController = {
       const limit = parseInt(req.query.limit) || 5;
       const search = req.query.search || "";
       const skip = (page - 1) * limit;
-      if (req.body.tags) {
-        var tags = req.body.tags.split(",");
+      if (req.query.tags) {
+        var tags = req.query.tags.split(",");
       } else {
         var tags = [];
       }
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
-      const type = req.query.type||"all";
+      const type = req.query.type || "all";
       const order = req.query.order || "descending";
       const criteria = req.query.criteria || "date";
-      switch (type){
-        case "all":{
-          var userIdForStore = userId; 
-          var userIdForAuthor = userId; 
+      switch (type) {
+        case "all": {
+          var userIdForStore = userId;
+          var userIdForAuthor = userId;
           break;
         }
-        case "stored":{
-          var userIdForStore = userId; 
-          var userIdForAuthor = null; 
+        case "stored": {
+          var userIdForStore = userId;
+          var userIdForAuthor = null;
           break;
         }
-        case "me":{
-          var userIdForStore = null; 
-          var userIdForAuthor = userId; 
+        case "me": {
+          var userIdForStore = null;
+          var userIdForAuthor = userId;
           break;
         }
       }
@@ -66,7 +66,9 @@ const postController = {
         {
           $match: {
             $and: [
-              { $or: [{ author: userIdForAuthor }, { stored: userIdForStore }] },
+              {
+                $or: [{ author: userIdForAuthor }, { stored: userIdForStore }],
+              },
               { title: { $regex: search, $options: "i" } },
             ],
           },
@@ -109,20 +111,20 @@ const postController = {
         (!Data[0].countingPostsNoTags[0] && !tags[0]) ||
         (!Data[0].countingPostsWithTags[0] && tags[0])
       ) {
-        return res.status(500).json("Oops!There is no posts here!");
+        return res.status(200).json("Oops!There is no posts here!");
       }
       const totalPosts = tags[0]
         ? Data[0].countingPostsWithTags[0].totalPosts
         : Data[0].countingPostsNoTags[0].totalPosts;
       const totalPages = Math.ceil(totalPosts / limit);
       const posts = tags[0] ? Data[0].postsWithTags : Data[0].posts;
-      const hasMore = (totalPages-page)?true:false
+      const hasMore = totalPages - page ? true : false;
       res.status(200).json({
         posts,
         currentPage: page,
         totalPages,
         totalPosts,
-        hasMore
+        hasMore,
       });
     } catch (error) {
       res.status(500).json(error);
@@ -135,30 +137,32 @@ const postController = {
       // Check if tags are passed and ensure it's a string before splitting
       let tags = [];
       if (req.body.tags) {
-        if (typeof req.body.tags === 'string') {
+        if (typeof req.body.tags === "string") {
           tags = req.body.tags.split(","); // Split string into array of tags
         } else if (Array.isArray(req.body.tags)) {
           tags = req.body.tags; // If tags are already an array, use it directly
         }
       }
-  
+
       // Lấy thông tin user
       const userId = req.user.id;
       const user = await User.findById(userId);
       if (!user) {
         return res.status(500).json("Invalid user!");
       }
-  
+
       // Xử lý files từ req.files["code_files"]
       const codeFiles = req.files?.["code_files"] || [];
       const files = codeFiles.map((file) => ({
         fileUrl: file.path, // Đường dẫn file trên Cloudinary
         fileName: file.originalname, // Tên gốc của file
       }));
-  
+
       // Xử lý stored nếu có
-      const storedIds = (stored || []).map((id) => new mongoose.Types.ObjectId(id)); // Use 'new' here
-  
+      const storedIds = (stored || []).map(
+        (id) => new mongoose.Types.ObjectId(id)
+      ); // Use 'new' here
+
       // Tạo bài viết mới
       const newPost = new Post({
         title,
@@ -171,12 +175,12 @@ const postController = {
         files, // Lưu danh sách file vào post
         stored: storedIds,
       });
-  
+
       // Lưu bài viết vào database
       await newPost.save();
       return res.status(200).json({
-          message:"Post created successfully!",
-          postId:newPost._id
+        message: "Post created successfully!",
+        postId: newPost._id,
       });
     } catch (error) {
       console.error("Error creating post:", error);
@@ -276,13 +280,13 @@ const postController = {
         : Data[0].countingPostsNoTags[0].totalPosts;
       const totalPages = Math.ceil(totalPosts / limit);
       const posts = tags[0] ? Data[0].postsWithTags : Data[0].posts;
-      const hasMore = (totalPages-page)?true:false
+      const hasMore = totalPages - page ? true : false;
       res.status(200).json({
         posts,
         currentPage: page,
         totalPages,
         totalPosts,
-        hasMore
+        hasMore,
       });
     } catch (error) {
       res.status(500).json(error);

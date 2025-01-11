@@ -8,10 +8,10 @@ import { v2 } from "cloudinary";
 const app = express();
 
 const PORT = process.env.PORT;
-
+configDotenv();
 // CORS configuration: Set the origin to your frontend's URL
 const corsOptions = {
-  origin: "http://localhost:5174", // Set this to the exact frontend URL
+  origin: "http://localhost:5173", // Set this to the exact frontend URL
   methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
   allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
   credentials: true, // Allow cookies to be sent
@@ -29,7 +29,7 @@ connectDB();
 router(app);
 
 // Cloudinary configuration
-configDotenv();
+
 v2.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,

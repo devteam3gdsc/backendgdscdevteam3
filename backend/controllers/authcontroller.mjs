@@ -123,7 +123,7 @@ const authController = {
     try {
       // Lấy Refresh Token từ cookie
       const refreshToken = req.cookies.refreshToken;
-
+      console.log(req.headers);
       // Nếu không có Refresh Token, trả về lỗi
       if (!refreshToken) {
         return res.status(401).json("Refresh Token is required");
@@ -171,7 +171,7 @@ const authController = {
           //   sameSite: "None",
           //   // sameSite: "strict", // Đảm bảo cookie không bị gửi cross-site
           // });
-          res.cookie("refreshToken", refreshToken, {
+          res.cookie("refreshToken", newRefreshToken, {
             httpOnly: true, // Prevents JavaScript access
             secure: process.env.NODE_ENV === "production", // Use HTTPS in production
             //secure: true,

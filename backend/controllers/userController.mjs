@@ -25,7 +25,10 @@ const userController = {
       const userId = req.user.id;
       const user = await User.findById(userId);
       return res.status(200).json({
-        user,
+        displayname:user.displayname,
+        username:user.username,
+        avatar:user.avatar,
+        email:user.email
       });
     } catch (error) {
       res.status(500).json(error);

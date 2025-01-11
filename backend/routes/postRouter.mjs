@@ -33,7 +33,7 @@ postRouter.get(
   postController.storePost
 );
 postRouter.get(
-  "/unstore/:postId",
+  "/unstored/:postId",
   authMiddleware.verifyToken,
   postController.unStorePost
 );

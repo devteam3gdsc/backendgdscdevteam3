@@ -4,7 +4,6 @@ const authMiddleware = {
   verifyToken: async (req, res, next) => {
     try {
       const token = req.cookies.refreshToken;
-      console.log(1);
       if (token) {
         const secret = process.env.JWT_REFRESH_SECRET;
         const verified = jwt.verify(token, secret);

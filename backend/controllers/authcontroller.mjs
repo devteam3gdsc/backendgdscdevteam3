@@ -51,7 +51,7 @@ const authController = {
           const accessToken = jwt.sign(
             { id: existedUser.id },
             process.env.JWT_ACCESS_SECRET,
-            { expiresIn: "30s" }
+            { expiresIn: "3000s" }
           );
           const refreshToken = jwt.sign(
             { id: existedUser.id },
@@ -123,13 +123,12 @@ const authController = {
     try {
       // Lấy Refresh Token từ cookie
       const refreshToken = req.cookies.refreshToken;
-      console.log(req.headers);
       // Nếu không có Refresh Token, trả về lỗi
       if (!refreshToken) {
         return res.status(401).json("Refresh Token is required");
       }
       // Tìm người dùng có token này
-      const user = await User.findOne({ refreshTokens: refreshToken });
+      const user = await User.findOne({ refreshTokens: {$in:[refreshToken]} });
       if (!user) {
         return res.status(403).json("Invalid Refresh Token");
       }
@@ -175,7 +174,7 @@ const authController = {
             httpOnly: true, // Prevents JavaScript access
             secure: process.env.NODE_ENV === "production", // Use HTTPS in production
             //secure: true,
-            sameSite: "None",
+            sameSite: "NOne",
             path: "/", // Global path for cookies
             // sameSite: "strict", // Prevent CSRF attacks
             maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year in milliseconds

@@ -71,8 +71,8 @@ const commentsController = {
   //detail/:postId/comment
   getComments: async (req, res) => {
     try {
-      const postId = new mongoose.Types.ObjectId(req.params.postId);
-      const userId = new mongoose.Types.ObjectId(req.user.id);
+      const postId = new mongoose.Types.ObjectId(`${req.params.postId}`);
+      const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
       const order = req.query.order || "descending";
       const limit = parseInt(req.query.limit) || 5; // Số comment mỗi lần tải
       const lastCommentId = req.query.cursor; // Cursor để xác định vị trí

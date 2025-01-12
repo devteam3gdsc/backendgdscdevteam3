@@ -111,7 +111,10 @@ const postController = {
         (!Data[0].countingPostsNoTags[0] && !tags[0]) ||
         (!Data[0].countingPostsWithTags[0] && tags[0])
       ) {
-        return res.status(200).json("Oops!There is no posts here!");
+        return res.status(200).json({
+          posts: [],
+          hasMore: false,
+        });
       }
       const totalPosts = tags[0]
         ? Data[0].countingPostsWithTags[0].totalPosts
@@ -174,6 +177,7 @@ const postController = {
         visibility,
         files, // Lưu danh sách file vào post
         stored: storedIds,
+        editedAt: Date.now(),
       });
 
       // Lưu bài viết vào database
@@ -273,7 +277,10 @@ const postController = {
         (!Data[0].countingPostsNoTags[0] && !tags[0]) ||
         (!Data[0].countingPostsWithTags[0] && tags[0])
       ) {
-        return res.status(500).json("Oops!There is no posts here!");
+        return res.status(200).json({
+          posts: [],
+          hasMore: false,
+        });
       }
       const totalPosts = tags[0]
         ? Data[0].countingPostsWithTags[0].totalPosts
@@ -440,7 +447,14 @@ const postController = {
       });
       const post = await Post.updateOne(
         { author: userId, _id: postId },
-        { $set: { title: title, content: content, files: files } }
+        {
+          $set: {
+            title: title,
+            content: content,
+            files: files,
+            editedAt: Date.now(),
+          },
+        }
       );
       if (post.matchedCount === 0) {
         return res.status(403).json("You are not the author of the post");

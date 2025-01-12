@@ -176,7 +176,7 @@ const authController = {
             httpOnly: true, // Prevents JavaScript access
             secure: process.env.NODE_ENV === "production", // Use HTTPS in production
             secure: true,
-            sameSite: "NOne",
+            sameSite: "None",
             path: "/", // Global path for cookies
             // sameSite: "strict", // Prevent CSRF attacks
             maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year in milliseconds

@@ -38,7 +38,7 @@ const authController = {
       const existedUser = existedEmail || existedUsername;
 
       if (!existedUser) {
-        return res.status(400).json("Username or email is not existed");
+        return res.status(400).json("Username or email does not existed");
       } else {
         const passwordCheck = await bcrypt.compare(
           req.body.password,

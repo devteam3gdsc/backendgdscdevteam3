@@ -199,8 +199,8 @@ const postController = {
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 5;
       const skip = (page - 1) * limit;
-      if (req.body.tags) {
-        var tags = req.body.tags.split(",");
+      if (req.query.tags) {
+        var tags = req.query.tags.split(",");
       } else {
         var tags = [];
       }

@@ -25,10 +25,10 @@ const userController = {
       const userId = req.user.id;
       const user = await User.findById(userId);
       return res.status(200).json({
-        displayname:user.displayname,
-        username:user.username,
-        avatar:user.avatar,
-        email:user.email
+        displayname: user.displayname,
+        username: user.username,
+        avatar: user.avatar,
+        email: user.email,
       });
     } catch (error) {
       res.status(500).json(error);
@@ -40,10 +40,14 @@ const userController = {
     try {
       const userId = req.user.id;
       const { username, displayname, email } = req.body;
-      const avatarURL = req.file.path;
       const user = await User.findById(userId);
       const avatar = user.avatar;
-      if (avatar) {
+      const avatarURL = req.file ? req.file.path : avatar;
+      if (
+        avatar &&
+        avatar !=
+          "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
+      ) {
         const URLparts = avatar.split("/");
         const URLlastPart = URLparts[URLparts.length - 1].split(".");
         const anotherURL = URLlastPart[0];

@@ -76,7 +76,7 @@ const authController = {
             httpOnly: true, // Prevents JavaScript access
             secure: process.env.NODE_ENV === "production", // Use HTTPS in production
             path: "/", // Global path for cookies
-            // secure: true,
+            secure: true,
             sameSite: "None",
             maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year in milliseconds
           });
@@ -128,7 +128,9 @@ const authController = {
         return res.status(401).json("Refresh Token is required");
       }
       // Tìm người dùng có token này
-      const user = await User.findOne({ refreshTokens: {$in:[refreshToken]} });
+      const user = await User.findOne({
+        refreshTokens: { $in: [refreshToken] },
+      });
       if (!user) {
         return res.status(403).json("Invalid Refresh Token");
       }
@@ -173,7 +175,7 @@ const authController = {
           res.cookie("refreshToken", newRefreshToken, {
             httpOnly: true, // Prevents JavaScript access
             secure: process.env.NODE_ENV === "production", // Use HTTPS in production
-            //secure: true,
+            secure: true,
             sameSite: "NOne",
             path: "/", // Global path for cookies
             // sameSite: "strict", // Prevent CSRF attacks

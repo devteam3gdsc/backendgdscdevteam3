@@ -24,8 +24,8 @@ const commentsController = {
       await newComment.save();
       await Post.findByIdAndUpdate(postId, { $inc: { totalComments: 1 } });
       return res.status(200).json({
-        message:"comment created successfully!",
-        commentId:newComment._id
+        message: "comment created successfully!",
+        commentId: newComment._id,
       });
     } catch (error) {
       res.status(500).json(error);
@@ -41,10 +41,12 @@ const commentsController = {
         author: userId,
         _id: commentId,
       });
-      await Post.findByIdAndUpdate(postId, { $inc: { totalComments: -1 } });
       if (comment.deletedCount === 0) {
         return res.status(403).json("You are not the author of the comment");
-      } else return res.status(200).json("Comment delete successfully!");
+      } else {
+        await Post.findByIdAndUpdate(postId, { $inc: { totalComments: -1 } });
+        return res.status(200).json("Comment delete successfully!");
+      }
     } catch (error) {
       return res.status(500).json(error);
     }

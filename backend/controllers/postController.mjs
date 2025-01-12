@@ -118,7 +118,7 @@ const postController = {
         : Data[0].countingPostsNoTags[0].totalPosts;
       const totalPages = Math.ceil(totalPosts / limit);
       const posts = tags[0] ? Data[0].postsWithTags : Data[0].posts;
-      const hasMore = totalPages - page >0 ? true : false;
+      const hasMore = totalPages - page > 0 ? true : false;
       res.status(200).json({
         posts,
         currentPage: page,
@@ -160,7 +160,7 @@ const postController = {
 
       // Xử lý stored nếu có
       const storedIds = (stored || []).map(
-        (id) => new mongoose.Types.ObjectId(id)
+        (id) => new mongoose.Types.ObjectId(`${id}`)
       ); // Use 'new' here
 
       // Tạo bài viết mới

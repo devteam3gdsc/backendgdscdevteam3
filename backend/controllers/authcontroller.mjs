@@ -64,14 +64,6 @@ const authController = {
           existedUser.refreshTokens.push(refreshToken);
           await existedUser.save();
 
-          // Cài đặt Refresh Token vào cookie
-          // res.cookie("refreshToken", refreshToken, {
-          //   httpOnly: true,
-          //   secure: process.env.NODE_ENV === "production", // Đổi thành `true` khi dùng HTTPS
-          //   path: "/",
-          //   sameSite: "None",
-          //   //sameSite: "strict",
-          // });
           res.cookie("refreshToken", refreshToken, {
             httpOnly: true, // Prevents JavaScript access
             secure: process.env.NODE_ENV === "production", // Use HTTPS in production
@@ -164,14 +156,6 @@ const authController = {
           user.refreshTokens.push(newRefreshToken);
           await user.save();
 
-          //  Cập nhật Refresh Token mới vào cookie
-          // res.cookie("refreshToken", newRefreshToken, {
-          //   httpOnly: true, // Đảm bảo chỉ có thể truy cập qua HTTP
-          //   secure: process.env.NODE_ENV === "production", // Đặt thành true khi chạy trên HTTPS
-          //   path: "/",
-          //   sameSite: "None",
-          //   // sameSite: "strict", // Đảm bảo cookie không bị gửi cross-site
-          // });
           res.cookie("refreshToken", newRefreshToken, {
             httpOnly: true, // Prevents JavaScript access
             secure: process.env.NODE_ENV === "production", // Use HTTPS in production

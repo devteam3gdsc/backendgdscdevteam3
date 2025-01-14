@@ -52,22 +52,33 @@ const commentsController = {
     }
   },
   // /post/:postId/comment/edit/:commentId
-  editComment: async (req, res) => {
-    try {
-      const userId = req.user.id;
-      const commentId = req.params.commentId;
-      const { text, code } = req.body;
-      const comment = await Comments.updateOne(
-        { author: userId, _id: commentId },
-        { $set: { text: text, code: code } }
-      );
-      if (comment.matchedCount === 0) {
-        return res.status(403).json("You are not the author of the comment");
-      } else return res.status(200).json("Comment edited successfully!");
-    } catch (error) {
-      return res.status(500).json(error);
+ editComment: async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const commentId = req.params.commentId;
+    const { text, code } = req.body;
+    
+    const comment = await Comments.updateOne(
+      { author: userId, _id: commentId },
+      { 
+        $set: { 
+          text: text, 
+          code: code, 
+          createdAt: Date.now() // Thêm trường createdAt
+        }
+      }
+    );
+
+    if (comment.matchedCount === 0) {
+      return res.status(403).json("You are not the author of the comment");
+    } else {
+      return res.status(200).json("Comment edited successfully!");
     }
-  },
+  } catch (error) {
+    return res.status(500).json(error);
+  }
+},
+
   //detail/:postId/comment
   getComments: async (req, res) => {
     try {

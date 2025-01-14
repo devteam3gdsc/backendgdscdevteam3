@@ -5,13 +5,15 @@
   "main": "server.mjs",
   "scripts": {
     "start:dev": "nodemon server.mjs",
-    "start": "node server.mjs"
+    "start": "node server.mjs",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "keywords": [],
   "author": "Ives van Hoorne",
   "license": "MIT",
   "dependencies": {
     "@cloudinary/url-gen": "^1.21.0",
+    "@jest/globals": "^29.7.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "cloudinary": "^1.41.3",
@@ -20,6 +22,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "install": "^0.13.0",
+    "jest": "^29.7.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.8.4",
     "multer": "^1.4.5-lts.1",
@@ -27,5 +30,8 @@
     "nodemon": "^3.1.9",
     "npm": "^10.9.2"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "@shelf/jest-mongodb": "^4.3.2"
+  }
 }

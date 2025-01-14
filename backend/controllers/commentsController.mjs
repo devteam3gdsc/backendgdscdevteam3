@@ -24,8 +24,8 @@ const commentsController = {
       await newComment.save();
       await Post.findByIdAndUpdate(postId, { $inc: { totalComments: 1 } });
       return res.status(200).json({
-        message:"comment created successfully!",
-        commentId:newComment._id
+        message: "comment created successfully!",
+        commentId: newComment._id,
       });
     } catch (error) {
       res.status(500).json(error);
@@ -41,10 +41,12 @@ const commentsController = {
         author: userId,
         _id: commentId,
       });
-      await Post.findByIdAndUpdate(postId, { $inc: { totalComments: -1 } });
       if (comment.deletedCount === 0) {
         return res.status(403).json("You are not the author of the comment");
-      } else return res.status(200).json("Comment delete successfully!");
+      } else {
+        await Post.findByIdAndUpdate(postId, { $inc: { totalComments: -1 } });
+        return res.status(200).json("Comment delete successfully!");
+      }
     } catch (error) {
       return res.status(500).json(error);
     }
@@ -69,44 +71,50 @@ const commentsController = {
   //detail/:postId/comment
   getComments: async (req, res) => {
     try {
-      const postId = new mongoose.Types.ObjectId(req.params.postId);
-      const userId = new mongoose.Types.ObjectId(req.user.id);
-      const order = req.query.order || "descending";
-      const limit = parseInt(req.query.limit) || 5; // Số comment mỗi lần tải
-      const lastCommentId = req.query.cursor; // Cursor để xác định vị trí
+      const postId = new mongoose.Types.ObjectId(`${req.params.postId}`);
+      const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
 
+      const order = req.query.order || "descending";
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 5;
+      const skip = (page - 1) * limit;
       // Định nghĩa thứ tự sắp xếp
       const sortOrder = order === "ascending" ? 1 : -1;
-
       // Điều kiện để lấy comment tiếp theo
       let matchCondition = { postId };
-      if (lastCommentId) {
-        const operator = sortOrder === 1 ? "$gt" : "$lt";
-        matchCondition._id = {
-          [operator]: new mongoose.Types.ObjectId(`${lastCommentId}`),
-        };
-      }
-
       // Query với phân trang dựa trên cursor
-      const comments = await Comments.aggregate([
+      const Data = await Comments.aggregate([
         { $match: matchCondition },
-        { $sort: { _id: sortOrder } },
-        { $limit: limit },
+        { $sort: { editedAt: sortOrder } },
         {
-          $addFields: {
-            isAuthor: { $eq: ["$author", userId] },
+          $facet: {
+            comments: [
+              { $skip: skip },
+              { $limit: limit },
+              {
+                $addFields: {
+                  isAuthor: { $eq: ["$author", userId] },
+                },
+              },
+            ],
+            countingComments: [{ $count: "totalComments" }],
           },
         },
       ]);
-
-      // Xác định cursor cho lần gọi tiếp theo
-      const nextCursor =
-        comments.length > 0 ? comments[comments.length - 1]._id : null;
-
+      if (!Data[0].countingComments[0]) {
+        return res.status(200).json({
+          comments: [],
+          hasMore: false,
+        });
+      }
+      console.log(12);
+      const totalComments = Data[0].countingComments[0].totalComments;
+      const totalPages = Math.ceil(totalComments / limit);
+      const comments = Data[0].comments;
+      const hasMore = totalPages - page > 0 ? true : false;
       return res.status(200).json({
         comments,
-        nextCursor,
-        hasMore: comments.length === limit,
+        hasMore,
       });
     } catch (error) {
       return res.status(500).json(error);

@@ -21,11 +21,13 @@ const userSchema = new mongoose.Schema(
       required: true,
       minlength: 6,
     },
-    avatar:{
+    avatar: {
       type: String,
+      default:
+        "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541",
     },
-    displayname:{
-      type:String
+    displayname: {
+      type: String,
     },
     refreshTokens: { type: [String], default: [] },
     // admin: {

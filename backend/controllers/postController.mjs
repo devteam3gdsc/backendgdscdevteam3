@@ -111,14 +111,17 @@ const postController = {
         (!Data[0].countingPostsNoTags[0] && !tags[0]) ||
         (!Data[0].countingPostsWithTags[0] && tags[0])
       ) {
-        return res.status(200).json("Oops!There is no posts here!");
+        return res.status(200).json({
+          posts: [],
+          hasMore: false,
+        });
       }
       const totalPosts = tags[0]
         ? Data[0].countingPostsWithTags[0].totalPosts
         : Data[0].countingPostsNoTags[0].totalPosts;
       const totalPages = Math.ceil(totalPosts / limit);
       const posts = tags[0] ? Data[0].postsWithTags : Data[0].posts;
-      const hasMore = totalPages - page >0 ? true : false;
+      const hasMore = totalPages - page > 0 ? true : false;
       res.status(200).json({
         posts,
         currentPage: page,
@@ -160,7 +163,7 @@ const postController = {
 
       // Xử lý stored nếu có
       const storedIds = (stored || []).map(
-        (id) => new mongoose.Types.ObjectId(id)
+        (id) => new mongoose.Types.ObjectId(`${id}`)
       ); // Use 'new' here
 
       // Tạo bài viết mới
@@ -174,6 +177,7 @@ const postController = {
         visibility,
         files, // Lưu danh sách file vào post
         stored: storedIds,
+        editedAt: Date.now(),
       });
 
       // Lưu bài viết vào database
@@ -195,8 +199,8 @@ const postController = {
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 5;
       const skip = (page - 1) * limit;
-      if (req.body.tags) {
-        var tags = req.body.tags.split(",");
+      if (req.query.tags) {
+        var tags = req.query.tags.split(",");
       } else {
         var tags = [];
       }
@@ -273,7 +277,10 @@ const postController = {
         (!Data[0].countingPostsNoTags[0] && !tags[0]) ||
         (!Data[0].countingPostsWithTags[0] && tags[0])
       ) {
-        return res.status(500).json("Oops!There is no posts here!");
+        return res.status(200).json({
+          posts: [],
+          hasMore: false,
+        });
       }
       const totalPosts = tags[0]
         ? Data[0].countingPostsWithTags[0].totalPosts
@@ -440,7 +447,14 @@ const postController = {
       });
       const post = await Post.updateOne(
         { author: userId, _id: postId },
-        { $set: { title: title, content: content, files: files } }
+        {
+          $set: {
+            title: title,
+            content: content,
+            files: files,
+            editedAt: Date.now(),
+          },
+        }
       );
       if (post.matchedCount === 0) {
         return res.status(403).json("You are not the author of the post");

@@ -38,7 +38,7 @@ const authController = {
       const existedUser = existedEmail || existedUsername;
 
       if (!existedUser) {
-        return res.status(400).json("Username or email is not existed");
+        return res.status(400).json("Username or email does not existed");
       } else {
         const passwordCheck = await bcrypt.compare(
           req.body.password,
@@ -64,19 +64,11 @@ const authController = {
           existedUser.refreshTokens.push(refreshToken);
           await existedUser.save();
 
-          // Cài đặt Refresh Token vào cookie
-          // res.cookie("refreshToken", refreshToken, {
-          //   httpOnly: true,
-          //   secure: process.env.NODE_ENV === "production", // Đổi thành `true` khi dùng HTTPS
-          //   path: "/",
-          //   sameSite: "None",
-          //   //sameSite: "strict",
-          // });
           res.cookie("refreshToken", refreshToken, {
             httpOnly: true, // Prevents JavaScript access
             secure: process.env.NODE_ENV === "production", // Use HTTPS in production
             path: "/", // Global path for cookies
-            // secure: true,
+            secure: true,
             sameSite: "None",
             maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year in milliseconds
           });
@@ -128,7 +120,9 @@ const authController = {
         return res.status(401).json("Refresh Token is required");
       }
       // Tìm người dùng có token này
-      const user = await User.findOne({ refreshTokens: {$in:[refreshToken]} });
+      const user = await User.findOne({
+        refreshTokens: { $in: [refreshToken] },
+      });
       if (!user) {
         return res.status(403).json("Invalid Refresh Token");
       }
@@ -162,19 +156,11 @@ const authController = {
           user.refreshTokens.push(newRefreshToken);
           await user.save();
 
-          //  Cập nhật Refresh Token mới vào cookie
-          // res.cookie("refreshToken", newRefreshToken, {
-          //   httpOnly: true, // Đảm bảo chỉ có thể truy cập qua HTTP
-          //   secure: process.env.NODE_ENV === "production", // Đặt thành true khi chạy trên HTTPS
-          //   path: "/",
-          //   sameSite: "None",
-          //   // sameSite: "strict", // Đảm bảo cookie không bị gửi cross-site
-          // });
           res.cookie("refreshToken", newRefreshToken, {
             httpOnly: true, // Prevents JavaScript access
             secure: process.env.NODE_ENV === "production", // Use HTTPS in production
-            //secure: true,
-            sameSite: "NOne",
+            secure: true,
+            sameSite: "None",
             path: "/", // Global path for cookies
             // sameSite: "strict", // Prevent CSRF attacks
             maxAge: 365 * 24 * 60 * 60 * 1000, // 1 year in milliseconds

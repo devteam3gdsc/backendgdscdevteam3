@@ -10,11 +10,11 @@ const postSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: true,
+      // required: true,
     },
     content: {
       type: String,
-      required: true,
+      // required: true,
     },
     tags: [String],
     author: {
@@ -59,6 +59,10 @@ const postSchema = new mongoose.Schema(
     totalComments: {
       type: Number,
       default: 0,
+    },
+    editedAt: {
+      type: Date,
+      default: Date.now(),
     },
   },
   { timestamps: true }

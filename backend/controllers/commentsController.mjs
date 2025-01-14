@@ -96,9 +96,8 @@ const commentsController = {
                 },
               },
             ],
-            countingComments: [{ $count: "totalComments" }],
-          },
-        },
+            countingComments: [{ $count: "totalComments" }],}
+        }
       ]);
   
       if (!Data[0].countingComments[0].totalComments) {
@@ -113,6 +112,7 @@ const commentsController = {
       const hasMore = totalPages - page > 0 ? true : false;
       return res.status(200).json({
         comments,
+        hasMore,
         hasMore,
       });
     } catch (error) {

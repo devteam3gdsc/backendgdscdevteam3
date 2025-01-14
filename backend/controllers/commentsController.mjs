@@ -59,7 +59,7 @@ const commentsController = {
       const { text, code } = req.body;
       const comment = await Comments.updateOne(
         { author: userId, _id: commentId },
-        { $set: { text: text, code: code, editedAt:Date.now() } }
+        { $set: { text: text, code: code, editedAt: Date.now() } }
       );
       if (comment.matchedCount === 0) {
         return res.status(403).json("You are not the author of the comment");
@@ -96,11 +96,11 @@ const commentsController = {
                 },
               },
             ],
-            countingComments: [{ $count: "totalComments" }],}
-        }
+            countingComments: [{ $count: "totalComments" }],
+          },
+        },
       ]);
-  
-      if (!Data[0].countingComments[0].totalComments) {
+      if (!Data[0].countingComments[0]) {
         return res.status(200).json({
           comments: [],
           hasMore: false,

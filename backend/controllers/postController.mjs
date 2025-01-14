@@ -4,53 +4,66 @@ import Post from "../models/Posts.mjs";
 import User from "../models/Users.mjs";
 import mongoose from "mongoose";
 import { v2 } from "cloudinary";
+import { httpError } from "../utils/httpResponse.mjs";
 const postController = {
   //[GET] /me?page=...&limit=...&search=...&type=...
   getUserPost: async (req, res) => {
     try {
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 5;
-      const search = req.query.search || ""; 
+      const search = req.query.search || "";
       const skip = (page - 1) * limit;
-      const type = req.query.type ||"me";
+      const type = req.query.type || "me";
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
       let matchData = [];
-      if (type == "me"){
-        matchData.push({author:userId})
-      }
-      else matchData.push({stored:{$in:[userId]}});
-      if (req.query.tags){
+      if (type == "me") {
+        matchData.push({ author: userId });
+      } else matchData.push({ stored: { $in: [userId] } });
+      if (req.query.tags) {
         const tags = req.query.tags.split(",");
-        matchData.push({ tags: { $all: tags }});
+        matchData.push({ tags: { $all: tags } });
       }
-      if (search){
-        matchData.push({ title: { $regex: search, $options: "i" }})
+      if (search) {
+        matchData.push({ title: { $regex: search, $options: "i" } });
       }
-      const result = await postServices.getPosts(userId,{$and:[...matchData]},req.query.criteria,req.query.order,skip,limit)
+      const result = await postServices.getPosts(
+        userId,
+        { $and: [...matchData] },
+        req.query.criteria,
+        req.query.order,
+        skip,
+        limit
+      );
       const totalPages = Math.ceil(result.totalPosts / limit);
       const hasMore = totalPages - page > 0 ? true : false;
       res.status(200).json({
-        posts:result.posts,
+        posts: result.posts,
         currentPage: page,
         totalPages,
-        totalPosts:result.totalPosts,
+        totalPosts: result.totalPosts,
         hasMore,
       });
     } catch (error) {
-      if (error instanceof httpError) return res.status(error.statusCode).json(error.message)
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
       else return res.status(500).json(error);
     }
   },
   // /post/create
   createPost: async (req, res) => {
     try {
-      const newPostId = await postServices.createPost(req.user.id,req.body,req.files)
+      const newPostId = await postServices.createPost(
+        req.user.id,
+        req.body,
+        req.files
+      );
       return res.status(200).json({
         message: "Post created successfully!",
         postId: newPostId,
       });
     } catch (error) {
-      if (error instanceof httpError) return res.status(error.statusCode).json(error.message)
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
       else return res.status(500).json(error);
     }
   },
@@ -59,29 +72,37 @@ const postController = {
     try {
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 5;
-      const search = req.query.search || ""; 
+      const search = req.query.search || "";
       const skip = (page - 1) * limit;
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
-      let matchData = [{visibility:"public"}];
-      if (req.query.tags){
+      let matchData = [{ visibility: "public" }];
+      if (req.query.tags) {
         const tags = req.query.tags.split(",");
-        matchData.push({ tags: { $all: tags }});
+        matchData.push({ tags: { $all: tags } });
       }
-      if (search){
-        matchData.push({ title: { $regex: search, $options: "i" }})
+      if (search) {
+        matchData.push({ title: { $regex: search, $options: "i" } });
       }
-      const result = await postServices.getPosts(userId,{$and:[...matchData]},req.query.criteria,req.query.order,skip,limit)
+      const result = await postServices.getPosts(
+        userId,
+        { $and: [...matchData] },
+        req.query.criteria,
+        req.query.order,
+        skip,
+        limit
+      );
       const totalPages = Math.ceil(result.totalPosts / limit);
       const hasMore = totalPages - page > 0 ? true : false;
       res.status(200).json({
-        posts:result.posts,
+        posts: result.posts,
         currentPage: page,
         totalPages,
-        totalPosts:result.totalPosts,
+        totalPosts: result.totalPosts,
         hasMore,
       });
     } catch (error) {
-      if (error instanceof httpError) return res.status(error.statusCode).json(error.message)
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
       else return res.status(500).json(error);
     }
   },
@@ -93,7 +114,8 @@ const postController = {
       await Post.findByIdAndUpdate(postId, { $push: { stored: userId } });
       return res.status(200).json("saved!");
     } catch (error) {
-      if (error instanceof httpError) return res.status(error.statusCode).json(error.message)
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
       else return res.status(500).json(error);
     }
   },
@@ -117,7 +139,8 @@ const postController = {
         post,
       });
     } catch (error) {
-      if (error instanceof httpError) return res.status(error.statusCode).json(error.message)
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
       else return res.status(500).json(error);
     }
   },
@@ -158,7 +181,7 @@ const postController = {
       const userId = req.user.id;
       const postId = req.params.postId;
       const { title, content } = req.body;
-      const codeFiles = req.files["code_files"];
+      const codeFiles = req.files?.["code_files"] || [];
       const files = codeFiles.map((file) => {
         return {
           fileName: file.originalname,

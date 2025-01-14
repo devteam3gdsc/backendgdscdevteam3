@@ -3,7 +3,6 @@ import cors from "cors";
 import connectDB from "./backend/config/db.mjs";
 import cookieParser from "cookie-parser";
 import router from "./backend/routes/index.mjs";
-import express from 'express';
 import { configDotenv } from "dotenv";
 import { v2 } from "cloudinary";
 const app = express();

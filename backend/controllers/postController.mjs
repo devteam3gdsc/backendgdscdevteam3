@@ -5,6 +5,10 @@ import User from "../models/Users.mjs";
 import mongoose from "mongoose";
 import { v2 } from "cloudinary";
 import { httpError } from "../utils/httpResponse.mjs";
+import findDocument from "../utils/findDocument.mjs";
+import updateDocument from "../utils/updateDocument.mjs";
+import { fileDestroy, getFiles } from "../utils/filesHelper.mjs";
+import { edit } from "@cloudinary/url-gen/actions/animated";
 const postController = {
   //[GET] /me?page=...&limit=...&search=...&type=...
   getUserPost: async (req, res) => {
@@ -109,9 +113,7 @@ const postController = {
   storePost: async (req, res) => {
     //cần xem lại, nếu người đó là tác giả hay đã từng lưu?,làm cho ẩn đi khi gửi
     try {
-      const userId = req.user.id;
-      const postId = req.params.postId;
-      await Post.findByIdAndUpdate(postId, { $push: { stored: userId } });
+      await updateDocument(Post,1,[{_id:req.params.postId}], [{ $push: { stored: req.user.id} }]);
       return res.status(200).json("saved!");
     } catch (error) {
       if (error instanceof httpError)
@@ -149,30 +151,16 @@ const postController = {
     try {
       const userId = req.user.id;
       const postId = req.params.postId;
-      const post = await Post.findOne({ author: userId, _id: postId });
-      if (!post) {
-        return res.status(403).json("You are not the author of the post");
-      }
+      const post = await findDocument(Post,1,[{author:userId,_id:postId}],[])
       const urls = post.files;
-      const publicIds = urls.map((url) => {
-        const URLparts = url.fileUrl.split("/");
-        const URLlastPart = URLparts[URLparts.length - 1].split(".");
-        const anotherURL = URLlastPart[0];
-        const publicId = URLparts[URLparts.length - 2] + "/" + anotherURL;
-        return publicId;
-      });
-      for (const publicId of publicIds) {
-        try {
-          await v2.uploader.destroy(publicId, { resource_type: "raw" });
-        } catch (error) {
-          return res.status(500).json(error);
-        }
-      }
+      await fileDestroy(urls,"raw");
       await post.deleteOne();
       await Comments.deleteMany({ postId: postId });
       return res.status(200).json("Post delete successfully!");
     } catch (error) {
-      res.status(500).json(error);
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
     }
   },
   // /post/edit/:postId
@@ -180,69 +168,51 @@ const postController = {
     try {
       const userId = req.user.id;
       const postId = req.params.postId;
-      const { title, content } = req.body;
-      const codeFiles = req.files?.["code_files"] || [];
-      const files = codeFiles.map((file) => {
-        return {
-          fileName: file.originalname,
-          fileUrl: file.path,
-        };
-      });
-      const post = await Post.updateOne(
-        { author: userId, _id: postId },
-        {
-          $set: {
-            title: title,
-            content: content,
-            files: files,
-            editedAt: Date.now(),
-          },
-        }
-      );
-      if (post.matchedCount === 0) {
-        return res.status(403).json("You are not the author of the post");
-      } else return res.status(200).json("Post edited successfully!");
+      const result = await postServices.editPost(userId,postId,req.body,req.files);
+      return res.status(result.statusCode).json(result.message)
     } catch (error) {
-      return res.status(500).json(error);
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
     }
   },
   // /post/like/:postId
   likePost: async (req, res) => {
     try {
-      const userId = req.user.id;
-      const postId = req.params.postId;
-      await Post.findByIdAndUpdate(postId, {
-        $addToSet: { likes: userId },
+      await updateDocument(Post,1,[{_id:req.params.postId}], [{
+        $addToSet: { likes:req.user.id},
         $inc: { totalLikes: 1 },
-      });
+      }]);
       return res.status(200).json("liked!");
     } catch (error) {
-      return res.status(500).json(error);
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
     }
   },
   // /post/unlike/:postId
   unLikePost: async (req, res) => {
     try {
-      const userId = req.user.id;
-      const postId = req.params.postId;
-      await Post.findByIdAndUpdate(postId, {
-        $pull: { likes: userId },
+      await updateDocument(Post,1,[{_id:req.params.postId}], [{
+        $pull: { likes: req.user.id },
         $inc: { totalLikes: -1 },
-      });
+      }]);
       return res.status(200).json("unliked!");
     } catch (error) {
-      return res.status(500).json(error);
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
     }
   },
   // /post/unstore/:postId
   unStorePost: async (req, res) => {
     try {
-      const userId = req.user.id;
-      const postId = req.params.postId;
-      await Post.findByIdAndUpdate(postId, { $pull: { stored: userId } });
+      await updateDocument(Post,1,[{_id:req.params.postId}], [{ $pull: { stored: req.user.id } }]);
       return res.status(200).json("unstored!");
     } catch (error) {
-      return res.status(500).json(error);
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
     }
   },
 };

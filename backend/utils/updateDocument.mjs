@@ -14,11 +14,8 @@ const updateDocument = async (model,amount,[...criterias],[...updates])=>{
         Object.assign(updatesNeeded,i);
     };
     let result;
-    console.log(filterData)
     if (amount > 1){
-        console.log(2)
         result = await model.updateMany(filterData,updatesNeeded).exec();
-        console.log(result)
     }
     else {
         result = await model.updateOne(filterData,updatesNeeded).exec();

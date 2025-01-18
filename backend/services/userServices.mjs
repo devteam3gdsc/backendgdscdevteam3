@@ -28,7 +28,6 @@ const userServices = {
   ) => {
     try {
       const user = await findDocument(User, 1, [{ _id: userId }], []);
-      console.log(user);
       const avatar = user.avatar;
       const avatarURL = avatarFile ? avatarFile.path : avatar;
       if (

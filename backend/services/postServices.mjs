@@ -1,8 +1,10 @@
 import Post from "../models/Posts.mjs";
 import User from "../models/Users.mjs";
 import findDocument from "../utils/findDocument.mjs";
-import { httpError } from "../utils/httpResponse.mjs";
-import { getFiles } from "../utils/filesHelper.mjs";
+import { httpError, httpResponse } from "../utils/httpResponse.mjs";
+import { fileDestroy, getFiles } from "../utils/filesHelper.mjs";
+import { edit } from "@cloudinary/url-gen/actions/animated";
+import updateDocument from "../utils/updateDocument.mjs";
 const postServices = {
   getPosts: async (
     userId,
@@ -105,6 +107,40 @@ const postServices = {
       return newPost._id;
     } catch (error) {
       throw new httpError(`creating post service error: ${error}`, 500);
+    }
+  },
+  editPost: async (userId,postId, { ...data }, reqfiles) => {
+    try {
+      let tags = [];
+      if (data.tags) {
+        if (typeof data.tags === "string") {
+          tags = data.tags.split(","); // Split string into array of tags
+        } else if (Array.isArray(data.tags)) {
+          tags = data.tags; // If tags are already an array, use it directly
+        }
+      }
+      const {files} = await findDocument(
+        Post,
+        1,
+        [{ author: userId,_id:postId }],
+        [{files:1,_id:0}]
+      );
+      const files_urls = files.map((file)=>file.fileUrl);
+      await fileDestroy(files_urls,"raw");
+      const code_files = getFiles(reqfiles, "code_files");
+      await updateDocument(Post,1,[{_id:postId,author:userId}],[{$set:{
+        ...data,
+        tags,
+        author: userId,
+        files:code_files, // Lưu danh sách file vào post
+        editedAt: Date.now(),
+      }}]).catch((error) => {
+        throw new httpError(`editing post failed: ${error}`, 500);
+      });
+      console.log(1);
+      return new httpResponse("edit post successfully",200);
+    } catch (error) {
+      throw new httpError(`editing post service error: ${error}`, 500);
     }
   },
 };

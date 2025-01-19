@@ -3,6 +3,7 @@ import findDocument from "../utils/findDocument.mjs";
 import userServices from "../services/userServices.mjs";
 import {httpError} from "../utils/httpResponse.mjs"
 const userController = {
+  //[GET] /user/publicInfo
   getUserPublicInfo: async (req, res) => {
     try {
       const result = await findDocument(User,1,[{_id:req.user.id}],[{_id:0,displayname:1,avatar:1,}]);
@@ -12,6 +13,7 @@ const userController = {
       else return res.status(500).json(error);
     }
   },
+  //[GET] /user/fullInfo
   getUserFullInfo: async (req, res) => {
     try {
       const result = await findDocument(User,1,[{_id:req.user.id}],[{_id:0,displayname:1,email:1,avatar:1,username:1}]);
@@ -21,6 +23,7 @@ const userController = {
       else return res.status(500).json(error);
     }
   },
+  //[PUT] /user/updateFull
   updateFullUserInfo: async (req, res) => {
     try {
       const userId = req.user.id;
@@ -31,6 +34,7 @@ const userController = {
       else return res.status(500).json(error);
     }
   },
+  //[PUT] /user/updatePassword
   updateUserPassword: async (req, res) => {
     try {
       const userId = req.user.id;

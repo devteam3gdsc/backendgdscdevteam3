@@ -53,7 +53,7 @@ const postController = {
       else return res.status(500).json(error);
     }
   },
-  // /post/create
+  //[POST] /post/create
   createPost: async (req, res) => {
     try {
       const newPostId = await postServices.createPost(
@@ -71,7 +71,7 @@ const postController = {
       else return res.status(500).json(error);
     }
   },
-  // /community?page=...&limit=...&search=...
+  //[GET] /community?page=...&limit=...&search=...
   getCommunityPosts: async (req, res) => {
     try {
       const page = parseInt(req.query.page) || 1;
@@ -110,6 +110,7 @@ const postController = {
       else return res.status(500).json(error);
     }
   },
+  //[GET] /post/store/:postId
   storePost: async (req, res) => {
     //cần xem lại, nếu người đó là tác giả hay đã từng lưu?,làm cho ẩn đi khi gửi
     try {
@@ -121,7 +122,7 @@ const postController = {
       else return res.status(500).json(error);
     }
   },
-  //detail/:postId
+  //[GET] /post/detail/:postId
   detailPost: async (req, res) => {
     //thieu gioi han comment
     try {
@@ -176,7 +177,7 @@ const postController = {
       else return res.status(500).json(error);
     }
   },
-  // /post/like/:postId
+  //[GET] /post/like/:postId
   likePost: async (req, res) => {
     try {
       await updateDocument(Post,1,[{_id:req.params.postId}], [{
@@ -190,7 +191,7 @@ const postController = {
       else return res.status(500).json(error);
     }
   },
-  // /post/unlike/:postId
+  //[GET] /post/unlike/:postId
   unLikePost: async (req, res) => {
     try {
       await updateDocument(Post,1,[{_id:req.params.postId}], [{
@@ -204,7 +205,7 @@ const postController = {
       else return res.status(500).json(error);
     }
   },
-  // /post/unstore/:postId
+  //[GET] /post/unstored/:postId
   unStorePost: async (req, res) => {
     try {
       await updateDocument(Post,1,[{_id:req.params.postId}], [{ $pull: { stored: req.user.id } }]);

@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import Post from "../models/Posts.mjs";
 import User from "../models/Users.mjs";
 const commentsController = {
-  // /post/:postId/comment/create
+  //[POST] /post/:postId/comment/create
   createComment: async (req, res) => {
     try {
       const { text, code } = req.body;
@@ -31,7 +31,7 @@ const commentsController = {
       res.status(500).json(error);
     }
   },
-  // /post/:postId/comment/delete/:commentId
+  //[DELETE] /post/:postId/comment/delete/:commentId
   deleteComment: async (req, res) => {
     try {
       const userId = req.user.id;
@@ -51,7 +51,7 @@ const commentsController = {
       return res.status(500).json(error);
     }
   },
-  // /post/:postId/comment/edit/:commentId
+  //[PUT] /post/:postId/comment/edit/:commentId
   editComment: async (req, res) => {
     try {
       const userId = req.user.id;
@@ -68,7 +68,7 @@ const commentsController = {
       return res.status(500).json(error);
     }
   },
-  //detail/:postId/comment
+  //[GET] /post/detail/:postId/comment
   getComments: async (req, res) => {
     try {
       const postId = new mongoose.Types.ObjectId(`${req.params.postId}`);

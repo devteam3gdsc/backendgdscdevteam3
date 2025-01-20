@@ -53,6 +53,7 @@ const postController = {
       else return res.status(500).json(error);
     }
   },
+  
   //[POST] /post/create
   createPost: async (req, res) => {
     try {

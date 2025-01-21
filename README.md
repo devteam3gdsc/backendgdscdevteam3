@@ -251,6 +251,116 @@ https://backendgdscdevteam3.onrender.com/post/6786b1df20d6160de991e269/comment/e
 
 
 
+//NOTIFICATION 
+// [POST] /notification/comment/:commentId
+// [POST] /notification/like/:postId
+http://localhost:4000/notification/like/6786b1df20d6160de991e269
+{
+    "userId": "6786b1c520d6160de991e264",
+    "senderId": "678e1b282517777299fbc019",
+    "type": "like",
+    "message": "678e1b282517777299fbc019 liked your post.",
+    "relatedEntityId": "6786b1df20d6160de991e269",
+    "entityType": "Post",
+    "isRead": false,
+    "extraData": null,
+    "_id": "678e1c77dfab7903559fa3ec",
+    "createdAt": "2025-01-20T09:50:47.955Z",
+    "__v": 0
+}
+
+// [GET] /notification/
+http://localhost:4000/notification
+{
+    "notifications": [
+        {
+            "_id": "678e26163b439fe3ec3666b5",
+            "userId": "678e1b282517777299fbc019",
+            "senderId": "678e1b282517777299fbc019",
+            "type": "comments",
+            "message": "678e1b282517777299fbc019 commented on your post.",
+            "relatedEntityId": "678e230f7924e5732ca33d95",
+            "entityType": "Comments",
+            "isRead": false,
+            "extraData": null,
+            "createdAt": "2025-01-20T10:31:50.592Z",
+            "__v": 0
+        },
+        {
+            "_id": "678e25ff9c975695e3cf205c",
+            "userId": "678e1b282517777299fbc019",
+            "senderId": "678e1b282517777299fbc019",
+            "type": "comments",
+            "message": "678e1b282517777299fbc019 commented on your post.",
+            "relatedEntityId": "678e230f7924e5732ca33d95",
+            "entityType": "Comments",
+            "isRead": false,
+            "extraData": null,
+            "createdAt": "2025-01-20T10:31:27.189Z",
+            "__v": 0
+        },
+        {
+            "_id": "678e25e19f86dbfe950e788b",
+            "userId": "678e1b282517777299fbc019",
+            "senderId": "678e1b282517777299fbc019",
+            "type": "comments",
+            "message": "678e1b282517777299fbc019 commented on your post.",
+            "relatedEntityId": "678e230f7924e5732ca33d95",
+            "entityType": "Comments",
+            "isRead": false,
+            "extraData": null,
+            "createdAt": "2025-01-20T10:30:57.303Z",
+            "__v": 0
+        }
+    ],
+    "currentPage": 1,
+    "totalPages": 1,
+    "totalNotifications": 3,
+    "hasMore": false
+}
+
+http://localhost:4000/notification?page=1&limit=5&filter=unread
+http://localhost:4000/notification?page=1&limit=5&filter=read
+
+
+// [DELETE] /notification/:notificationId/delete 
+http://localhost:4000/notification/678e26163b439fe3ec3666b5/delete
+
+
+// [POST] /notification/read
+http://localhost:4000/notification/read
+
+// [GET] /notification/:notificationId/detail
+http://localhost:4000/notification/678e2f279a4af19bbae50a81/detail
+{
+    "_id": "678e2f279a4af19bbae50a81",
+    "userId": "678e1b282517777299fbc019",
+    "senderId": "678e1b282517777299fbc019",
+    "type": "comments",
+    "message": "678e1b282517777299fbc019 commented on your post.",
+    "relatedEntityId": "678e230f7924e5732ca33d95",
+    "entityType": "Comments",
+    "isRead": false,
+    "extraData": null,
+    "createdAt": "2025-01-20T11:10:31.753Z",
+    "__v": 0
+}
+
+// [POST] /notification/:notificationId/read
+http://localhost:4000/notification/678e2f279a4af19bbae50a81/read
+{
+    "_id": "678e2f279a4af19bbae50a81",
+    "userId": "678e1b282517777299fbc019",
+    "senderId": "678e1b282517777299fbc019",
+    "type": "comments",
+    "message": "678e1b282517777299fbc019 commented on your post.",
+    "relatedEntityId": "678e230f7924e5732ca33d95",
+    "entityType": "Comments",
+    "isRead": true,
+    "extraData": null,
+    "createdAt": "2025-01-20T11:10:31.753Z",
+    "__v": 0
+}
 
 
 

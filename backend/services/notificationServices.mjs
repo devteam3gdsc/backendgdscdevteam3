@@ -34,7 +34,7 @@ const NotificationServices = {
         userId: postOwnerId,
         senderId,
         type: "like",
-        message: `${senderId} liked your post.`,
+        message:  `${senderId} liked your post ${postId}`,
         relatedEntityId: postId,
         entityType: "Post",
       });
@@ -182,6 +182,7 @@ const NotificationServices = {
         throw new httpError(`Failed to mark notification as read: ${error.message}`, 500);
       }
     },
+
     markAllNotificationsAsRead: async (userId) => {
       try {
         if (!mongoose.Types.ObjectId.isValid(userId)) {

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Socket.IO Test</title>
+  <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+</head>
+<body>
+  <h1>Socket.IO Test</h1>
+  <p id="status">Not connected</p>
+  <button id="sendNotification">Send Notification</button>
+
+  <script>
+    const socket = io("http://localhost:4000");
+
+    // Khi kết nối thành công
+    socket.on("connect", () => {
+      document.getElementById("status").innerText = `Connected as ${socket.id}`;
+      console.log(`Connected to server with ID: ${socket.id}`);
+
+      // Gửi userId đến server
+      socket.emit("userConnected", "user123");
+    });
+
+    // Khi nhận thông báo từ server
+    socket.on("notificationEvent", (data) => {
+      alert(`Notification received: ${data.message}`);
+    });
+
+    // Ngắt kết nối
+    socket.on("disconnect", () => {
+      document.getElementById("status").innerText = "Disconnected";
+      console.log("Disconnected from server");
+    });
+
+    // Test gửi sự kiện từ client
+    document.getElementById("sendNotification").addEventListener("click", () => {
+      socket.emit("sendNotification", { userId: "user123", message: "Hello from client!" });
+    });
+  </script>
+</body>
+</html>

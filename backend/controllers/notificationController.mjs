@@ -43,42 +43,7 @@ const notificationController = {
             else return res.status(500).json(error); 
         }
     },
-
-    //[GET] /
-    // getUserNotifications : async (req, res) => {
-    //     try {
-    //       const page = parseInt(req.query.page) || 1;
-    //       const limit = parseInt(req.query.limit) || 5;
-    //       const skip = (page - 1) * limit;
     
-    //       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
-    
-    //       const result = await notificationServices.getNotificationsByUserId(
-    //         userId,
-    //         skip,
-    //         limit
-    //       );
-    
-    //       const totalPages = Math.ceil(result.totalNotifications / limit);
-    //       const hasMore = totalPages - page > 0;
-    
-    //       res.status(200).json({
-    //         notifications: result.notifications,
-    //         currentPage: page,
-    //         totalPages,
-    //         totalNotifications: result.totalNotifications,
-    //         hasMore,
-    //       });
-    //     } catch (error) {
-    //       if (error instanceof httpError)
-    //         return res.status(error.statusCode).json(error.message);
-    //       else return res.status(500).json(error);
-    //     }
-    //   },
-
-   // [GET] /notifications?filter=unread&page=1&limit=5
-   //?filter=read
-   //?filter=all
    // [GET] /notification/
    getUserNotifications: async (req, res) => {
     try {

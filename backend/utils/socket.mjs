@@ -1,21 +1,37 @@
 import { Server } from "socket.io";
+import tokensAndCookies from "../utils/tokensAndCookies.mjs";
+import { httpError } from "../utils/httpResponse.mjs";
 
 export const onlineUsers = new Map();
-let io; // Declare io variable
+let io;
 
 export const initializeSocket = (httpServer) => {
   io = new Server(httpServer, {
     cors: {
-      origin: "https://sks564-5173.csb.app",
+      origin: "http://127.0.0.1:5500",
       methods: ["GET", "POST", "PUT", "DELETE"],
       allowedHeaders: ["Content-Type", "Authorization"],
       credentials: true,
     },
   });
 
+  io.use((socket, next) => {
+    const token = socket.handshake.headers.authorization?.split(" ")[1]; // Get token from headers
+    if (token) {
+      try {
+        const verified = tokensAndCookies.accessTokenDecoding(token); // Xác thực token
+        socket.user = verified;  // Lưu thông tin người dùng vào socket
+        next();
+      } catch (error) {
+        return next(new Error("Unauthorized"));
+      }
+    } else {
+      return next(new Error("Unauthorized"));
+    }
+  });
+
   io.on("connection", (socket) => {
     console.log(`New socket connection established: ${socket.id}`);
-
     socket.on("userConnected", (userId) => {
       if (!userId) {
         console.error("userId is required for userConnected event");
@@ -45,5 +61,4 @@ export const initializeSocket = (httpServer) => {
   return io;
 };
 
-// Export io and onlineUsers
 export { io };

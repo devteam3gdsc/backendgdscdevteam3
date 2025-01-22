@@ -33,6 +33,7 @@
   },
   "type": "module",
   "devDependencies": {
-    "@shelf/jest-mongodb": "^4.3.2"
+    "@shelf/jest-mongodb": "^4.3.2",
+    "prettier": "3.4.2"
   }
 }

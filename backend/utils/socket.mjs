@@ -58,6 +58,11 @@ export const initializeSocket = (httpServer) => {
     });
   });
 
+  // socket.on("sendNotification", (data) => {
+  //   console.log(`Notification received from user ${data.userId}: ${data.message}`);
+  //   // Phát thông báo lại cho tất cả client
+  //   io.emit("notificationEvent", { message: `Broadcast: ${data.message}` });
+  // });
   return io;
 };
 

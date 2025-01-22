@@ -11,7 +11,7 @@ const PORT = process.env.PORT;
 configDotenv();
 // CORS configuration: Set the origin to your frontend's URL
 const corsOptions = {
-  origin: "https://sks564-5174.csb.app", // Set this to the exact frontend URL
+  origin: "https://qnyn3q-5173.csb.app", // Set this to the exact frontend URL
   methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
   allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
   credentials: true, // Allow cookies to be sent

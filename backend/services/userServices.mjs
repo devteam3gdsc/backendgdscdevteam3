@@ -55,6 +55,7 @@ const userServices = {
         throw new httpError(`updateFullUserInfo service error:${error}`, 500);
     }
   },
+  
   signUpUser: async ({ ...data }) => {
     try {
       const { username, password, email } = data;

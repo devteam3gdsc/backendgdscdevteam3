@@ -63,7 +63,7 @@ const authController = {
         user.resetPasswordToken = resetToken;//hashedToken;
         user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15' 
         await user.save();
-        const resetLink = `https://backendgdscdevteam3.onrender.com/auth/passwordNew/${resetToken}`;
+        const resetLink = `${process.env.FE_URL}/auth/passwordNew/${resetToken}`;
         await sendEmail(
             user.email,
              "Reset Your Password",

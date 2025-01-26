@@ -54,7 +54,6 @@ const authController = {
 
   forgotPassword : async (req, res) => {
     try {
-      console.log(1)
         const { email } = req.body;
         const user = await User.findOne({ email });
         if(!user || user.id !== req.user.id) return res.status(404).json({ message:"User not found!" });
@@ -64,7 +63,7 @@ const authController = {
         user.resetPasswordToken = resetToken;//hashedToken;
         user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15' 
         await user.save();
-        const resetLink = `http://localhost:${process.env.PORT}/auth/reset-password/${resetToken}`;
+        const resetLink = `${process.env.FE_URL}/auth/passwordNew/${resetToken}`;
         await sendEmail(
             user.email,
              "Reset Your Password",

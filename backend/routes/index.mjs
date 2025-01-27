@@ -1,3 +1,4 @@
+import authMiddleware from "../middlewares/authMidleware.mjs";
 import authRouter from "./auth.mjs";
 import pageRouter from "./pageRouter.mjs";
 import postRouter from "./postRouter.mjs";

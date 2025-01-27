@@ -13,20 +13,23 @@ const updateDocument = async (model,amount,[...criterias],[...updates])=>{
     for ( let i of updates){
         Object.assign(updatesNeeded,i);
     };
+    console.log(updatesNeeded);
     let result;
     if (amount > 1){
         result = await model.updateMany(filterData,updatesNeeded).exec();
     }
     else {
-        result = await model.updateOne(filterData,updatesNeeded).exec();
+        result = await model.updateOne(filterData,updatesNeeded);
     }
+    console.log(result)
     if (result.matchedCount === 0){
-        throw new httpError(`${model} not found!`,404)
+        throw new httpError(`document not found!`,404)
     }
     else return result;
     } 
     catch (error) {
-     throw new httpError(`updateDocument services error: ${error[0]}`,500)
+    if (error instanceof httpError) throw error
+    else throw new httpError(`updateDocument services error: ${error[0]}`,500)
     }
 }
 export default updateDocument;

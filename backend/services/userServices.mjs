@@ -10,7 +10,7 @@ import { fileDestroy } from "../utils/filesHelper.mjs";
 const userServices = {
   updateUserPassword: async (userId, oldPassword, newPassword) => {
     try {
-      const user = await findDocument(User, 1, [{ _id: userId }], []);
+      const user = await findDocument(User, { _id: userId },{});
       if (await authServices.passwordCheck(oldPassword, user.password)) {
         const hashed = await authServices.createHashedPassword(newPassword);
         await user.updateOne({ $set: { password: hashed } });
@@ -24,10 +24,10 @@ const userServices = {
   updateUserFullInfo: async (
     userId,
     avatarFile,
-    { displayname, ...updatedData }
+    { displayname,totalLikes,totalComments,totalFollowing,totalFollowers,totalPosts, ...updatedData }
   ) => {
     try {
-      const user = await findDocument(User, 1, [{ _id: userId }], []);
+      const user = await findDocument(User,{ _id: userId},{});
       const avatar = user.avatar;
       const avatarURL = avatarFile ? avatarFile.path : avatar;
       if (

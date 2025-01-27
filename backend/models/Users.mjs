@@ -1,5 +1,13 @@
 import mongoose from "mongoose";
-
+const contactLinksSchema = new mongoose.Schema(
+  {
+    facebook: { type: String },
+    youtube:  { type: String },
+    github:   { type: String },
+    email:    { type: String }
+  },
+  { _id: false }
+);
 const userSchema = new mongoose.Schema(
   {
     username: {
@@ -29,6 +37,7 @@ const userSchema = new mongoose.Schema(
     displayname: {
       type: String,
     },
+    refreshTokens: { type: [String], default: [] },
     totalLikes:{
       type:Number,
       default:0
@@ -58,7 +67,6 @@ const userSchema = new mongoose.Schema(
       type:Number,
       default:0
     },
-    refreshTokens: { type: [String], default: [] },
     resetPasswordToken: { type: String},
     resetPasswordExpires: { type: Date},
   },

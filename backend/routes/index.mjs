@@ -1,3 +1,4 @@
+import authMiddleware from "../middlewares/authMidleware.mjs";
 import authRouter from "./auth.mjs";
 import pageRouter from "./pageRouter.mjs";
 import postRouter from "./postRouter.mjs";
@@ -7,5 +8,6 @@ function router(app) {
   app.use("",pageRouter);
   app.use("/post",postRouter);
   app.use("/user",userRouter);
+  // app.use("/following",authMiddleware.verifyToken,post)
 }
 export default router;

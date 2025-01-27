@@ -15,6 +15,7 @@ const postServices = {
     limit
   ) => {
     try {
+      console.log(matchData);
       const order = orders || "descending";
       const criteria = criterias || "date";
       switch (criteria) {
@@ -88,9 +89,8 @@ const postServices = {
       }
       const userData = await findDocument(
         User,
-        1,
-        [{ _id: userId }],
-        [{ avatar: 1, displayname: 1 }]
+        { _id: userId },
+        { avatar: 1, displayname: 1 }
       );
       const files = getFiles(reqfiles, "code_files");
       const newPost = await Post.create({
@@ -121,9 +121,8 @@ const postServices = {
       }
       const {files} = await findDocument(
         Post,
-        1,
-        [{ author: userId,_id:postId }],
-        [{files:1,_id:0}]
+        { author: userId,_id:postId },
+        {files:1,_id:0}
       );
       const files_urls = files.map((file)=>file.fileUrl);
       await fileDestroy(files_urls,"raw");
@@ -137,7 +136,6 @@ const postServices = {
       }}]).catch((error) => {
         throw new httpError(`editing post failed: ${error}`, 500);
       });
-      console.log(1);
       return new httpResponse("edit post successfully",200);
     } catch (error) {
       throw new httpError(`editing post service error: ${error}`, 500);

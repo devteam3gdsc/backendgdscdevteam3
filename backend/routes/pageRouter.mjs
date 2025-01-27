@@ -10,5 +10,6 @@ pageRouter.get(
   authMiddleware.verifyToken,
   postController.getCommunityPosts
 );
+pageRouter.get("/following", authMiddleware.verifyToken,postController.getFollowedPost)
 
 export default pageRouter;

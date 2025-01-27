@@ -251,6 +251,22 @@ https://backendgdscdevteam3.onrender.com/post/6786b1df20d6160de991e269/comment/e
 
 
 
+*****AFTER MVP:
+
+//[PUT]: /post/setState/:postId?state=... "public/private"
+https://backendgdscdevteam3.onrender.com/post/setState/6786b1df20d6160de991e269?state=public
+
+//[GET]: /user/:userId/posts
+
+//[GET]: /user/:userId/follow
+
+//[GET]: /user/:userId/unfollow
+
+//[GET]: /post/halfDetail/:postId
+
+//[GET]: /following
+
+
 
 
 

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import User from "./Users.mjs";
 const fileSchema = new mongoose.Schema(
   {
     fileUrl: { type: String },
@@ -10,10 +11,12 @@ const postSchema = new mongoose.Schema(
   {
     title: {
       type: String,
+      default:""
       // required: true,
     },
     content: {
       type: String,
+      default:""
       // required: true,
     },
     tags: [String],
@@ -49,13 +52,11 @@ const postSchema = new mongoose.Schema(
       enum: ["public", "private"],
       default: "public",
     },
-    stored: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        default: [],
-      },
-    ],
+    stored: [{
+      type: mongoose.Types.ObjectId,
+      ref:"User",
+      default: []
+    }],
     totalComments: {
       type: Number,
       default: 0,

@@ -23,6 +23,8 @@ const commentsController = {
       });
       await newComment.save();
       await Post.findByIdAndUpdate(postId, { $inc: { totalComments: 1 } });
+      const author = await Post.findById(postId,{author:1});
+      await User.findByIdAndUpdate(author, { $inc: { totalComments: 1 } })
       return res.status(200).json({
         message: "comment created successfully!",
         commentId: newComment._id,

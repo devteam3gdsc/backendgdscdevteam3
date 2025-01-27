@@ -53,7 +53,7 @@ const userSchema = new mongoose.Schema(
     following:[{
       type:mongoose.Types.ObjectId,
       ref:"User",
-      default:[]      
+      default:[]
     }],
     totalFollowing:{
       type:Number,

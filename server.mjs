@@ -11,7 +11,7 @@ const PORT = process.env.PORT;
 configDotenv();
 // CORS configuration: Set the origin to your frontend's URL
 const corsOptions = {
-  origin: "http://localhost:4000", // Set this to the exact frontend URL
+  origin: `${process.env.FE_URL}`, // Set this to the exact frontend URL
   methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
   allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
   credentials: true, // Allow cookies to be sent

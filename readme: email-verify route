@@ -360,6 +360,28 @@ http://localhost:4000/notification/678e2f279a4af19bbae50a81/read
 
 
 
+//EMAIL-VERIFY
+
+// [POST] /auth/passwordReset
+
+http://localhost:4000/auth/forgot-password
+{
+    "email": "ngovietthanhbinh2006@gmail.com"
+}
+{
+    "message": "Email sent successfully"
+}
+
+// [POST] /auth/passwordNew/:token
+
+http://localhost:4000/auth/passwordReset/82ca52b4c5f82b3b7b60015f69c84458be8c9eff
+{
+    "newPassword": "hi hi hi"
+}
+
+{
+    "message": "Password reset successfully"
+}
 
 
 

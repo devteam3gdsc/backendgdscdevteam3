@@ -8,6 +8,6 @@ function router(app) {
   app.use("",pageRouter);
   app.use("/post",postRouter);
   app.use("/user",userRouter);
-  // app.use("/following",authMiddleware.verifyToken,post)
+
 }
 export default router;

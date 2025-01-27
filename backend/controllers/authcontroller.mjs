@@ -52,6 +52,7 @@ const authController = {
       else return res.status(500).json(error);
   }},
 
+  // [POST] /auth/passwordReset
   forgotPassword : async (req, res) => {
     try {
         const { email } = req.body;
@@ -75,6 +76,7 @@ const authController = {
     }
 },
 
+// [POST] /auth/passwordNew/:token
 resetPassword : async (req, res) => {
 try {
     const { token } = req.params;

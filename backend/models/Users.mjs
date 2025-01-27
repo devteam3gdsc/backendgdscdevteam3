@@ -29,6 +29,35 @@ const userSchema = new mongoose.Schema(
     displayname: {
       type: String,
     },
+    totalLikes:{
+      type:Number,
+      default:0
+    },
+    totalComments:{
+      type:Number,
+      default:0
+    },
+    totalFollowers:{
+      type:Number,
+      default:0
+    },
+    following:[{
+      type:mongoose.Types.ObjectId,
+      ref:"User",
+      default:[]
+    }],
+    totalFollowing:{
+      type:Number,
+      default:0
+    },
+    story:{
+      type:String
+    },
+    contactLinks:contactLinksSchema,
+    totalPosts:{
+      type:Number,
+      default:0
+    },
     refreshTokens: { type: [String], default: [] },
     resetPasswordToken: { type: String},
     resetPasswordExpires: { type: Date},

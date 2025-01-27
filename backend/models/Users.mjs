@@ -69,14 +69,10 @@ const userSchema = new mongoose.Schema(
     },
     resetPasswordToken: { type: String},
     resetPasswordExpires: { type: Date},
-    // admin: {
-    //   type: Boolean,
-    //   default: false,
-    // },
-    // refreshTokens: { type: [String], default: [] },
   },
   { timestamps: true }
 );
+
 
 const User = mongoose.model("Users", userSchema);
 export default User;

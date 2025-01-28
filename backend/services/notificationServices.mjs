@@ -23,6 +23,8 @@ const NotificationServices = {
       throw new httpError("Failed to create notification", 500);
     }
   },
+// display name
+// avatar
 
   createLikeNotification: async ({ postId, senderId }) => {
     try {
@@ -30,11 +32,15 @@ const NotificationServices = {
       if (!post) throw new httpError("Post not found", 404);
 
       const postOwnerId = post.author;
+
+      const senderUser = await User.findById(senderId);
+
       const notification = new Notification({
         userId: postOwnerId,
-        senderId,
+        senderName: senderUser.displayname,
+        avatar: senderUser.avatar,
         type: "like",
-        message:  `${senderId} liked your post ${postId}`,
+        message:  `liked your post`,
         relatedEntityId: postId,
         entityType: "Post",
       });
@@ -65,11 +71,14 @@ const NotificationServices = {
 
       const postOwnerId = post.author;
 
+      const senderUser = await User.findById(senderId);
+
       const notification = new Notification({
         userId: postOwnerId,
-        senderId,
+        senderName: senderUser.displayname,
+        avatar: senderUser.avatar,
         type: "comments",
-        message: `${senderId} commented on your post.`,
+        message: `commented on your post.`,
         relatedEntityId: commentId,
         entityType: "Comments",
       });

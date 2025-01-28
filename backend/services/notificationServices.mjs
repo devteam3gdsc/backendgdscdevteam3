@@ -37,8 +37,9 @@ const NotificationServices = {
 
       const notification = new Notification({
         userId: postOwnerId,
+        senderId,
         senderName: senderUser.displayname,
-        avatar: senderUser.avatar,
+        senderAvatar: senderUser.avatar,
         type: "like",
         message:  `liked your post`,
         relatedEntityId: postId,
@@ -75,8 +76,9 @@ const NotificationServices = {
 
       const notification = new Notification({
         userId: postOwnerId,
+        senderId,
         senderName: senderUser.displayname,
-        avatar: senderUser.avatar,
+        senderAvatar: senderUser.avatar,
         type: "comments",
         message: `commented on your post.`,
         relatedEntityId: commentId,

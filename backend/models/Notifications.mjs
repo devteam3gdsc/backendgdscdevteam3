@@ -10,6 +10,12 @@ const notificationSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "User", // Người tạo ra hành động, ví dụ: người like, comment
     },
+    senderName: {
+      type: String,
+    },
+    senderAvatar: {
+      type: String,
+    },
     type: {
       type: String,
       required: true, // Loại thông báo: like, comment, follow, message, system, etc.

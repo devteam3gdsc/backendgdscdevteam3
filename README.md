@@ -251,9 +251,143 @@ https://backendgdscdevteam3.onrender.com/post/6786b1df20d6160de991e269/comment/e
 
 
 
+*****AFTER MVP:
+
+//[PUT]: /post/setState/:postId?state=... "public/private"
+https://backendgdscdevteam3.onrender.com/post/setState/6786b1df20d6160de991e269?state=public
+
+//[GET]: /user/posts/:userId
+http://localhost:4000/user/posts/67969873ecbc4d64613ffb1d
+{
+    "posts": [
+        {
+            "_id": "679698beecbc4d64613ffb27",
+            "title": "imtest",
+            "tags": [],
+            "author": "67969873ecbc4d64613ffb1d",
+            "authorname": "imtest",
+            "avatar": "https://res.cloudinary.com/devteam3-gdsc/image/upload/v1737924020/User_avatar_files/vxnhwx2kfayl2xrs8mv1.png",
+            "likes": [],
+            "totalLikes": 0,
+            "files": [
+                {
+                    "fileUrl": "https://res.cloudinary.com/devteam3-gdsc/raw/upload/v1737924832/User_code_files/rg6keq8ebd9b1zzomxuo",
+                    "fileName": "1726.js"
+                }
+            ],
+            "visibility": "public",
+            "stored": [],
+            "totalComments": 0,
+            "editedAt": "2025-01-26T20:53:53.055Z",
+            "createdAt": "2025-01-26T20:19:10.163Z",
+            "updatedAt": "2025-01-26T20:53:53.056Z",
+            "__v": 0,
+            "Stored": false,
+            "Liked": false,
+            "isAuthor": false
+        },
+        {
+            "_id": "679698b5ecbc4d64613ffb23",
+            "title": "dffff",
+            "tags": [],
+            "author": "67969873ecbc4d64613ffb1d",
+            "authorname": "imtest",
+            "avatar": "https://res.cloudinary.com/devteam3-gdsc/image/upload/v1737924020/User_avatar_files/vxnhwx2kfayl2xrs8mv1.png",
+            "likes": [],
+            "totalLikes": 0,
+            "files": [],
+            "visibility": "public",
+            "stored": [],
+            "totalComments": 0,
+            "editedAt": "2025-01-26T20:19:01.568Z",
+            "createdAt": "2025-01-26T20:19:01.570Z",
+            "updatedAt": "2025-01-26T20:40:21.117Z",
+            "__v": 0,
+            "Stored": false,
+            "Liked": false,
+            "isAuthor": false
+        }
+    ],
+    "currentPage": 1,
+    "totalPages": 1,
+    "totalPosts": 2,
+    "hasMore": false
+}
+
+//[GET]: /user/:userId/follow
+
+//[GET]: /user/:userId/unfollow
+
+//[GET]: /post/halfDetail/:postId
+http://localhost:4000/post/halfDetail/6786b1e720d6160de991e26c
+{
+    "title": "sadfs",
+    "content": "bbb",
+    "authorname": "aaa",
+    "avatar": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
+}
+
+//[GET]: /following
+http://localhost:4000/following
+{
+    "posts": [
+        {
+            "_id": "679698beecbc4d64613ffb27",
+            "title": "imtest",
+            "tags": [],
+            "author": "67969873ecbc4d64613ffb1d",
+            "authorname": "imtest",
+            "avatar": "https://res.cloudinary.com/devteam3-gdsc/image/upload/v1737924020/User_avatar_files/vxnhwx2kfayl2xrs8mv1.png",
+            "likes": [],
+            "totalLikes": 0,
+            "files": [
+                {
+                    "fileUrl": "https://res.cloudinary.com/devteam3-gdsc/raw/upload/v1737924832/User_code_files/rg6keq8ebd9b1zzomxuo",
+                    "fileName": "1726.js"
+                }
+            ],
+            "visibility": "public",
+            "stored": [],
+            "totalComments": 0,
+            "editedAt": "2025-01-26T20:53:53.055Z",
+            "createdAt": "2025-01-26T20:19:10.163Z",
+            "updatedAt": "2025-01-26T20:53:53.056Z",
+            "__v": 0,
+            "Stored": false,
+            "Liked": false,
+            "isAuthor": false
+        },
+        {
+            "_id": "679698b5ecbc4d64613ffb23",
+            "title": "dffff",
+            "tags": [],
+            "author": "67969873ecbc4d64613ffb1d",
+            "authorname": "imtest",
+            "avatar": "https://res.cloudinary.com/devteam3-gdsc/image/upload/v1737924020/User_avatar_files/vxnhwx2kfayl2xrs8mv1.png",
+            "likes": [],
+            "totalLikes": 0,
+            "files": [],
+            "visibility": "public",
+            "stored": [],
+            "totalComments": 0,
+            "editedAt": "2025-01-26T20:19:01.568Z",
+            "createdAt": "2025-01-26T20:19:01.570Z",
+            "updatedAt": "2025-01-26T20:40:21.117Z",
+            "__v": 0,
+            "Stored": false,
+            "Liked": false,
+            "isAuthor": false
+        }
+    ],
+    "currentPage": 1,
+    "totalPages": 1,
+    "totalPosts": 2,
+    "hasMore": false
+}
+
+
 //NOTIFICATION 
-// [POST] /notification/comment/:commentId
-// [POST] /notification/like/:postId
+
 http://localhost:4000/notification/like/6786b1df20d6160de991e269
 {
     "userId": "6786b1c520d6160de991e264",
@@ -269,7 +403,6 @@ http://localhost:4000/notification/like/6786b1df20d6160de991e269
     "__v": 0
 }
 
-// [GET] /notification/
 http://localhost:4000/notification
 {
     "notifications": [
@@ -322,15 +455,12 @@ http://localhost:4000/notification
 http://localhost:4000/notification?page=1&limit=5&filter=unread
 http://localhost:4000/notification?page=1&limit=5&filter=read
 
-
-// [DELETE] /notification/:notificationId/delete 
 http://localhost:4000/notification/678e26163b439fe3ec3666b5/delete
 
-
-// [POST] /notification/read
 http://localhost:4000/notification/read
 
-// [GET] /notification/:notificationId/detail
+http://localhost:4000/notification/comment/678e230f7924e5732ca33d95
+
 http://localhost:4000/notification/678e2f279a4af19bbae50a81/detail
 {
     "_id": "678e2f279a4af19bbae50a81",
@@ -346,7 +476,7 @@ http://localhost:4000/notification/678e2f279a4af19bbae50a81/detail
     "__v": 0
 }
 
-// [POST] /notification/:notificationId/read
+
 http://localhost:4000/notification/678e2f279a4af19bbae50a81/read
 {
     "_id": "678e2f279a4af19bbae50a81",
@@ -364,8 +494,28 @@ http://localhost:4000/notification/678e2f279a4af19bbae50a81/read
 
 
 
+//EMAIL-VERIFY
 
+// [POST] /auth/passwordReset
 
+http://localhost:4000/auth/forgot-password
+{
+    "email": "ngovietthanhbinh2006@gmail.com"
+}
+{
+    "message": "Email sent successfully"
+}
+
+// [POST] /auth/passwordNew/:token
+
+http://localhost:4000/auth/passwordReset/82ca52b4c5f82b3b7b60015f69c84458be8c9eff
+{
+    "newPassword": "hi hi hi"
+}
+
+{
+    "message": "Password reset successfully"
+}
 
 
 

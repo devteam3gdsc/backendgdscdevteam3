@@ -20,10 +20,10 @@ const io = initializeSocket(httpServer); // Call the function
 
 // CORS configuration
 const corsOptions = {
-  origin: "https://sks564-5173.csb.app",
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true,
+  origin: `${process.env.FE_URL}`, // Set this to the exact frontend URL
+  methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
+  allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
+  credentials: true, // Allow cookies to be sent
 };
 
 app.use(cors(corsOptions));

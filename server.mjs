@@ -5,11 +5,20 @@ import cookieParser from "cookie-parser";
 import router from "./backend/routes/index.mjs";
 import { configDotenv } from "dotenv";
 import { v2 } from "cloudinary";
-const app = express();
+import { createServer } from "http";
+import { initializeSocket } from "./backend/utils/socket.mjs"; // Import the function
 
+const app = express();
 const PORT = process.env.PORT;
 configDotenv();
-// CORS configuration: Set the origin to your frontend's URL
+
+// HTTP server
+const httpServer = createServer(app);
+
+// Initialize Socket.IO
+const io = initializeSocket(httpServer); // Call the function
+
+// CORS configuration
 const corsOptions = {
   origin: `${process.env.FE_URL}`, // Set this to the exact frontend URL
   methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
@@ -17,9 +26,7 @@ const corsOptions = {
   credentials: true, // Allow cookies to be sent
 };
 
-// Use the CORS middleware with the above configuration
 app.use(cors(corsOptions));
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -29,14 +36,13 @@ connectDB();
 router(app);
 
 // Cloudinary configuration
-
 v2.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
   api_secret: process.env.API_SECRET,
 });
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`);
+// Start the HTTP server
+httpServer.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });

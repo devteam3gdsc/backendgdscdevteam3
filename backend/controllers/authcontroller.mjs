@@ -66,13 +66,9 @@ const authController = {
         const resetLink = `${process.env.FE_URL}/pass-new/${resetToken}`;
         await sendEmail(
           user.email,
-          "Reset Your Password",
-          `
-          <p>Click the link below to reset your password:</p>
-          <a href="${resetLink}" style="color: blue; text-decoration: underline;">Reset Your Password</a>
-          <p>If you did not request this, please ignore this email.</p>
-          `
-      );      
+           "Reset Your Password",
+           `Click the link to reset your password: ${resetLink}`
+      );   
         return res.status(200).json({ message: "Email sent successfully" });
     } catch(error) {
         return res.status(500).json({ message: "Something went wrong", error });

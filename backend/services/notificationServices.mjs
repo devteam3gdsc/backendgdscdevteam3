@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import { httpError } from "../utils/httpResponse.mjs";
 import Post from "../models/Posts.mjs";
 import Comments from "../models/Comments.mjs";
+import User from "../models/Users.mjs";
 import { io, onlineUsers } from "../utils/socket.mjs"
 
 const NotificationServices = {

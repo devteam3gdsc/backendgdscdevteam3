@@ -516,3 +516,14 @@ http://localhost:4000/auth/passwordReset/82ca52b4c5f82b3b7b60015f69c84458be8c9ef
 {
     "message": "Password reset successfully"
 }
+
+
+
+
+
+
+
+
+
+
+

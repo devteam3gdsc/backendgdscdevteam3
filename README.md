@@ -251,6 +251,140 @@ https://backendgdscdevteam3.onrender.com/post/6786b1df20d6160de991e269/comment/e
 
 
 
+*****AFTER MVP:
+
+//[PUT]: /post/setState/:postId?state=... "public/private"
+https://backendgdscdevteam3.onrender.com/post/setState/6786b1df20d6160de991e269?state=public
+
+//[GET]: /user/posts/:userId
+http://localhost:4000/user/posts/67969873ecbc4d64613ffb1d
+{
+    "posts": [
+        {
+            "_id": "679698beecbc4d64613ffb27",
+            "title": "imtest",
+            "tags": [],
+            "author": "67969873ecbc4d64613ffb1d",
+            "authorname": "imtest",
+            "avatar": "https://res.cloudinary.com/devteam3-gdsc/image/upload/v1737924020/User_avatar_files/vxnhwx2kfayl2xrs8mv1.png",
+            "likes": [],
+            "totalLikes": 0,
+            "files": [
+                {
+                    "fileUrl": "https://res.cloudinary.com/devteam3-gdsc/raw/upload/v1737924832/User_code_files/rg6keq8ebd9b1zzomxuo",
+                    "fileName": "1726.js"
+                }
+            ],
+            "visibility": "public",
+            "stored": [],
+            "totalComments": 0,
+            "editedAt": "2025-01-26T20:53:53.055Z",
+            "createdAt": "2025-01-26T20:19:10.163Z",
+            "updatedAt": "2025-01-26T20:53:53.056Z",
+            "__v": 0,
+            "Stored": false,
+            "Liked": false,
+            "isAuthor": false
+        },
+        {
+            "_id": "679698b5ecbc4d64613ffb23",
+            "title": "dffff",
+            "tags": [],
+            "author": "67969873ecbc4d64613ffb1d",
+            "authorname": "imtest",
+            "avatar": "https://res.cloudinary.com/devteam3-gdsc/image/upload/v1737924020/User_avatar_files/vxnhwx2kfayl2xrs8mv1.png",
+            "likes": [],
+            "totalLikes": 0,
+            "files": [],
+            "visibility": "public",
+            "stored": [],
+            "totalComments": 0,
+            "editedAt": "2025-01-26T20:19:01.568Z",
+            "createdAt": "2025-01-26T20:19:01.570Z",
+            "updatedAt": "2025-01-26T20:40:21.117Z",
+            "__v": 0,
+            "Stored": false,
+            "Liked": false,
+            "isAuthor": false
+        }
+    ],
+    "currentPage": 1,
+    "totalPages": 1,
+    "totalPosts": 2,
+    "hasMore": false
+}
+
+//[GET]: /user/:userId/follow
+
+//[GET]: /user/:userId/unfollow
+
+//[GET]: /post/halfDetail/:postId
+http://localhost:4000/post/halfDetail/6786b1e720d6160de991e26c
+{
+    "title": "sadfs",
+    "content": "bbb",
+    "authorname": "aaa",
+    "avatar": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
+}
+
+//[GET]: /following
+http://localhost:4000/following
+{
+    "posts": [
+        {
+            "_id": "679698beecbc4d64613ffb27",
+            "title": "imtest",
+            "tags": [],
+            "author": "67969873ecbc4d64613ffb1d",
+            "authorname": "imtest",
+            "avatar": "https://res.cloudinary.com/devteam3-gdsc/image/upload/v1737924020/User_avatar_files/vxnhwx2kfayl2xrs8mv1.png",
+            "likes": [],
+            "totalLikes": 0,
+            "files": [
+                {
+                    "fileUrl": "https://res.cloudinary.com/devteam3-gdsc/raw/upload/v1737924832/User_code_files/rg6keq8ebd9b1zzomxuo",
+                    "fileName": "1726.js"
+                }
+            ],
+            "visibility": "public",
+            "stored": [],
+            "totalComments": 0,
+            "editedAt": "2025-01-26T20:53:53.055Z",
+            "createdAt": "2025-01-26T20:19:10.163Z",
+            "updatedAt": "2025-01-26T20:53:53.056Z",
+            "__v": 0,
+            "Stored": false,
+            "Liked": false,
+            "isAuthor": false
+        },
+        {
+            "_id": "679698b5ecbc4d64613ffb23",
+            "title": "dffff",
+            "tags": [],
+            "author": "67969873ecbc4d64613ffb1d",
+            "authorname": "imtest",
+            "avatar": "https://res.cloudinary.com/devteam3-gdsc/image/upload/v1737924020/User_avatar_files/vxnhwx2kfayl2xrs8mv1.png",
+            "likes": [],
+            "totalLikes": 0,
+            "files": [],
+            "visibility": "public",
+            "stored": [],
+            "totalComments": 0,
+            "editedAt": "2025-01-26T20:19:01.568Z",
+            "createdAt": "2025-01-26T20:19:01.570Z",
+            "updatedAt": "2025-01-26T20:40:21.117Z",
+            "__v": 0,
+            "Stored": false,
+            "Liked": false,
+            "isAuthor": false
+        }
+    ],
+    "currentPage": 1,
+    "totalPages": 1,
+    "totalPosts": 2,
+    "hasMore": false
+}
+
 
 //NOTIFICATION 
 

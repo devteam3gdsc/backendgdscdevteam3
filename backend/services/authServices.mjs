@@ -66,7 +66,7 @@ const authServices = {
       const newAccessToken = tokensAndCookies.createNewAccessToken(userId);
       const newRefreshToken = tokensAndCookies.createNewRefreshToken(userId);
       let userRefreshTokens = (
-        await findDocument(User, 1, [{ _id: userId }], [{ refreshTokens: 1 }])
+        await findDocument(User, { _id: userId }, {refreshTokens: 1, _id:0})
       ).refreshTokens;
       userRefreshTokens = userRefreshTokens.filter(
         (token) => token !== refreshToken

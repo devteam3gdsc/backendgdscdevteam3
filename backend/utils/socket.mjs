@@ -56,20 +56,20 @@ export const initializeSocket = (httpServer) => {
         console.log(`Socket ID ${socket.id} disconnected, but no user was associated`);
       }
     });
-  });
-  socket.on("getNotifications", async (userId) => {
-    if (!userId) {
-      console.error("userId is required for getNotifications event");
-      return;
-    }
+    socket.on("getNotifications", async (userId) => {
+      if (!userId) {
+        console.error("userId is required for getNotifications event");
+        return;
+      }
+      
+      console.log(`User ${userId} requested notifications`);
     
-    console.log(`User ${userId} requested notifications`);
-  
-    const notifications = await Notification.find({ userId }).sort({ createdAt: -1 }).limit(10);
-    
-    socket.emit("notifications", notifications);
+      const notifications = await Notification.find({ userId }).sort({ createdAt: -1 }).limit(10);
+      
+      socket.emit("notifications", notifications);
+    });
   });
-  
+ 
   return io;
 };
 

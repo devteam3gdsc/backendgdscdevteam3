@@ -57,12 +57,19 @@ export const initializeSocket = (httpServer) => {
       }
     });
   });
-
-  // socket.on("sendNotification", (data) => {
-  //   console.log(`Notification received from user ${data.userId}: ${data.message}`);
-  //   // Phát thông báo lại cho tất cả client
-  //   io.emit("notificationEvent", { message: `Broadcast: ${data.message}` });
-  // });
+  socket.on("getNotifications", async (userId) => {
+    if (!userId) {
+      console.error("userId is required for getNotifications event");
+      return;
+    }
+    
+    console.log(`User ${userId} requested notifications`);
+  
+    const notifications = await Notification.find({ userId }).sort({ createdAt: -1 }).limit(10);
+    
+    socket.emit("notifications", notifications);
+  });
+  
   return io;
 };
 

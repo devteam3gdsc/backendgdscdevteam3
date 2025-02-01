@@ -20,6 +20,24 @@ const authMiddleware = {
       else return res.status(500).json(error);
     }
   },
+  verifySocketToken : (socket, next) => {
+    try {
+      let token = null;
+      if(socket.handshake.query?.token) {
+        token = socket.handshake.query.token;
+      }
+
+      if(!token) {
+        return next(new Error("Unauthorized: No token provided!"));
+      }
+
+      const verified = tokensAndCookies.accessTokenDecoding(token);
+      socket.user = verified;
+      next();
+    } catch (error) {
+      return next(new Error("Unauthorized: Invalid Token"));
+    }
+  },
 };
 
 export default authMiddleware;

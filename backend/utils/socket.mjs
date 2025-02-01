@@ -1,34 +1,21 @@
 import { Server } from "socket.io";
 import tokensAndCookies from "../utils/tokensAndCookies.mjs";
 import { httpError } from "../utils/httpResponse.mjs";
-
+import authMiddleware from "../middlewares/authMidleware.mjs";
 export const onlineUsers = new Map();
 let io;
 
 export const initializeSocket = (httpServer) => {
   io = new Server(httpServer, {
     cors: {
-      origin: `${process.env.FE_URL}`,
+      origin:  "*",//`${process.env.FE_URL}`,
       methods: ["GET", "POST", "PUT", "DELETE"],
       allowedHeaders: ["Content-Type", "Authorization"],
       credentials: true,
     },
   });
 
-  io.use((socket, next) => {
-    const token = socket.handshake.headers.authorization?.split(" ")[1]; // Get token from headers
-    if (token) {
-      try {
-        const verified = tokensAndCookies.accessTokenDecoding(token); // Xác thực token
-        socket.user = verified;  // Lưu thông tin người dùng vào socket
-        next();
-      } catch (error) {
-        return next(new Error("Unauthorized"));
-      }
-    } else {
-      return next(new Error("Unauthorized"));
-    }
-  });
+  io.use(authMiddleware.verifySocketToken);
 
   io.on("connection", (socket) => {
     console.log(`New socket connection established: ${socket.id}`);

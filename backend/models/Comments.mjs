@@ -11,15 +11,22 @@ const commentSchema = new mongoose.Schema(
       ref: "User",
       require: true,
     },
-    postId: {
+    hostId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Post",
-      require: true,
+      require: true
     },
     editedAt: {
       type: Date,
       default: Date.now(),
     },
+    totalComments:{
+      type:Number,
+      default: 0
+    },
+    totalLikes:{
+      type:Number,
+      default: 0
+    }
     // authorname: String
   },
   { timestamps: true }

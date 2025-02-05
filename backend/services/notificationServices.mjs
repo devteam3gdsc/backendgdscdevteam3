@@ -105,52 +105,37 @@ const NotificationServices = {
     }
   },
 
-  getNotificationsByUserId: async (
-    userId,
-    skip = 0,
-    limit = 10,
-    filter = "all"
-  ) => {
+  getNotificationsByUserId: async (userId, skip = 0, limit = 10, filter = "all") => {
     try {
-      // Ensure userId is valid and convert it to an ObjectId
       if (!mongoose.Types.ObjectId.isValid(userId)) {
         throw new Error("Invalid userId");
       }
-
+  
       const matchStage = { userId: new mongoose.Types.ObjectId(userId) };
-
-      // Add filtering based on the `filter` parameter
       if (filter === "read") {
-        matchStage.isRead = true; // Filter for read notifications
+        matchStage.isRead = true; 
       } else if (filter === "unread") {
-        matchStage.isRead = false; // Filter for unread notifications
+        matchStage.isRead = false; 
       }
-
+  
       const Data = await Notification.aggregate([
-        { $match: matchStage }, // Match notifications for the user with isRead filter
-        { $sort: { createdAt: -1 } }, // Sort by newest notifications
+        { $match: { userId: new mongoose.Types.ObjectId(userId) } }, 
+        { $sort: { createdAt: -1 } }, 
         {
           $facet: {
-            notifications: [{ $skip: skip }, { $limit: limit }],
-            countingNotifications: [{ $count: "totalNotifications" }], // Count total notifications
+            notifications: [{ $match: matchStage }, { $skip: skip }, { $limit: limit }], 
+            totalNotifications: [{ $count: "count" }], 
+            totalUnreadNotifications: [{ $match: { isRead: false } }, { $count: "count" }], 
+            totalReadNotifications: [{ $match: { isRead: true } }, { $count: "count" }], 
           },
         },
       ]);
-
-      if (!Data[0].countingNotifications[0]) {
-        return {
-          notifications: [],
-          totalNotifications: 0,
-        };
-      }
-
-      const totalNotifications =
-        Data[0].countingNotifications[0].totalNotifications;
-      const notifications = Data[0].notifications;
-
+  
       return {
-        notifications,
-        totalNotifications,
+        notifications: Data[0].notifications,
+        totalNotifications: Data[0].totalNotifications[0]?.count || 0,
+        totalUnreadNotifications: Data[0].totalUnreadNotifications[0]?.count || 0,
+        totalReadNotifications: Data[0].totalReadNotifications[0]?.count || 0,
       };
     } catch (error) {
       throw new Error(`getNotifications service error: ${error.message}`);

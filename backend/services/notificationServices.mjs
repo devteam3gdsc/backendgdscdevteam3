@@ -36,6 +36,31 @@ const NotificationServices = {
 
       const senderUser = await User.findById(senderId);
 
+      // check over 24h from create post
+      const postAgeInHours = (Date.now() - post.createdAt) / (1000 * 60 * 60); 
+      if (postAgeInHours > 24) {
+        return null;
+      }
+
+      // stop, check if more than 20 notif 
+      const notificationCount = await Notification.countDocuments({ relatedEntityId: postId });
+      if (notificationCount >= 20) {
+        return null;
+      }
+
+      // check senderUser isFollowing postOwnerId
+      const isFollowing = await User.exists({
+        _id: senderId,
+        following: postOwnerId
+      });
+      if (!isFollowing) return null;
+
+      // check first like
+      const hasLiked = post.likes.includes(senderId);
+      if (hasLiked) {
+        return null; 
+      }
+
       const notification = new Notification({
         userId: String(postOwnerId),
         senderId,

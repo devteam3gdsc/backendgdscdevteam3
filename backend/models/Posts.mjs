@@ -5,18 +5,18 @@ const fileSchema = new mongoose.Schema(
     fileUrl: { type: String },
     fileName: { type: String },
   },
-  { _id: false }
+  { _id: false },
 );
 const postSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      default:""
+      default: "",
       // required: true,
     },
     content: {
       type: String,
-      default:""
+      default: "",
       // required: true,
     },
     tags: [String],
@@ -30,6 +30,20 @@ const postSchema = new mongoose.Schema(
     },
     avatar: {
       type: String,
+    },
+    // Nếu bài viết thuộc về một group
+    group: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Group",
+      default: null,
+    },
+    // Trạng thái bài viết (chờ duyệt hay đã duyệt)
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: function () {
+        return this.group ? "pending" : "approved"; // Nếu bài viết thuộc group thì "pending", ngược lại là "approved"
+      },
     },
     // comments: [
     //     {type: mongoose.Schema.Types.ObjectId,
@@ -52,11 +66,13 @@ const postSchema = new mongoose.Schema(
       enum: ["public", "private"],
       default: "public",
     },
-    stored: [{
-      type: mongoose.Types.ObjectId,
-      ref:"User",
-      default: []
-    }],
+    stored: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "User",
+        default: [],
+      },
+    ],
     totalComments: {
       type: Number,
       default: 0,
@@ -66,7 +82,7 @@ const postSchema = new mongoose.Schema(
       default: Date.now(),
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 postSchema.pre("save", function (next) {

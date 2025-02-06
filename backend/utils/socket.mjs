@@ -20,7 +20,7 @@ export const initializeSocket = (httpServer) => {
 
   io.on("connection", (socket) => {
     console.log(
-      `New socket connection: ${socket.id}, User ID: ${socket.userId}`
+      `New socket connection: ${socket.id}, User ID: ${socket.userId}`,
     );
 
     // Gửi phản hồi cho FE xác nhận kết nối thành công

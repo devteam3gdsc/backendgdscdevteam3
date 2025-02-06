@@ -8,8 +8,12 @@ pageRouter.get("/me", authMiddleware.verifyToken, postController.getUserPost);
 pageRouter.get(
   "/community",
   authMiddleware.verifyToken,
-  postController.getCommunityPosts
+  postController.getCommunityPosts,
 );
-pageRouter.get("/following", authMiddleware.verifyToken,postController.getFollowedPost)
+pageRouter.get(
+  "/following",
+  authMiddleware.verifyToken,
+  postController.getFollowedPost,
+);
 
 export default pageRouter;

@@ -22,7 +22,7 @@ const commentSchema = new mongoose.Schema(
     },
     // authorname: String
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 commentSchema.pre("save", function (next) {
   this.updatedAt = Date.now();

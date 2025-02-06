@@ -1,0 +1,174 @@
+import { sofa } from "@cloudinary/url-gen/qualifiers/focusOn";
+import {Group, Project, Team, Section} from "../models/Groups.mjs"
+import User from "../models/Users.mjs";
+import Post from "../models/Posts.mjs";
+import mongoose from "mongoose"
+const groupServices = {
+    //-----------GROUP-----------------
+    createGroup : async (data, creatorId) => {
+        try {
+            const newGroup = new Group({
+                ...data,
+                creator: creatorId,
+                members: [{
+                    user: creatorId,
+                    role: "creator"
+                }]
+            });
+
+            await newGroup.save();
+            return newGroup;
+        } catch (error) {
+            throw new Error(`Creating group service error: ${error}`, 500);
+        }
+    },
+
+    updateGroup: async (groupId, updateData) => {
+        try {
+            const updatedGroup = await Group.findByIdAndUpdate(
+                groupId, 
+                { $set: updateData }, // Use $set to merge updates instead of replacing the document
+                { new: true, upsert: false, runValidators: true } // Ensure validation and no unintended document creation
+            );
+            
+            if (!updatedGroup) {
+                throw new Error("Group not found.");
+            }
+    
+            return updatedGroup;
+        } catch (error) {
+            throw new Error(`Updating group service error: ${error}`);
+        }
+    },
+
+    deleteGroup: async (groupId) => {
+        try {
+            console.log(groupId)
+            const group = await Group.findById(groupId);
+            
+            if (!group) {
+                throw new Error("Group not found.");
+            }
+    
+            await Group.findByIdAndDelete(groupId);
+            return { message: "Group deleted successfully" };
+        } catch (error) {
+            throw new Error(`Deleting group service error: ${error}`);
+        }
+    },
+
+    getFullGroupData : async (groupId, userId) => {
+        try {
+            if (!mongoose.Types.ObjectId.isValid(groupId)) {
+                console.error("groupId không hợp lệ:", groupId);
+            } else {
+                console.log("groupId hợp lệ:", groupId);
+            }
+
+            const group = await Group.aggregate([
+                { $match: { _id: new mongoose.Types.ObjectId(groupId) } },
+                { 
+                    $lookup: {
+                        from: "users", // Tên collection (viết thường, số nhiều)
+                        localField: "members.user",
+                        foreignField: "_id",
+                        as: "membersData"
+                    }
+                },
+                { 
+                    $lookup: {
+                        from: "users",
+                        localField: "creator",
+                        foreignField: "_id",
+                        as: "creatorData"
+                    }
+                }
+            ]);
+            
+            if(!group) {
+                return res.status(404).json({message: "Group not found"});
+            }
+            const numberOfProjects = await Project.countDocuments({group: groupId});
+            const numberOfPosts = await Post.countDocuments({group: groupId}); //need to edit Post model
+             // Kiểm tra nếu nhóm là private, chỉ cho phép thành viên tham gia
+             const groupData = group[0]; // Vì `aggregate()` trả về mảng
+
+             if (!groupData) {
+                 return res.status(404).json({ message: "Group not found" });
+             }
+             
+             const members = groupData.membersData || []; // Lấy members từ lookup
+             const isJoined = members.some(m => m._id.toString() === userId.toString());
+
+
+            const canJoin = group.private ? isJoined : true; // Nếu private thì phải là thành viên mới được tham gia
+           // Sắp xếp avatar theo thứ tự ưu tiên
+let sortedMembers = members.sort((a, b) => {
+    return b.following.includes(userId) - a.following.includes(userId);
+});
+// Lấy tối đa 4 avatar từ danh sách thành viên
+const memberAvatars = sortedMembers.slice(0, 4).map(m => m.avatar);
+            return ({
+    name: groupData.name,
+    bio: groupData.description,
+    avatar: groupData.avatar,
+    members: memberAvatars,
+    numberOfPosts,
+    numberOfMembers: members.length,
+    numberOfProjects,
+    joined: isJoined,
+    canJoin // Chỉ tham gia nếu nhóm là public hoặc user đã là thành viên
+            });
+        } catch (error) {
+            // throw new Error(`Getting  groupData service error: ${error}`);
+            console.error("Error fetching group data:", error);
+            res.status(500).json({ message: "Internal server error", error: error.message });
+        }
+    },
+
+    getGroupsByUserId : async (userId) => {
+        try {
+            const groups = await Group.find({ "members.user": userId}).populate("members.user");
+            return groups;
+        } catch (error) {
+            throw new Error(`GetGroupsByUserId service error: ${error}`, 500);
+        }
+    },
+
+    //-----------PROJECT-----------------
+    createProject : async (data, groupId, createdBy) => {
+        try {
+            const newProject = new Project({
+                ...data,
+                group: groupId,
+                createdBy: createdBy,
+            });
+
+            await newProject.save();
+            return newProject;
+        } catch (error) {
+            throw new Error(`Creating project service error: ${error}`, 500);
+        }
+    },
+
+    updateProject : async (projectId, updateData) => {
+        try { 
+            const updatedProject = await Group.findByIdAndUpdate(projectId, updateData, { new: true});
+            return updatedProject;
+        } catch (error) {
+            throw new Error(`Updating project service error: ${error}`, 500);
+        }
+    },
+
+    deleteProject : async (projectId) => {
+        try {
+            await Project.findByIdAndDelete(projectId);
+            return { message: "Project deleted successfully "};
+        } catch (error) {
+            throw new Error(`Deleting project service error: ${error}`, 500);
+        }
+    },
+
+};
+
+export default groupServices;

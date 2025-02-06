@@ -2,11 +2,11 @@ import mongoose from "mongoose";
 const contactLinksSchema = new mongoose.Schema(
   {
     facebook: { type: String },
-    youtube:  { type: String },
-    github:   { type: String },
-    email:    { type: String }
+    youtube: { type: String },
+    github: { type: String },
+    email: { type: String },
   },
-  { _id: false }
+  { _id: false },
 );
 const userSchema = new mongoose.Schema(
   {
@@ -38,41 +38,42 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
     refreshTokens: { type: [String], default: [] },
-    totalLikes:{
-      type:Number,
-      default:0
+    totalLikes: {
+      type: Number,
+      default: 0,
     },
-    totalComments:{
-      type:Number,
-      default:0
+    totalComments: {
+      type: Number,
+      default: 0,
     },
-    totalFollowers:{
-      type:Number,
-      default:0
+    totalFollowers: {
+      type: Number,
+      default: 0,
     },
-    following:[{
-      type:mongoose.Types.ObjectId,
-      ref:"User",
-      default:[]
-    }],
-    totalFollowing:{
-      type:Number,
-      default:0
+    following: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "User",
+        default: [],
+      },
+    ],
+    totalFollowing: {
+      type: Number,
+      default: 0,
     },
-    story:{
-      type:String
+    story: {
+      type: String,
     },
-    contactLinks:contactLinksSchema,
-    totalPosts:{
-      type:Number,
-      default:0
+    contactLinks: contactLinksSchema,
+    totalPosts: {
+      type: Number,
+      default: 0,
     },
-    resetPasswordToken: { type: String},
-    resetPasswordExpires: { type: Date},
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
-
 
 const User = mongoose.model("Users", userSchema);
 export default User;

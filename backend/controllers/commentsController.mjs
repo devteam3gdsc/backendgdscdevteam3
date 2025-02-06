@@ -23,8 +23,8 @@ const commentsController = {
       });
       await newComment.save();
       await Post.findByIdAndUpdate(postId, { $inc: { totalComments: 1 } });
-      const author = await Post.findById(postId,{author:1});
-      await User.findByIdAndUpdate(author, { $inc: { totalComments: 1 } })
+      const author = await Post.findById(postId, { author: 1 });
+      await User.findByIdAndUpdate(author, { $inc: { totalComments: 1 } });
       return res.status(200).json({
         message: "comment created successfully!",
         commentId: newComment._id,
@@ -61,7 +61,7 @@ const commentsController = {
       const { text, code } = req.body;
       const comment = await Comments.updateOne(
         { author: userId, _id: commentId },
-        { $set: { text: text, code: code, editedAt: Date.now() } }
+        { $set: { text: text, code: code, editedAt: Date.now() } },
       );
       if (comment.matchedCount === 0) {
         return res.status(403).json("You are not the author of the comment");

@@ -1,9 +1,9 @@
 import User from "../models/Users.mjs";
 import Post from "../models/Posts.mjs";
 import Comments from "../models/Comments.mjs";
-import {httpError} from "./httpResponse.mjs";
-const findDocument = async (model,{...criterias},{...keys})=>{
-    try {
+import { httpError } from "./httpResponse.mjs";
+const findDocument = async (model, { ...criterias }, { ...keys }) => {
+  try {
     // const filterData = {};
     // const keysNeeded = {};
     // for ( let i of criterias){
@@ -21,15 +21,13 @@ const findDocument = async (model,{...criterias},{...keys})=>{
     // }
     console.log(keys);
     console.log(criterias);
-    const result = await model.findOne(criterias,keys);
-    if (!result){
-        throw new httpError(`${model} not found!`,404)
-    }
-    else return result
-    } 
-    catch (error) {
-     throw new httpError(`findDocument services error: ${error}`,500)
-    }
-}
+    const result = await model.findOne(criterias, keys);
+    if (!result) {
+      throw new httpError(`${model} not found!`, 404);
+    } else return result;
+  } catch (error) {
+    throw new httpError(`findDocument services error: ${error}`, 500);
+  }
+};
 
 export default findDocument;

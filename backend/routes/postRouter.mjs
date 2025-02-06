@@ -25,60 +25,75 @@ postRouter.post(
   "/create",
   authMiddleware.verifyToken,
   cpUpload,
-  postController.createPost
+  postController.createPost,
 );
 postRouter.get(
   "/store/:postId",
   authMiddleware.verifyToken,
-  postController.storePost
+  postController.storePost,
 );
 postRouter.get(
   "/unstored/:postId",
   authMiddleware.verifyToken,
-  postController.unStorePost
+  postController.unStorePost,
 );
 postRouter.get(
   "/like/:postId",
   authMiddleware.verifyToken,
-  postController.likePost
+  postController.likePost,
 );
-postRouter.get("/unlike/:postId",authMiddleware.verifyToken, postController.unLikePost);
-postRouter.get("/detail/:postId",authMiddleware.verifyToken, postController.detailPost);
+postRouter.get(
+  "/unlike/:postId",
+  authMiddleware.verifyToken,
+  postController.unLikePost,
+);
+postRouter.get(
+  "/detail/:postId",
+  authMiddleware.verifyToken,
+  postController.detailPost,
+);
 postRouter.delete(
   "/delete/:postId",
   authMiddleware.verifyToken,
-  postController.deletePost
+  postController.deletePost,
 );
 postRouter.put(
   "/edit/:postId",
   authMiddleware.verifyToken,
   cpUpload,
-  postController.editPost
+  postController.editPost,
 );
-postRouter.put("/setState/:postId",authMiddleware.verifyToken,postController.setState);
-postRouter.get("/halfDetail/:postId",authMiddleware.verifyToken,postController.halfDetail);
-
+postRouter.put(
+  "/setState/:postId",
+  authMiddleware.verifyToken,
+  postController.setState,
+);
+postRouter.get(
+  "/halfDetail/:postId",
+  authMiddleware.verifyToken,
+  postController.halfDetail,
+);
 
 //comment:
 postRouter.get(
   "/detail/:postId/comment",
   authMiddleware.verifyToken,
-  commentsController.getComments
+  commentsController.getComments,
 );
 postRouter.post(
   "/:postId/comment/create",
   authMiddleware.verifyToken,
-  commentsController.createComment
+  commentsController.createComment,
 );
 postRouter.delete(
   "/:postId/comment/delete/:commentId",
   authMiddleware.verifyToken,
-  commentsController.deleteComment
+  commentsController.deleteComment,
 );
 postRouter.put(
   "/:postId/comment/edit/:commentId",
   authMiddleware.verifyToken,
-  commentsController.editComment
+  commentsController.editComment,
 );
 
 export default postRouter;

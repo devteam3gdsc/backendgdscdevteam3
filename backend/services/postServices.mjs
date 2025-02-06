@@ -12,7 +12,7 @@ const postServices = {
     criterias,
     orders,
     skip,
-    limit
+    limit,
   ) => {
     try {
       console.log(matchData);
@@ -90,7 +90,7 @@ const postServices = {
       const userData = await findDocument(
         User,
         { _id: userId },
-        { avatar: 1, displayname: 1 }
+        { avatar: 1, displayname: 1 },
       );
       const files = getFiles(reqfiles, "code_files");
       const newPost = await Post.create({
@@ -109,7 +109,7 @@ const postServices = {
       throw new httpError(`creating post service error: ${error}`, 500);
     }
   },
-  editPost: async (userId,postId, { ...data }, reqfiles) => {
+  editPost: async (userId, postId, { ...data }, reqfiles) => {
     try {
       let tags = [];
       if (data.tags) {
@@ -119,24 +119,33 @@ const postServices = {
           tags = data.tags; // If tags are already an array, use it directly
         }
       }
-      const {files} = await findDocument(
+      const { files } = await findDocument(
         Post,
-        { author: userId,_id:postId },
-        {files:1,_id:0}
+        { author: userId, _id: postId },
+        { files: 1, _id: 0 },
       );
-      const files_urls = files.map((file)=>file.fileUrl);
-      await fileDestroy(files_urls,"raw");
+      const files_urls = files.map((file) => file.fileUrl);
+      await fileDestroy(files_urls, "raw");
       const code_files = getFiles(reqfiles, "code_files");
-      await updateDocument(Post,1,[{_id:postId,author:userId}],[{$set:{
-        ...data,
-        tags,
-        author: userId,
-        files:code_files, // Lưu danh sách file vào post
-        editedAt: Date.now(),
-      }}]).catch((error) => {
+      await updateDocument(
+        Post,
+        1,
+        [{ _id: postId, author: userId }],
+        [
+          {
+            $set: {
+              ...data,
+              tags,
+              author: userId,
+              files: code_files, // Lưu danh sách file vào post
+              editedAt: Date.now(),
+            },
+          },
+        ],
+      ).catch((error) => {
         throw new httpError(`editing post failed: ${error}`, 500);
       });
-      return new httpResponse("edit post successfully",200);
+      return new httpResponse("edit post successfully", 200);
     } catch (error) {
       throw new httpError(`editing post service error: ${error}`, 500);
     }

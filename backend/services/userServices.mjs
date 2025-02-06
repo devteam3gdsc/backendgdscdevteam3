@@ -10,7 +10,7 @@ import { fileDestroy } from "../utils/filesHelper.mjs";
 const userServices = {
   updateUserPassword: async (userId, oldPassword, newPassword) => {
     try {
-      const user = await findDocument(User, { _id: userId },{});
+      const user = await findDocument(User, { _id: userId }, {});
       if (await authServices.passwordCheck(oldPassword, user.password)) {
         const hashed = await authServices.createHashedPassword(newPassword);
         await user.updateOne({ $set: { password: hashed } });
@@ -24,10 +24,18 @@ const userServices = {
   updateUserFullInfo: async (
     userId,
     avatarFile,
-    { displayname,totalLikes,totalComments,totalFollowing,totalFollowers,totalPosts, ...updatedData }
+    {
+      displayname,
+      totalLikes,
+      totalComments,
+      totalFollowing,
+      totalFollowers,
+      totalPosts,
+      ...updatedData
+    },
   ) => {
     try {
-      const user = await findDocument(User,{ _id: userId},{});
+      const user = await findDocument(User, { _id: userId }, {});
       const avatar = user.avatar;
       const avatarURL = avatarFile ? avatarFile.path : avatar;
       if (
@@ -42,11 +50,11 @@ const userServices = {
       });
       await Post.updateMany(
         { author: userId },
-        { $set: { authorname: displayname, avatar: avatarURL } }
+        { $set: { authorname: displayname, avatar: avatarURL } },
       );
       await Comments.updateMany(
         { author: userId },
-        { $set: { authorname: displayname, avatar: avatarURL } }
+        { $set: { authorname: displayname, avatar: avatarURL } },
       );
       return new httpResponse("updated successfully", 200);
     } catch (error) {
@@ -55,7 +63,7 @@ const userServices = {
         throw new httpError(`updateFullUserInfo service error:${error}`, 500);
     }
   },
-  
+
   signUpUser: async ({ ...data }) => {
     try {
       const { username, password, email } = data;

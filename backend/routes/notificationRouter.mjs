@@ -8,49 +8,49 @@ const notificationRouter = Router();
 notificationRouter.post(
   "/comment/:commentId",
   authMiddleware.verifyToken,
-  notificationController.createCommentNotification
+  notificationController.createCommentNotification,
 );
 
 // [POST] /notification/like/:postId - Create a notification for a like
 notificationRouter.post(
   "/like/:postId",
   authMiddleware.verifyToken,
-  notificationController.createLikeNotification
+  notificationController.createLikeNotification,
 );
 
 // [GET] /notification/:notificationId/detail - Get details of a single notification by ID
 notificationRouter.get(
   "/:notificationId/detail",
   authMiddleware.verifyToken,
-  notificationController.getNotification
+  notificationController.getNotification,
 );
 
 // [GET] /notification/ - Get a list of user notifications with optional filters
 notificationRouter.get(
   "/",
   authMiddleware.verifyToken,
-  notificationController.getUserNotifications
+  notificationController.getUserNotifications,
 );
 
 // [DELETE] /notification/:notificationId/delete - Delete a notification by ID
 notificationRouter.delete(
   "/:notificationId/delete",
   authMiddleware.verifyToken,
-  notificationController.deleteNotification
+  notificationController.deleteNotification,
 );
 
 // [POST] /notification/:notificationId/read - Mark a single notification as read
 notificationRouter.post(
   "/:notificationId/read",
   authMiddleware.verifyToken,
-  notificationController.markNotificationAsRead
+  notificationController.markNotificationAsRead,
 );
 
 // [POST] /notification/read - Mark all notifications as read
 notificationRouter.post(
   "/read",
   authMiddleware.verifyToken,
-  notificationController.markAllNotificationsAsRead
+  notificationController.markAllNotificationsAsRead,
 );
 
 export default notificationRouter;

@@ -17,26 +17,38 @@ const upload = multer({ storage });
 userRouter.get(
   "/fullInfo",
   authMiddleware.verifyToken,
-  userController.getUserFullInfo
+  userController.getUserFullInfo,
 );
 userRouter.get(
   "/:userId/publicInfo",
   authMiddleware.verifyToken,
-  userController.getUserPublicInfo
+  userController.getUserPublicInfo,
 );
 userRouter.put(
   "/updateFull",
   authMiddleware.verifyToken,
   upload.single("avatar"),
-  userController.updateFullUserInfo
+  userController.updateFullUserInfo,
 );
 userRouter.put(
   "/updatePassword",
   authMiddleware.verifyToken,
-  userController.updateUserPassword
+  userController.updateUserPassword,
 );
-userRouter.get("/test",authMiddleware.verifyToken,userController.test);
-userRouter.get("/follow/:userId",authMiddleware.verifyToken,userController.follow)
-userRouter.get("/unfollow/:userId",authMiddleware.verifyToken,userController.unfollow)
-userRouter.get("/posts/:userId",authMiddleware.verifyToken,postController.getAnotherUserPost)
+userRouter.get("/test", authMiddleware.verifyToken, userController.test);
+userRouter.get(
+  "/follow/:userId",
+  authMiddleware.verifyToken,
+  userController.follow,
+);
+userRouter.get(
+  "/unfollow/:userId",
+  authMiddleware.verifyToken,
+  userController.unfollow,
+);
+userRouter.get(
+  "/posts/:userId",
+  authMiddleware.verifyToken,
+  postController.getAnotherUserPost,
+);
 export default userRouter;

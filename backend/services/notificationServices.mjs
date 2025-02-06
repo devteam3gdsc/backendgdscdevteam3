@@ -37,13 +37,15 @@ const NotificationServices = {
       const senderUser = await User.findById(senderId);
 
       // check over 24h from create post
-      const postAgeInHours = (Date.now() - post.createdAt) / (1000 * 60 * 60); 
+      const postAgeInHours = (Date.now() - post.createdAt) / (1000 * 60 * 60);
       if (postAgeInHours > 24) {
         return null;
       }
 
-      // stop, check if more than 20 notif 
-      const notificationCount = await Notification.countDocuments({ relatedEntityId: postId });
+      // stop, check if more than 20 notif
+      const notificationCount = await Notification.countDocuments({
+        relatedEntityId: postId,
+      });
       if (notificationCount >= 20) {
         return null;
       }
@@ -51,14 +53,14 @@ const NotificationServices = {
       // check senderUser isFollowing postOwnerId
       const isFollowing = await User.exists({
         _id: senderId,
-        following: postOwnerId
+        following: postOwnerId,
       });
       if (!isFollowing) return null;
 
       // check first like
       const hasLiked = post.likes.includes(senderId);
       if (hasLiked) {
-        return null; 
+        return null;
       }
 
       const notification = new Notification({
@@ -105,13 +107,15 @@ const NotificationServices = {
       const senderUser = await User.findById(senderId);
 
       // check over 24h from create post
-      const postAgeInHours = (Date.now() - post.createdAt) / (1000 * 60 * 60); 
+      const postAgeInHours = (Date.now() - post.createdAt) / (1000 * 60 * 60);
       if (postAgeInHours > 24) {
         return null;
       }
 
-      // stop, check if more than 20 notif 
-      const notificationCount = await Notification.countDocuments({ relatedEntityId: postId });
+      // stop, check if more than 20 notif
+      const notificationCount = await Notification.countDocuments({
+        relatedEntityId: postId,
+      });
       if (notificationCount >= 20) {
         return null;
       }
@@ -119,14 +123,14 @@ const NotificationServices = {
       // check senderUser isFollowing postOwnerId
       const isFollowing = await User.exists({
         _id: senderId,
-        following: postOwnerId
+        following: postOwnerId,
       });
       if (!isFollowing) return null;
 
       // check first like
       const hasLiked = post.likes.includes(senderId);
       if (hasLiked) {
-        return null; 
+        return null;
       }
       const notification = new Notification({
         userId: String(postOwnerId),
@@ -154,36 +158,52 @@ const NotificationServices = {
     }
   },
 
-  getNotificationsByUserId: async (userId, skip = 0, limit = 10, filter = "all") => {
+  getNotificationsByUserId: async (
+    userId,
+    skip = 0,
+    limit = 10,
+    filter = "all",
+  ) => {
     try {
       if (!mongoose.Types.ObjectId.isValid(userId)) {
         throw new Error("Invalid userId");
       }
-  
+
       const matchStage = { userId: new mongoose.Types.ObjectId(userId) };
       if (filter === "read") {
-        matchStage.isRead = true; 
+        matchStage.isRead = true;
       } else if (filter === "unread") {
-        matchStage.isRead = false; 
+        matchStage.isRead = false;
       }
-  
+
       const Data = await Notification.aggregate([
-        { $match: { userId: new mongoose.Types.ObjectId(userId) } }, 
-        { $sort: { createdAt: -1 } }, 
+        { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+        { $sort: { createdAt: -1 } },
         {
           $facet: {
-            notifications: [{ $match: matchStage }, { $skip: skip }, { $limit: limit }], 
-            totalNotifications: [{ $count: "count" }], 
-            totalUnreadNotifications: [{ $match: { isRead: false } }, { $count: "count" }], 
-            totalReadNotifications: [{ $match: { isRead: true } }, { $count: "count" }], 
+            notifications: [
+              { $match: matchStage },
+              { $skip: skip },
+              { $limit: limit },
+            ],
+            totalNotifications: [{ $count: "count" }],
+            totalUnreadNotifications: [
+              { $match: { isRead: false } },
+              { $count: "count" },
+            ],
+            totalReadNotifications: [
+              { $match: { isRead: true } },
+              { $count: "count" },
+            ],
           },
         },
       ]);
-  
+
       return {
         notifications: Data[0].notifications,
         totalNotifications: Data[0].totalNotifications[0]?.count || 0,
-        totalUnreadNotifications: Data[0].totalUnreadNotifications[0]?.count || 0,
+        totalUnreadNotifications:
+          Data[0].totalUnreadNotifications[0]?.count || 0,
         totalReadNotifications: Data[0].totalReadNotifications[0]?.count || 0,
       };
     } catch (error) {
@@ -216,7 +236,7 @@ const NotificationServices = {
       const updatedNotification = await Notification.findByIdAndUpdate(
         notificationId,
         { isRead: true },
-        { new: true }
+        { new: true },
       );
 
       if (!updatedNotification) {
@@ -233,7 +253,7 @@ const NotificationServices = {
     } catch (error) {
       throw new httpError(
         `Failed to mark notification as read: ${error.message}`,
-        500
+        500,
       );
     }
   },
@@ -246,7 +266,7 @@ const NotificationServices = {
 
       const result = await Notification.updateMany(
         { userId, isRead: false },
-        { isRead: true }
+        { isRead: true },
       );
 
       // Notify the user if they are online
@@ -260,11 +280,11 @@ const NotificationServices = {
       return result;
     } catch (error) {
       console.error(
-        `Error marking all notifications as read for user ${userId}: ${error.message}`
+        `Error marking all notifications as read for user ${userId}: ${error.message}`,
       );
       throw new httpError(
         `Failed to mark all notifications as read: ${error.message}`,
-        500
+        500,
       );
     }
   },
@@ -293,11 +313,11 @@ const NotificationServices = {
       };
     } catch (error) {
       console.error(
-        `Error deleting notification ${notificationId}: ${error.message}`
+        `Error deleting notification ${notificationId}: ${error.message}`,
       );
       throw new httpError(
         `Failed to delete notification: ${error.message}`,
-        500
+        500,
       );
     }
   },
@@ -321,7 +341,7 @@ const NotificationServices = {
       return result;
     } catch (error) {
       console.error(
-        `Error deleting all notifications for user ${userId}: ${error.message}`
+        `Error deleting all notifications for user ${userId}: ${error.message}`,
       );
       throw new httpError("Failed to delete all notifications", 500);
     }

@@ -132,7 +132,26 @@ const commentsController = {
     }
   },
   likeComments: async (req,res)=>{
-
+    try {
+      const userId = new mongoose.Types.ObjectId(`${req.user.id}`)
+      await Comments.updateOne({_id:req.params.commentId},{$inc:{totalLikes:1}});
+      return res.status(200).json("liked!");
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  },
+  unlikeComments: async (req,res)=>{
+    try {
+      const userId = new mongoose.Types.ObjectId(`${req.user.id}`)
+      await Comments.updateOne({_id:req.params.commentId},{$inc:{totalLikes:-1}});
+      return res.status(200).json("unliked!");
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
   }
 };
 

@@ -56,7 +56,7 @@ postRouter.put(
   cpUpload,
   postController.editPost
 );
-postRouter.put("/setState/:postId",authMiddleware.verifyToken,postController.setState);
+postRouter.get("/setState/:postId",authMiddleware.verifyToken,postController.setState);
 postRouter.get("/halfDetail/:postId",authMiddleware.verifyToken,postController.halfDetail);
 
 

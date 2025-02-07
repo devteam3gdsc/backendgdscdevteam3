@@ -18,6 +18,7 @@ const groupSchema = new mongoose.Schema(
         role: {
           type: String,
           enum: ["creator", "admin", "member"],
+          default: "member",
           required: true,
         },
       },

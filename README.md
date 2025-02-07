@@ -508,3 +508,109 @@ http://localhost:4000/auth/passwordReset/82ca52b4c5f82b3b7b60015f69c84458be8c9ef
 {
 "message": "Password reset successfully"
 }
+
+
+
+// POST http://localhost:4000/group/create
+{
+    "name": "groupuser2",
+    "description": "",
+    "private": false,
+    "moderation": false,
+    "avatar": "",
+    "creator": "679597b08d8bedbe78208c33",
+    "members": [
+        {
+            "user": "679597b08d8bedbe78208c33",
+            "role": "creator",
+            "_id": "67a5cfe37221d6573c1d81f3"
+        }
+    ],
+    "projects": [],
+    "posts": [],
+    "_id": "67a5cfe37221d6573c1d81f2",
+    "createdAt": "2025-02-07T09:18:27.827Z",
+    "updatedAt": "2025-02-07T09:18:27.827Z",
+    "__v": 0
+}
+
+// PUT http://localhost:4000/group/update/67a5cfe37221d6573c1d81f2
+{
+    "_id": "67a5cfe37221d6573c1d81f2",
+    "name": "groupuser2222",
+    "description": "",
+    "private": false,
+    "moderation": false,
+    "avatar": "",
+    "creator": "679597b08d8bedbe78208c33",
+    "members": [
+        {
+            "user": "679597b08d8bedbe78208c33",
+            "role": "creator",
+            "_id": "67a5cfe37221d6573c1d81f3"
+        }
+    ],
+    "projects": [],
+    "posts": [],
+    "createdAt": "2025-02-07T09:18:27.827Z",
+    "updatedAt": "2025-02-07T09:20:05.388Z",
+    "__v": 0
+}
+
+// GET http://localhost:4000/group/fullData/67a5cfe37221d6573c1d81f2
+{
+    "name": "groupuser2222",
+    "bio": "",
+    "avatar": "",
+    "members": [
+        "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
+    ],
+    "numberOfPosts": 0,
+    "numberOfMembers": 1,
+    "numberOfProjects": 0,
+    "joined": true,
+    "canJoin": true
+}
+
+// DELETE http://localhost:4000/group/delete/67a5cfe37221d6573c1d81f2
+{
+    "message": "Group deleted successfully"
+}
+
+
+// POST http://localhost:4000/group/invite/67a4cfee39057ae06b9727af
+{
+  "members": ["6786b1c520d6160de991e264", "67872550d1dd8257ea418b42"]
+}
+{
+    "message": "Invite new member successfully"
+}
+
+// DELETE http://localhost:4000/group/removeMember/67a4cfee39057ae06b9727af/67872e57d1dd8257ea418e67
+{
+  "members": ["67872e57d1dd8257ea418e67"]
+}
+{
+    "message": "Delete member successfully"
+}
+
+// POST http://localhost:4000/group/join/67a4b1a5fd48ada7ebba874c
+{
+    "message": "Join group successfully"
+}
+
+// POST http://localhost:4000/group/leave/67a4b1a5fd48ada7ebba874c
+{
+    "message": "leave group successfully"
+}
+
+
+// POST http://localhost:4000/group/assignAdmin/67a5e2e1560b4238c754b169/67872e57d1dd8257ea418e67
+{
+    "message": "assign admin group successfully"
+}
+
+// POST http://localhost:4000/group/assignCreator/67a5e767a29c317761d87ad8/67872e57d1dd8257ea418e67
+{
+    "message": "assign creator group successfully"
+}

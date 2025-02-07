@@ -26,4 +26,39 @@ groupRouter.get(
   authMiddleware.verifyToken,
   groupController.getFullGroupData,
 );
+
+groupRouter.post(
+  "/invite/:groupId",
+  authMiddleware.verifyToken,
+  roleMiddleware(["creator", "admin"]),
+  groupController.inviteMembers,
+);
+groupRouter.delete(
+  "/removeMember/:groupId/:removedUserId",
+  authMiddleware.verifyToken,
+  roleMiddleware(["creator", "admin"]),
+  groupController.removeMember,
+);
+groupRouter.post(
+  "/join/:groupId",
+  authMiddleware.verifyToken,
+  groupController.joinGroup,
+);
+groupRouter.post(
+  "/leave/:groupId",
+  authMiddleware.verifyToken,
+  groupController.leaveGroup,
+);
+groupRouter.post(
+  "/assignAdmin/:groupId/:assignAdminUserId",
+  authMiddleware.verifyToken,
+  roleMiddleware(["creator", "admin"]),
+  groupController.assignAdmin,
+);
+groupRouter.post(
+  "/assignCreator/:groupId/:assignCreatorUserId",
+  authMiddleware.verifyToken,
+  roleMiddleware(["creator"]),
+  groupController.assignCreator,
+);
 export default groupRouter;

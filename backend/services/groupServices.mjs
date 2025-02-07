@@ -135,6 +135,108 @@ const memberAvatars = sortedMembers.slice(0, 4).map(m => m.avatar);
         }
     },
 
+    inviteMembers : async (groupId, members) => {
+        try {
+            const group = await Group.findById(groupId);
+            if(!group){
+                throw new Error("Group not found");
+            }
+    
+            members.forEach(memberId => {
+                if(!group.members.some(m => m.user.equals(memberId))) {
+                    group.members.push({ user: memberId, role: "member" });
+                }
+            });
+            await group.save();
+            return group;
+        } catch (error) {
+            throw new Error(`Invite members service error: ${error}`, 500);
+        }
+    },
+
+    removeMember: async (groupId, removedUserId) => {
+        try {
+            const group = await Group.findById(groupId);
+            if(!group) {
+                throw new Error("Group not found");
+            };
+
+            group.members = group.members.filter(m => !m.user.equals(removedUserId));
+            await group.save();
+            return group;
+        } catch (error) {
+            throw new Error(`Remove members service error: ${error}`, 500);
+        }
+    },
+
+    joinGroup : async (groupId, userId) => {
+        try {
+            const group = await Group.findById(groupId);
+            if(!group) {
+                throw new Error("Group not found");
+            };
+
+            if(group.private) {
+                throw new Error("Group is private");
+            }
+
+            if(!group.members.some(m => m.user.equals(userId))) {
+                group.members.push({ user: userId, role: "member" });
+                await group.save();
+            }
+            return group;
+        } catch (error) {
+            throw new Error(`Join group service error: ${error}`, 500);
+        }
+    },
+
+    leaveGroup : async(groupId, userId) => {
+        try {
+            const group = await Group.findById(groupId);
+            if (!group) throw new Error("Group not found");
+        
+            if (group.creator.equals(userId)) throw new Error("You are creator, please choose another creator before leave");
+        
+            group.members = group.members.filter(m => !m.user.equals(userId));
+            await group.save();
+            return group;
+        } catch (error) {
+            throw new Error(`Leave group service error: ${error}`, 500);
+        }
+    },
+
+    assignAdmin : async (groupId, assignAdminUserId) => {
+        try {
+            const group = await Group.findById(groupId);
+            if (!group) throw new Error("Group not found");
+
+            const member = group.members.find(m => m.user.equals(assignAdminUserId));
+            if (!member) throw new Error("User not found in group");
+
+            member.role = "admin";
+            await group.save();
+            return group;
+        } catch (error) {
+            throw new Error(`Assign admin group service error: ${error}`, 500);
+        }
+    },
+
+    assignCreator : async (groupId, assignCreatorUserId) => {
+        try {
+            const group = await Group.findById(groupId);
+            if (!group) throw new Error("Group not found");
+
+            const member = group.members.find(m => m.user.equals(assignCreatorUserId));
+            if (!member) throw new Error("User not found in group");
+
+            member.role = "creator";
+            await group.save();
+            return group;
+        } catch (error) {
+            throw new Error(`Assign creator group service error: ${error}`, 500);
+        }
+    },
+
     //-----------PROJECT-----------------
     createProject : async (data, groupId, createdBy) => {
         try {
@@ -169,6 +271,8 @@ const memberAvatars = sortedMembers.slice(0, 4).map(m => m.avatar);
         }
     },
 
+
+    //-----------PROJECT-----------------
 };
 
 export default groupServices;

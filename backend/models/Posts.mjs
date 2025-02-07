@@ -37,7 +37,7 @@ const postSchema = new mongoose.Schema(
       ref: "Group",
       default: null,
     },
-    // Trạng thái bài viết (chờ duyệt hay đã duyệt)
+    // Trạng thái bài viết (chờ duyệt hay đã duyệt) 
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],

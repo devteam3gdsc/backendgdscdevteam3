@@ -64,6 +64,73 @@ const groupController = {
       else return res.status(500).json(error);
     }
   },
+
+  inviteMembers : async (req, res) => {
+    try {
+      const group = await groupServices.inviteMembers(req.params.groupId,req.body.members);//{ "members": ["userId1", "userId2", "userId3"]
+      res.status(200).json({ message:"Invite new member successfully"});
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  },
+
+  removeMember : async (req, res) => {
+    try {
+      const group = await groupServices.removeMember(req.params.groupId, req.params.removedUserId);
+      res.status(200).json({ message:"Delete member successfully"});
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  },
+
+  joinGroup : async (req, res) => {
+    try {
+      const group = await groupServices.joinGroup(req.params.groupId, req.user.id);
+      res.status(200).json({ message:"Join group successfully"});
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  },
+
+  leaveGroup : async (req, res) => {
+    try {
+      const group = await groupServices.leaveGroup(req.params.groupId, req.user.id);
+      res.status(200).json({ message:"leave group successfully"});
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  },
+
+  assignAdmin : async (req, res) => {
+    try {
+      const group = await groupServices.assignAdmin(req.params.groupId, req.params.assignAdminUserId);
+      res.status(200).json({ message:"assign admin group successfully"});
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  },
+  assignCreator : async (req, res) => {
+    try {
+      const group = await groupServices.assignCreator(req.params.groupId, req.params.assignCreatorUserId);
+      res.status(200).json({ message:"assign creator group successfully"});
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  },
+
+
 };
 
 export default groupController;

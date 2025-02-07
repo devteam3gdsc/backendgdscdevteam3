@@ -18,6 +18,7 @@ const commentsController = {
         authorname: user.displayname,
         avatar: user.avatar,
         code: code,
+        editedAt:Date.now(),
         text: text,
         hostId: hostId,
       });

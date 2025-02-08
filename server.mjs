@@ -20,7 +20,7 @@ const io = initializeSocket(httpServer); // Call the function
 
 // CORS configuration
 const corsOptions = {
-  origin: `${process.env.FE_URL}`, // Set this to the exact frontend URL
+  origin: `${process.env.LOCAL_HOST}`, // Set this to the exact frontend URL
   methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
   allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
   credentials: true, // Allow cookies to be sent

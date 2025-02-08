@@ -183,11 +183,8 @@ const postController = {
   //[GET] /post/like/:postId
   likePost: async (req, res) => {
     try {
-      const post = await findDocument(Post,{_id:req.params.postId},{});
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`)
-      post.likes.push(userId)
-      post.totalLikes = post.totalLikes + 1;
-      await post.save();
+      const post = await Post.findOneAndUpdate({_id:req.params.postId},{$push:{likes:userId},$inc:{totalLikes:1}},{new:false});
       await updateDocument(User,1,[{_id:post.author}],[{$inc:{totalLikes:1}}]);
       return res.status(200).json("liked!");
     } catch (error) {
@@ -199,12 +196,11 @@ const postController = {
   //[GET] /post/unlike/:postId
   unLikePost: async (req, res) => {
     try {
-      await updateDocument(Post,1,[{_id:req.params.postId}], [{
-        $pull: { likes:req.user.id},
-        $inc: { totalLikes: -1 },
-      }]);
-      const result = (await findDocument(Post,{_id:req.params.postId},{author:1})).author
-      await updateDocument(User,1,[{_id:result}],[{$inc:{totalLikes:-1}}]);
+      const post = await Post.findOneAndUpdate({_id:req.params.postId},{
+      $pull: { likes:req.user.id},
+      $inc: { totalLikes: -1 }
+    },{new:false});
+      await updateDocument(User,1,[{_id:post.author}],[{$inc:{totalLikes:-1}}]);
       return res.status(200).json("unliked");
     } catch (error) {
       if (error instanceof httpError)

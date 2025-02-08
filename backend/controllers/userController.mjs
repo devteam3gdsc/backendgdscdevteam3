@@ -24,7 +24,7 @@ const userController = {
     try {
       const result = await findDocument(User,
         {_id:req.user.id},
-        {_id:0,displayname:1,email:1,avatar:1,username:1,totalLikes:1,totalComments:1,story:1,contactLinks:1,totalPosts:1}
+        {_id:1,displayname:1,email:1,avatar:1,username:1,totalLikes:1,totalComments:1,story:1,contactLinks:1,totalPosts:1}
       );
       return res.status(200).json(result);
     } catch (error) {

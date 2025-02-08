@@ -132,6 +132,18 @@ const groupController = {
       else return res.status(500).json(error);
     }
   },
+
+  removeAdmin : async (req, res) => {
+    try {
+      const group = await groupServices.removeAdmin(req.params.groupId, req.params.removeAdminUserId);
+      res.status(200).json({ message:"Remove admin group successfully"});
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  },
+
   assignCreator : async (req, res) => {
     try {
       const group = await groupServices.assignCreator(req.params.groupId, req.params.assignCreatorUserId);

@@ -5,6 +5,7 @@ import postRouter from "./postRouter.mjs";
 import userRouter from "./userRouter.mjs";
 import notificationRouter from "./notificationRouter.mjs";
 import groupRouter from "./groupRouter.mjs";
+import projectRouter from "./projectRouter.mjs";
 function router(app) {
   app.use("/auth", authRouter);
   app.use("", pageRouter);
@@ -12,5 +13,6 @@ function router(app) {
   app.use("/user", userRouter);
   app.use("/notification", notificationRouter);
   app.use("/group", groupRouter);
+  app.use("/project", projectRouter);
 }
 export default router;

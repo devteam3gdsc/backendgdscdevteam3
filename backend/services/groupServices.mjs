@@ -13,7 +13,7 @@ const groupServices = {
                 creator: creatorId,
                 members: [{
                     user: creatorId,
-                    role: "creator"
+                    role: "admin"
                 }]
             });
 
@@ -264,6 +264,23 @@ const memberAvatars = sortedMembers.slice(0, 4).map(m => m.avatar);
         }
     },
 
+    removeAdmin : async (groupId, removeAdminUserId) => {
+        try {
+            const group = await Group.findById(groupId);
+            if (!group) throw new Error("Group not found");
+            const member = group.members.find(m => m.user.equals(removeAdminUserId));
+            if(!member) throw new Error("User not found in group");
+            if( member.role === "member") {
+                throw new Error("User is member");
+            }
+            member.role = "member"
+            await group.save();
+            return group;
+        } catch (error) {
+            throw new Error(`Remove admin group service error: ${error}`, 500);
+        } 
+    },
+
     assignCreator : async (groupId, assignCreatorUserId) => {
         try {
             const group = await Group.findById(groupId);
@@ -279,43 +296,6 @@ const memberAvatars = sortedMembers.slice(0, 4).map(m => m.avatar);
             throw new Error(`Assign creator group service error: ${error}`, 500);
         }
     },
-
-    //-----------PROJECT-----------------
-    createProject : async (data, groupId, createdBy) => {
-        try {
-            const newProject = new Project({
-                ...data,
-                group: groupId,
-                createdBy: createdBy,
-            });
-
-            await newProject.save();
-            return newProject;
-        } catch (error) {
-            throw new Error(`Creating project service error: ${error}`, 500);
-        }
-    },
-
-    updateProject : async (projectId, updateData) => {
-        try { 
-            const updatedProject = await Group.findByIdAndUpdate(projectId, updateData, { new: true});
-            return updatedProject;
-        } catch (error) {
-            throw new Error(`Updating project service error: ${error}`, 500);
-        }
-    },
-
-    deleteProject : async (projectId) => {
-        try {
-            await Project.findByIdAndDelete(projectId);
-            return { message: "Project deleted successfully "};
-        } catch (error) {
-            throw new Error(`Deleting project service error: ${error}`, 500);
-        }
-    },
-
-
-    //-----------PROJECT-----------------
 };
 
 export default groupServices;

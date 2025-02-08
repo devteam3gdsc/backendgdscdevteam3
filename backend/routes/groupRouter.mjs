@@ -12,13 +12,13 @@ groupRouter.post(
 groupRouter.put(
   "/update/:groupId",
   authMiddleware.verifyToken,
-  roleMiddleware(["creator", "admin"]),
+  roleMiddleware("group",["admin"]),
   groupController.updateGroup,
 );
 groupRouter.delete(
   "/delete/:groupId",
   authMiddleware.verifyToken,
-  roleMiddleware(["creator"]),
+  roleMiddleware("group",["admin"]),
   groupController.deleteGroup,
 );
 groupRouter.get(
@@ -30,7 +30,7 @@ groupRouter.get(
 groupRouter.post(
   "/invite/:groupId",
   authMiddleware.verifyToken,
-  roleMiddleware(["creator", "admin"]),
+  roleMiddleware("group",["admin"]),
   groupController.inviteMembers,
 );
 groupRouter.post(
@@ -41,7 +41,7 @@ groupRouter.post(
 groupRouter.delete(
   "/removeMember/:groupId/:removedUserId",
   authMiddleware.verifyToken,
-  roleMiddleware(["creator", "admin"]),
+  roleMiddleware("group",["admin"]),
   groupController.removeMember,
 );
 groupRouter.post(
@@ -57,13 +57,21 @@ groupRouter.post(
 groupRouter.post(
   "/assignAdmin/:groupId/:assignAdminUserId",
   authMiddleware.verifyToken,
-  roleMiddleware(["creator", "admin"]),
+  roleMiddleware("group",["admin"]),
   groupController.assignAdmin,
 );
 groupRouter.post(
-  "/assignCreator/:groupId/:assignCreatorUserId",
+  "/removeAdmin/:groupId/:removeAdminUserId",
   authMiddleware.verifyToken,
-  roleMiddleware(["creator"]),
-  groupController.assignCreator,
+  roleMiddleware("group",["admin"]),
+  groupController.removeAdmin,
 );
+// groupRouter.post(
+//   "/assignCreator/:groupId/:assignCreatorUserId",
+//   authMiddleware.verifyToken,
+//   roleMiddleware("group",["creator"]),
+//   groupController.assignCreator,
+// );
+
+
 export default groupRouter;

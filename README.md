@@ -640,3 +640,18 @@ http://localhost:4000/group/confirmInvite/67a5e2e1560b4238c754b169?accept=true
         "message": "User joined the group"
     }
 }
+
+//------------PROJECT------------
+// POST
+http://localhost:4000/project/create/67a5e2e1560b4238c754b169
+
+
+// POST 
+http://localhost:4000/project/update/67a72552dd3d9cde964ffd6a
+
+
+//DELETE
+http://localhost:4000/project/delete/67a72552dd3d9cde964ffd6a
+{
+    "message": "Deleting project successfully"
+}

@@ -41,30 +41,32 @@ const projectSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     description: { type: String, default: "" },
+    private: { type: Boolean, default: false },
+    avatar: { type: String, default: "" },
+    creator: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     group: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Group",
       required: true,
     },
     teams: [{ type: mongoose.Schema.Types.ObjectId, ref: "Team" }],
-    roles: [
+    members: [
       {
         user: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "User",
-          required: true,
         },
         role: {
           type: String,
-          enum: ["leader", "admin", "participant"],
+          enum: ["leader", "admin", "member"],
+          default: "member",
         },
       },
     ],
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
   },
   { timestamps: true },
 );

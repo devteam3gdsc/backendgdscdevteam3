@@ -30,10 +30,12 @@
     "multer-storage-cloudinary": "^4.0.0",
     "nodemailer": "^6.9.16",
     "nodemon": "^3.1.9",
-    "npm": "^10.9.2"
+    "npm": "^10.9.2",
+    "socket.io": "^4.8.1"
   },
   "type": "module",
   "devDependencies": {
-    "@shelf/jest-mongodb": "^4.3.2"
+    "@shelf/jest-mongodb": "^4.3.2",
+    "prettier": "3.4.2"
   }
 }

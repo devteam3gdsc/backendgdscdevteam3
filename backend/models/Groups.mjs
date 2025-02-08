@@ -23,6 +23,12 @@ const groupSchema = new mongoose.Schema(
         },
       },
     ],
+    pendingInvites: [
+      {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      }
+    ],
     projects: [{ type: mongoose.Schema.Types.ObjectId, ref: "Project" }],
     posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }], //danh sách bài viết
   },

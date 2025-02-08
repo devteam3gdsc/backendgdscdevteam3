@@ -3,6 +3,7 @@ import {Group, Project, Team, Section} from "../models/Groups.mjs"
 import User from "../models/Users.mjs";
 import Post from "../models/Posts.mjs";
 import mongoose from "mongoose"
+import NotificationServices from "./notificationServices.mjs";
 const groupServices = {
     //-----------GROUP-----------------
     createGroup : async (data, creatorId) => {
@@ -135,22 +136,64 @@ const memberAvatars = sortedMembers.slice(0, 4).map(m => m.avatar);
         }
     },
 
-    inviteMembers : async (groupId, members) => {
+    inviteMembers : async (groupId, userId, members) => {
         try {
             const group = await Group.findById(groupId);
-            if(!group){
+            if(!group) {
                 throw new Error("Group not found");
             }
-    
-            members.forEach(memberId => {
-                if(!group.members.some(m => m.user.equals(memberId))) {
-                    group.members.push({ user: memberId, role: "member" });
+
+            const validMembers = members.filter(m => mongoose.Types.ObjectId.isValid(m));
+            if(validMembers.length === 0) {
+                throw new Error("No valid members to invite");
+            }
+
+            let newInvites = [];
+            validMembers.forEach(memberId => {
+                const isMember = group.members.some(m => m.user.equals(memberId));
+                const isAlreadyInvited = group.pendingInvites?.includes(memberId);
+
+                if(!isMember && !isAlreadyInvited) {
+                    newInvites.push(memberId);
                 }
             });
-            await group.save();
-            return group;
+
+            if(newInvites.length > 0) {
+                group.pendingInvites = [...(group.pendingInvites || []), ...newInvites];
+                await group.save();
+
+                newInvites.forEach(async (memberId) => {
+                    await NotificationServices.GroupInviteNotification(groupId, userId, memberId);
+                });
+            }
+
+            return { message: "Invites sent successfully", invited: newInvites };
         } catch (error) {
             throw new Error(`Invite members service error: ${error}`, 500);
+        }
+    },
+
+    confirmInvite : async (groupId, userId, accept) => {
+        try {
+            const group = await Group.findById(groupId);
+            if(!group) {
+                throw new Error("Group not found");
+            }
+
+            if (!group.pendingInvites?.includes(userId)) {
+                throw new Error("User was not invited");
+            }
+
+            if (accept) {
+                group.members.push({ user: userId, role: "member"});
+            }
+
+            group.pendingInvites = group.pendingInvites.filter(id => !id.equals(userId));
+            await group.save();
+
+            return {message: accept ? "User joined the group" : "Invite declined"};
+        } catch (error) {
+            throw new Error(`Confirm invite service error: ${error}`, 500);
         }
     },
 

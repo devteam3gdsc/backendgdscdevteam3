@@ -67,7 +67,8 @@ const groupController = {
 
   inviteMembers : async (req, res) => {
     try {
-      const group = await groupServices.inviteMembers(req.params.groupId,req.body.members);//{ "members": ["userId1", "userId2", "userId3"]
+      const group = await groupServices.inviteMembers(req.params.groupId, req.user.id, req.body.members);//{ "members": ["userId1", "userId2", "userId3"]
+     console.log(group)
       res.status(200).json({ message:"Invite new member successfully"});
     } catch (error) {
       if (error instanceof httpError)
@@ -75,6 +76,18 @@ const groupController = {
       else return res.status(500).json(error);
     }
   },
+
+  confirmInvite : async (req, res) => { // accept // ?accept=true/false
+    try {
+      const confirm = await groupServices.confirmInvite(req.params.groupId, req.user.id, req.query.accept);
+      res.status(200).json(confirm)
+      
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  }, 
 
   removeMember : async (req, res) => {
     try {

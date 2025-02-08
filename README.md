@@ -447,6 +447,23 @@ http://localhost:4000/notification
 "hasMore": false
 }
 
+// notification invite to group 
+  {
+            "_id": "67a6e0903e412198afeb216f",
+            "userId": "6791aebf4277d1beaf39ded7",
+            "senderId": "679597b08d8bedbe78208c33",
+            "senderName": "haibabon",
+            "senderAvatar": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541",
+            "type": "invite",
+            "message": "invited you join group",
+            "relatedEntityId": "67a5e2e1560b4238c754b169",
+            "entityType": "Group",
+            "isRead": false,
+            "extraData": null,
+            "createdAt": "2025-02-08T04:41:52.212Z",
+            "__v": 0
+        }
+
 http://localhost:4000/notification?page=1&limit=5&filter=unread
 http://localhost:4000/notification?page=1&limit=5&filter=read
 
@@ -613,4 +630,13 @@ http://localhost:4000/auth/passwordReset/82ca52b4c5f82b3b7b60015f69c84458be8c9ef
 // POST http://localhost:4000/group/assignCreator/67a5e767a29c317761d87ad8/67872e57d1dd8257ea418e67
 {
     "message": "assign creator group successfully"
+}
+
+
+// POST
+http://localhost:4000/group/confirmInvite/67a5e2e1560b4238c754b169?accept=true
+{
+    "confirm": {
+        "message": "User joined the group"
+    }
 }

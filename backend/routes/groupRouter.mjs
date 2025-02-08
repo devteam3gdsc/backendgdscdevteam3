@@ -33,6 +33,11 @@ groupRouter.post(
   roleMiddleware(["creator", "admin"]),
   groupController.inviteMembers,
 );
+groupRouter.post(
+  "/confirmInvite/:groupId",
+  authMiddleware.verifyToken,
+  groupController.confirmInvite,
+);
 groupRouter.delete(
   "/removeMember/:groupId/:removedUserId",
   authMiddleware.verifyToken,

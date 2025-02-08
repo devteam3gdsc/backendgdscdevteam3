@@ -545,15 +545,3 @@ http://localhost:4000/auth/passwordReset/82ca52b4c5f82b3b7b60015f69c84458be8c9ef
 [PUT]: /comment/edit/:commentId (nhưu cũ nhữung bỏ post này kia đi)
 
 [DELETE]: /comment/delete/:commentId (như cũ nhưng bỏ postId này kia đi)
-
-
-
-
-
-
-
-
-
-
-
-

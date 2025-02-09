@@ -526,7 +526,7 @@ http://localhost:4000/auth/passwordReset/82ca52b4c5f82b3b7b60015f69c84458be8c9ef
 "message": "Password reset successfully"
 }
 
-
+//-------------GROUP------------------
 
 // POST http://localhost:4000/group/create
 {
@@ -551,7 +551,9 @@ http://localhost:4000/auth/passwordReset/82ca52b4c5f82b3b7b60015f69c84458be8c9ef
     "__v": 0
 }
 
+
 // PUT http://localhost:4000/group/update/67a5cfe37221d6573c1d81f2
+// PUT /group/update/:groupId
 {
     "_id": "67a5cfe37221d6573c1d81f2",
     "name": "groupuser2222",
@@ -575,6 +577,8 @@ http://localhost:4000/auth/passwordReset/82ca52b4c5f82b3b7b60015f69c84458be8c9ef
 }
 
 // GET http://localhost:4000/group/fullData/67a5cfe37221d6573c1d81f2
+
+// GET http://localhost:4000/group/fullData/:groupId
 {
     "name": "groupuser2222",
     "bio": "",
@@ -590,12 +594,16 @@ http://localhost:4000/auth/passwordReset/82ca52b4c5f82b3b7b60015f69c84458be8c9ef
 }
 
 // DELETE http://localhost:4000/group/delete/67a5cfe37221d6573c1d81f2
+
+// DELETE http://localhost:4000/group/delete/:groupId
 {
     "message": "Group deleted successfully"
 }
 
 
 // POST http://localhost:4000/group/invite/67a4cfee39057ae06b9727af
+
+// POST http://localhost:4000/group/invite/:groupId
 {
   "members": ["6786b1c520d6160de991e264", "67872550d1dd8257ea418b42"]
 }
@@ -604,6 +612,8 @@ http://localhost:4000/auth/passwordReset/82ca52b4c5f82b3b7b60015f69c84458be8c9ef
 }
 
 // DELETE http://localhost:4000/group/removeMember/67a4cfee39057ae06b9727af/67872e57d1dd8257ea418e67
+
+// DELETE http://localhost:4000/group/removeMember/:groupId/:removedUserId
 {
   "members": ["67872e57d1dd8257ea418e67"]
 }
@@ -612,22 +622,30 @@ http://localhost:4000/auth/passwordReset/82ca52b4c5f82b3b7b60015f69c84458be8c9ef
 }
 
 // POST http://localhost:4000/group/join/67a4b1a5fd48ada7ebba874c
+
+// POST http://localhost:4000/group/join/:groupId
 {
     "message": "Join group successfully"
 }
 
 // POST http://localhost:4000/group/leave/67a4b1a5fd48ada7ebba874c
+
+// POST http://localhost:4000/group/leave/:groupId
 {
     "message": "leave group successfully"
 }
 
 
 // POST http://localhost:4000/group/assignAdmin/67a5e2e1560b4238c754b169/67872e57d1dd8257ea418e67
+
+// POST http://localhost:4000/group/assignAdmin/:groupId/:assignAdminUserId
 {
     "message": "assign admin group successfully"
 }
 
 // POST http://localhost:4000/group/assignCreator/67a5e767a29c317761d87ad8/67872e57d1dd8257ea418e67
+
+// POST http://localhost:4000/group/assignCreator/:groupId/:assignCreatorUserId
 {
     "message": "assign creator group successfully"
 }
@@ -635,6 +653,8 @@ http://localhost:4000/auth/passwordReset/82ca52b4c5f82b3b7b60015f69c84458be8c9ef
 
 // POST
 http://localhost:4000/group/confirmInvite/67a5e2e1560b4238c754b169?accept=true
+
+// POST http://localhost:4000/group/confirmInvite/:groupId
 {
     "confirm": {
         "message": "User joined the group"
@@ -645,13 +665,19 @@ http://localhost:4000/group/confirmInvite/67a5e2e1560b4238c754b169?accept=true
 // POST
 http://localhost:4000/project/create/67a5e2e1560b4238c754b169
 
+http://localhost:4000/project/create/:groupId
+
 
 // POST 
 http://localhost:4000/project/update/67a72552dd3d9cde964ffd6a
 
+http://localhost:4000/project/update/:projectId
+
 
 //DELETE
 http://localhost:4000/project/delete/67a72552dd3d9cde964ffd6a
+
+http://localhost:4000/project/delete/:projectId
 {
     "message": "Deleting project successfully"
 }
@@ -700,6 +726,8 @@ http://localhost:4000/project/create/67a5e2e1560b4238c754b169
 
 // GET 
 http://localhost:4000/project/fullData/67a86388ac612cf5f33de671
+
+http://localhost:4000/project/fullData/:projectId
 {
     "name": "create first project",
     "bio": "",
@@ -724,6 +752,9 @@ http://localhost:4000/project/fullData/67a86388ac612cf5f33de671
 
 // POST
 http://localhost:4000/project/invite/67a86388ac612cf5f33de671
+
+
+http://localhost:4000/project/invite/:projectId
 {
   "members": ["67872846d1dd8257ea418c48"]
 }
@@ -733,30 +764,40 @@ http://localhost:4000/project/invite/67a86388ac612cf5f33de671
 
 // DELETE 
 http://localhost:4000/project/removeMember/67a86388ac612cf5f33de671/679597b08d8bedbe78208c33
+
+http://localhost:4000/project/removeMember/:projectId/:removedUserId
 {
     "message": "Delete member successfully"
 }
 
 // POST 
 http://localhost:4000/project/join/67a86388ac612cf5f33de671
+
+http://localhost:4000/project/join/:projectId
 {
     "message": "Join project successfully"
 }
 
 // POST
 http://localhost:4000/project/leave/67a86388ac612cf5f33de671
+
+http://localhost:4000/project/leave/:projectId
 {
     "message": "leave project successfully"
 }
 
 // POST 
 http://localhost:4000/project/assignAdmin/67a86388ac612cf5f33de671/6791aebf4277d1beaf39ded7
+
+http://localhost:4000/project/assignAdmin/:projectId/:assignAdminUserId
 {
     "message": "assign admin project successfully"
 }
 
 // POST 
 http://localhost:4000/project/removeAdmin/67a86388ac612cf5f33de671/6791aebf4277d1beaf39ded7
+
+http://localhost:4000/project/removeAdmin/:projectId/:removeAdminUserId
 {
     "message": "Remove admin project successfully"
 }

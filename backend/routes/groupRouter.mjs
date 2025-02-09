@@ -66,12 +66,12 @@ groupRouter.post(
   roleMiddleware("group",["admin"]),
   groupController.removeAdmin,
 );
-// groupRouter.post(
-//   "/assignCreator/:groupId/:assignCreatorUserId",
-//   authMiddleware.verifyToken,
-//   roleMiddleware("group",["creator"]),
-//   groupController.assignCreator,
-// );
+groupRouter.post(
+  "/assignCreator/:groupId/:assignCreatorUserId",
+  authMiddleware.verifyToken,
+  roleMiddleware("group",["creator"]),
+  groupController.assignCreator,
+);
 
 
 export default groupRouter;

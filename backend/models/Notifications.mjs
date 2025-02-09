@@ -55,6 +55,7 @@ const notificationSchema = new mongoose.Schema({
       "Comments",
       "User",
       "Group",
+      "Project",
       "Message",
       "Achievement",
       "Invoice",

@@ -1,5 +1,5 @@
 import { sofa } from "@cloudinary/url-gen/qualifiers/focusOn";
-import {Group, Project, Team, Section} from "../models/Groups.mjs"
+import {Group, Project, Section} from "../models/Groups.mjs"
 import User from "../models/Users.mjs";
 import Post from "../models/Posts.mjs";
 import mongoose from "mongoose"

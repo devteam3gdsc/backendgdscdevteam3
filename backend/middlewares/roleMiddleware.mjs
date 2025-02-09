@@ -1,4 +1,4 @@
-import { Group, Project, Team, Section } from "../models/Groups.mjs";
+import { Group, Project, Section } from "../models/Groups.mjs";
 
 const roleMiddleware = (level, roles) => {
   return async (req, res, next) => {

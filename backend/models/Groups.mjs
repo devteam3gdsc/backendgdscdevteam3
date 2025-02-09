@@ -53,7 +53,6 @@ const projectSchema = new mongoose.Schema(
       ref: "Group",
       required: true,
     },
-    teams: [{ type: mongoose.Schema.Types.ObjectId, ref: "Team" }],
     members: [
       {
         user: {
@@ -62,44 +61,31 @@ const projectSchema = new mongoose.Schema(
         },
         role: {
           type: String,
-          enum: ["leader", "admin", "member"],
-          default: "member",
+          enum: ["leader", "admin", "participant"], 
+          default: "participant",
         },
       },
     ],
+    pendingInvites: [
+      {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      }
+    ],
+    sections: [{ type: mongoose.Schema.Types.ObjectId, ref: "Section" }],
   },
   { timestamps: true },
 );
 
 const Project = mongoose.model("Project", projectSchema);
 
-const teamSchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true },
-    project: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Project",
-      required: true,
-    }, // Team thuộc Project nào?
-    sections: [{ type: mongoose.Schema.Types.ObjectId, ref: "Section" }], // Chứa các Section (Landing Page, Sign In/Up)
-    members: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Thành viên trong team
-  },
-  { timestamps: true },
-);
-
-const Team = mongoose.model("Team", teamSchema);
-
 const sectionSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     description: { type: String, default: "" },
-    team: { type: mongoose.Schema.Types.ObjectId, ref: "Team", required: true }, // Section thuộc Team nào?
-    parent: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Section",
-      default: null,
-    }, // Section cha (nếu có)
-    children: [{ type: mongoose.Schema.Types.ObjectId, ref: "Section" }], // Danh sách section con
+    project: { type: mongoose.Schema.Types.ObjectId, ref: "Project", required: true },
+    parent: { type: mongoose.Schema.Types.ObjectId, ref: "Section", default: null },
+    children: [{ type: mongoose.Schema.Types.ObjectId, ref: "Section" }],
     participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Danh sách người có quyền trong section
   },
   { timestamps: true },
@@ -107,4 +93,4 @@ const sectionSchema = new mongoose.Schema(
 
 const Section = mongoose.model("Section", sectionSchema);
 
-export { Group, Project, Team, Section };
+export { Group, Project, Section };

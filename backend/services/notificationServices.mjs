@@ -187,6 +187,39 @@ const NotificationServices = {
     }
   },
 
+  ProjectInviteNotification : async (projectId, senderId, receiveId) => {
+    try {
+      const senderUser = await User.findById(senderId);
+      if(!senderUser) {
+        throw new Error("SenderUser not found");
+      }
+
+      const notification = new Notification({
+        userId: receiveId,
+        senderId,
+        senderName: senderUser.displayname,
+        senderAvatar: senderUser.avatar,
+        type: "invite",
+        message: `invited you join project`,
+        relatedEntityId: projectId,
+        entityType: "Project",
+      });
+
+      const savedNotification = await notification.save();
+
+      // Emit the notification to the user if they are online
+      const socketId = onlineUsers.get(receiveId);
+      if (socketId) {
+        io.to(socketId).emit("newNotification", savedNotification);
+      }
+
+      return savedNotification;
+    } catch (error) {
+      console.error(`Error creating invite notification: ${error.message}`);
+      throw new httpError("Failed to create invite notification", 500);
+    }
+  },
+
   getNotificationsByUserId: async (
     userId,
     skip = 0,

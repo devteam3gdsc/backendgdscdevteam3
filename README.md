@@ -655,3 +655,108 @@ http://localhost:4000/project/delete/67a72552dd3d9cde964ffd6a
 {
     "message": "Deleting project successfully"
 }
+
+
+//--------------PROJECT--------------
+// POST 
+http://localhost:4000/project/create/67a5e2e1560b4238c754b169
+{
+    "project": {
+        "name": "create first project",
+        "description": "",
+        "private": false,
+        "avatar": "",
+        "creator": "679597b08d8bedbe78208c33",
+        "group": "67a5e2e1560b4238c754b169",
+        "pendingInvites": [],
+        "sections": [],
+        "_id": "67a86388ac612cf5f33de671",
+        "members": [
+            {
+                "user": "679597b08d8bedbe78208c33",
+                "role": "leader",
+                "_id": "67a86388ac612cf5f33de672"
+            }
+        ],
+        "createdAt": "2025-02-09T08:12:56.079Z",
+        "updatedAt": "2025-02-09T08:12:56.079Z",
+        "__v": 0
+    },
+    "rootSection": {
+        "name": "create first project",
+        "description": "",
+        "project": "67a86388ac612cf5f33de671",
+        "parent": null,
+        "children": [],
+        "participants": [
+            "679597b08d8bedbe78208c33"
+        ],
+        "_id": "67a86388ac612cf5f33de674",
+        "createdAt": "2025-02-09T08:12:56.154Z",
+        "updatedAt": "2025-02-09T08:12:56.154Z",
+        "__v": 0
+    }
+}
+
+// GET 
+http://localhost:4000/project/fullData/67a86388ac612cf5f33de671
+{
+    "name": "create first project",
+    "bio": "",
+    "avatar": "",
+    "members": [
+        "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
+    ],
+    "numberOfMembers": 1,
+    "sections": [
+        {
+            "_id": "67a86388ac612cf5f33de674",
+            "name": "create first project",
+            "participants": [
+                "679597b08d8bedbe78208c33"
+            ],
+            "children": []
+        }
+    ],
+    "joined": true,
+    "canJoin": true
+}
+
+// POST
+http://localhost:4000/project/invite/67a86388ac612cf5f33de671
+{
+  "members": ["67872846d1dd8257ea418c48"]
+}
+{
+    "message": "Invite new member successfully"
+}
+
+// DELETE 
+http://localhost:4000/project/removeMember/67a86388ac612cf5f33de671/679597b08d8bedbe78208c33
+{
+    "message": "Delete member successfully"
+}
+
+// POST 
+http://localhost:4000/project/join/67a86388ac612cf5f33de671
+{
+    "message": "Join project successfully"
+}
+
+// POST
+http://localhost:4000/project/leave/67a86388ac612cf5f33de671
+{
+    "message": "leave project successfully"
+}
+
+// POST 
+http://localhost:4000/project/assignAdmin/67a86388ac612cf5f33de671/6791aebf4277d1beaf39ded7
+{
+    "message": "assign admin project successfully"
+}
+
+// POST 
+http://localhost:4000/project/removeAdmin/67a86388ac612cf5f33de671/6791aebf4277d1beaf39ded7
+{
+    "message": "Remove admin project successfully"
+}

@@ -23,4 +23,49 @@ projectRouter.delete(
     projectController.deleteProject,
 );
 
+projectRouter.get(
+    "/fullData/:projectId",
+    authMiddleware.verifyToken,
+    projectController.getFullProjectData,
+  );
+  
+projectRouter.post(
+    "/invite/:projectId",
+    authMiddleware.verifyToken,
+    roleMiddleware("project",["admin", "leader"]),
+    projectController.inviteMembers,
+  );
+projectRouter.post(
+    "/confirmInvite/:projectId",
+    authMiddleware.verifyToken,
+    projectController.confirmInvite,
+  );
+projectRouter.delete(
+    "/removeMember/:projectId/:removedUserId",
+    authMiddleware.verifyToken,
+    roleMiddleware("project",["admin", "leader"]),
+    projectController.removeMember,
+  );
+projectRouter.post(
+    "/join/:projectId",
+    authMiddleware.verifyToken,
+    projectController.joinProject,
+  );
+projectRouter.post(
+    "/leave/:projectId",
+    authMiddleware.verifyToken,
+    projectController.leaveProject,
+  );
+projectRouter.post(
+    "/assignAdmin/:projectId/:assignAdminUserId",
+    authMiddleware.verifyToken,
+    roleMiddleware("project",["admin", "leader"]),
+    projectController.assignAdmin,
+  );
+projectRouter.post(
+    "/removeAdmin/:projectId/:removeAdminUserId",
+    authMiddleware.verifyToken,
+    roleMiddleware("project",["admin", "leader"]),
+    projectController.removeAdmin,
+  );
 export default projectRouter;

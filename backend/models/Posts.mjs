@@ -31,10 +31,20 @@ const postSchema = new mongoose.Schema(
     avatar: {
       type: String,
     },
-    // Nếu bài viết thuộc về một group
+    // Nếu bài viết thuộc về một group, project, section
     group: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Group",
+      default: null,
+    },
+    project: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project",
+      default: null,
+    },
+    section: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Section",
       default: null,
     },
     // Trạng thái bài viết (chờ duyệt hay đã duyệt) 
@@ -42,7 +52,7 @@ const postSchema = new mongoose.Schema(
       type: String,
       enum: ["pending", "approved", "rejected"],
       default: function () {
-        return this.group ? "pending" : "approved"; // Nếu bài viết thuộc group thì "pending", ngược lại là "approved"
+        return this.group || this.project || this.section ? "pending" : "approved"; // Nếu bài viết thuộc group thì "pending", ngược lại là "approved"
       },
     },
     // comments: [
@@ -65,6 +75,9 @@ const postSchema = new mongoose.Schema(
       type: String,
       enum: ["public", "private"],
       default: "public",
+      // default: function () {
+      //   return this.group || this.project || this.section ? "private" : "public";
+      // },
     },
     stored: [
       {

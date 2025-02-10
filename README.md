@@ -801,3 +801,71 @@ http://localhost:4000/project/removeAdmin/:projectId/:removeAdminUserId
 {
     "message": "Remove admin project successfully"
 }
+
+//------POST------
+// GET 
+http://localhost:4000/group/getPending?group=67a86388ac612cf5f33de671
+
+// GET // post được tạo mặc định là public, nếu không để điều kiện group = thì sẽ lấy bài viết public, khác với community là community lấy được post public không thuộc group
+http://localhost:4000/group/getPosts?group=67a9cd1a45d31c5ad73a25c2&status=pending
+{
+    "posts": [
+        {
+            "_id": "67a9d379ba029a0894fba501",
+            "title": "post 10 in group",
+            "content": "",
+            "tags": [],
+            "author": "679597b08d8bedbe78208c33",
+            "authorname": "haibabon",
+            "avatar": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541",
+            "group": "67a9cd1a45d31c5ad73a25c2",
+            "project": null,
+            "section": null,
+            "likes": [],
+            "totalLikes": 0,
+            "files": [],
+            "stored": [],
+            "totalComments": 0,
+            "editedAt": "2025-02-10T10:22:49.140Z",
+            "status": "pending",
+            "visibility": "private",
+            "createdAt": "2025-02-10T10:22:49.150Z",
+            "updatedAt": "2025-02-10T10:22:49.151Z",
+            "__v": 0,
+            "Stored": false,
+            "Liked": false,
+            "isAuthor": true
+        },
+        {
+            "_id": "67a9d0c681ea0fdb277dba62",
+            "title": "post 9 in group",
+            "content": "",
+            "tags": [],
+            "author": "679597b08d8bedbe78208c33",
+            "authorname": "haibabon",
+            "avatar": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541",
+            "group": "67a9cd1a45d31c5ad73a25c2",
+            "project": null,
+            "section": null,
+            "likes": [],
+            "totalLikes": 0,
+            "files": [],
+            "stored": [],
+            "totalComments": 0,
+            "editedAt": "2025-02-10T10:11:18.385Z",
+            "status": "pending",
+            "visibility": "private",
+            "createdAt": "2025-02-10T10:11:18.386Z",
+            "updatedAt": "2025-02-10T10:11:18.386Z",
+            "__v": 0,
+            "Stored": false,
+            "Liked": false,
+            "isAuthor": true
+        },
+      ...
+    ],
+    "currentPage": 1,
+    "totalPages": 2,
+    "totalPosts": 7,
+    "hasMore": true
+}

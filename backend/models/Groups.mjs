@@ -30,7 +30,10 @@ const groupSchema = new mongoose.Schema(
       }
     ],
     projects: [{ type: mongoose.Schema.Types.ObjectId, ref: "Project" }],
-    posts: [{ type: mongoose.Schema.Types.ObjectId, ref: "Post" }], //danh sách bài viết
+    totalPosts: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true },
 );
@@ -73,6 +76,10 @@ const projectSchema = new mongoose.Schema(
       }
     ],
     sections: [{ type: mongoose.Schema.Types.ObjectId, ref: "Section" }],
+    totalPosts: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true },
 );
@@ -87,6 +94,10 @@ const sectionSchema = new mongoose.Schema(
     parent: { type: mongoose.Schema.Types.ObjectId, ref: "Section", default: null },
     children: [{ type: mongoose.Schema.Types.ObjectId, ref: "Section" }],
     participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Danh sách người có quyền trong section
+    totalPosts: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true },
 );

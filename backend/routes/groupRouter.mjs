@@ -2,6 +2,7 @@ import { Router } from "express";
 import groupController from "../controllers/groupController.mjs";
 import authMiddleware from "../middlewares/authMidleware.mjs";
 import roleMiddleware from "../middlewares/roleMiddleware.mjs";
+import postController from "../controllers/postController.mjs";
 
 const groupRouter = Router();
 groupRouter.post(
@@ -72,6 +73,20 @@ groupRouter.post(
   roleMiddleware("group",["creator"]),
   groupController.assignCreator,
 );
+// -----POST-----
+//[GET] /group/createPost
+groupRouter.post(
+  "/createPost",
+  authMiddleware.verifyToken,
+  //roleMiddleware("group",["creator"]),
+  postController.createPost, //group/project/section truyen qua body
+);
 
-
+ //[GET] /group/getPosts?page=...&limit=...&search=...&group=...&status=approved
+groupRouter.get( 
+  "/getPosts",
+  authMiddleware.verifyToken,
+  //roleMiddleware("group",["creator"]),
+  postController.getPostsInGroupProjectSection,
+);
 export default groupRouter;

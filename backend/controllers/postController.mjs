@@ -54,7 +54,7 @@ const postController = {
     }
   },
 
-  //[POST] /post/create
+  //[POST] /create
   createPost: async (req, res) => {
     try {
       const newPostId = await postServices.createPost(
@@ -87,6 +87,7 @@ const postController = {
       const skip = (page - 1) * limit;
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
       let matchData = [{ visibility: "public" }];
+      matchData.push({ group: { $exists: false }, project: { $exists: false }, section: { $exists: false } });
       if (req.query.tags) {
         const tags = req.query.tags.split(",");
         matchData.push({ tags: { $all: tags } });
@@ -96,7 +97,7 @@ const postController = {
       }
       const result = await postServices.getPosts(
         userId,
-        { $and: [...matchData] },
+        { $and: matchData },
         req.query.criteria,
         req.query.order,
         skip,
@@ -117,6 +118,58 @@ const postController = {
       else return res.status(500).json(error);
     }
   },
+
+  //[GET] /group/getPosts?page=...&limit=...&search=...&group=...&status=pending
+  getPostsInGroupProjectSection: async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 5;
+      const search = req.query.search || "";
+      const skip = (page - 1) * limit;
+      const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
+      const { group, project, section, status } = req.query;
+
+    // Mảng điều kiện lọc
+    let matchData = [{ visibility: "public" }];
+
+    // Lọc theo group, project, section nếu có
+    if (group) matchData.push({ group: new mongoose.Types.ObjectId(group) });
+    if (project) matchData.push({ project: new mongoose.Types.ObjectId(project) });
+    if (section) matchData.push({ section: new mongoose.Types.ObjectId(section) });
+
+    // Lọc theo trạng thái nếu có
+    if (status) matchData.push({ status });
+
+    // Lọc theo tags nếu có
+    if (req.query.tags) {
+      const tags = req.query.tags.split(",");
+      matchData.push({ tags: { $all: tags } });
+    }
+
+    // Lọc theo tiêu đề (tìm kiếm)
+    if (search) {
+      matchData.push({ title: { $regex: search, $options: "i" } });
+    }
+
+    // Gọi postServices
+    const result = await postServices.getPosts(userId, { $and: matchData }, req.query.criteria, req.query.order, skip, limit);
+
+      const totalPages = Math.ceil(result.totalPosts / limit);
+      const hasMore = totalPages - page > 0 ? true : false;
+      res.status(200).json({
+        posts: result.posts,
+        currentPage: page,
+        totalPages,
+        totalPosts: result.totalPosts,
+        hasMore,
+      });
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  },
+  
   //[GET] /post/store/:postId
   storePost: async (req, res) => {
     //cần xem lại, nếu người đó là tác giả hay đã từng lưu?,làm cho ẩn đi khi gửi

@@ -258,7 +258,7 @@ const postController = {
     }
   },
   //[GET] /following?page=...&limit=...&search=...
-  getFollowedPost: async (req,res) => {
+  getFeedPosts: async (req,res) => {
     try {
     const page = parseInt(req.query.page)||1;
     const limit = parseInt(req.query.limit)||5;

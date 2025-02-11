@@ -5,6 +5,7 @@ import { v2 } from "cloudinary";
 import multer from "multer";
 import userController from "../controllers/userController.mjs";
 import postController from "../controllers/postController.mjs";
+import authController from "../controllers/authcontroller.mjs";
 const userRouter = Router();
 const storage = new CloudinaryStorage({
   cloudinary: v2,
@@ -35,6 +36,7 @@ userRouter.put(
   authMiddleware.verifyToken,
   userController.updateUserPassword
 );
+userRouter.get("/briefData/:userId",authMiddleware.verifyToken,userController.getUserBriefData)
 userRouter.get("/test",authMiddleware.verifyToken,userController.test);
 userRouter.get("/follow/:userId",authMiddleware.verifyToken,userController.follow)
 userRouter.get("/unfollow/:userId",authMiddleware.verifyToken,userController.unfollow)

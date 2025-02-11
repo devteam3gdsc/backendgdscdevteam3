@@ -1,13 +1,4 @@
 import mongoose from "mongoose";
-const contactLinksSchema = new mongoose.Schema(
-  {
-    facebook: { type: String },
-    youtube:  { type: String },
-    github:   { type: String },
-    email:    { type: String }
-  },
-  { _id: false }
-);
 const userSchema = new mongoose.Schema(
   {
     username: {
@@ -62,7 +53,6 @@ const userSchema = new mongoose.Schema(
     story:{
       type:String
     },
-    contactLinks:contactLinksSchema,
     totalPosts:{
       type:Number,
       default:0

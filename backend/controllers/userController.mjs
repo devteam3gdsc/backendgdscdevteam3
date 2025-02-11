@@ -6,12 +6,24 @@ import Post from "../models/Posts.mjs";
 import authController from "./authcontroller.mjs";
 import updateDocument from "../utils/updateDocument.mjs";
 const userController = {
+  getUserBriefData: async (req, res) => {
+    try {
+      const result = await findDocument(User,
+        {_id:req.params.userId},
+        {_id:0,displayname:1,avatar:1,email:1}
+      );
+      return res.status(200).json(result);
+    } catch (error) {
+      if (error instanceof httpError) return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  },
   //[GET] /user/publicInfo
   getUserPublicInfo: async (req, res) => {
     try {
       const result = await findDocument(User,
         {_id:req.params.userId},
-        {_id:0,displayname:1,avatar:1,totalLikes:1,totalComments:1,story:1,contactLinks:1,totalPosts:1}
+        {_id:0,displayname:1,avatar:1,totalLikes:1,totalComments:1,story:1,email:1,totalPosts:1,totalFollowers:1,totalFollowing:1,createdAt:1}
       );
       return res.status(200).json(result);
     } catch (error) {
@@ -24,7 +36,7 @@ const userController = {
     try {
       const result = await findDocument(User,
         {_id:req.user.id},
-        {_id:1,displayname:1,email:1,avatar:1,username:1,totalLikes:1,totalComments:1,story:1,contactLinks:1,totalPosts:1}
+        {_id:1,displayname:1,email:1,avatar:1,username:1,totalLikes:1,totalComments:1,story:1,email:1,totalPosts:1,totalFollowers:1,totalFollowing:1,createdAt:1}
       );
       return res.status(200).json(result);
     } catch (error) {

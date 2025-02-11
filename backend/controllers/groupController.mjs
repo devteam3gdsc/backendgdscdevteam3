@@ -4,14 +4,17 @@ import groupServices from "../services/groupServices.mjs";
 const groupController = {
   createGroup: async (req, res) => {
     try {
-      const newGroup = await groupServices.createGroup(req.body, req.user.id);
-      res.status(201).json(newGroup);
+        const avatarFile = req.file; // Lấy file avatar từ request (nếu có)
+        const newGroup = await groupServices.createGroup(req.body, req.user.id, avatarFile);
+        res.status(201).json(newGroup);
     } catch (error) {
-      if (error instanceof httpError)
-        return res.status(error.statusCode).json(error.message);
-      else return res.status(500).json(error);
+        if (error instanceof httpError) {
+            return res.status(error.statusCode).json(error.message);
+        } else {
+            return res.status(500).json(error.message);
+        }
     }
-  },
+},
 
   getGroupsByUserId: async (req, res) => {
     try {

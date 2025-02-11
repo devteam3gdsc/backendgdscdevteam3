@@ -7,21 +7,26 @@ import NotificationServices from "./notificationServices.mjs";
 import { httpResponse } from "../utils/httpResponse.mjs";
 const groupServices = {
     //-----------GROUP-----------------
-    createGroup : async (data, creatorId) => {
+    createGroup: async (data, creatorId, avatarFile) => {
         try {
+            const avatarURL = avatarFile 
+                ? avatarFile.path 
+                : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541";
+    
             const newGroup = new Group({
                 ...data,
                 creator: creatorId,
+                avatar: avatarURL,
                 members: [{
                     user: creatorId,
                     role: "admin"
                 }]
             });
-
+    
             await newGroup.save();
             return newGroup;
         } catch (error) {
-            throw new Error(`Creating group service error: ${error}`, 500);
+            throw new Error(`Creating group service error: ${error}`);
         }
     },
 

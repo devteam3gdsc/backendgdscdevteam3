@@ -21,6 +21,7 @@ const groupRouter = Router();
 groupRouter.post(
   "/create",
   authMiddleware.verifyToken,
+  upload.single("avatar"),
   groupController.createGroup,
 );
 groupRouter.put(

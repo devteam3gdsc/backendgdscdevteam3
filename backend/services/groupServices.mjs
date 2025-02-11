@@ -4,6 +4,7 @@ import User from "../models/Users.mjs";
 import Post from "../models/Posts.mjs";
 import mongoose from "mongoose"
 import NotificationServices from "./notificationServices.mjs";
+import { httpResponse } from "../utils/httpResponse.mjs";
 const groupServices = {
     //-----------GROUP-----------------
     createGroup : async (data, creatorId) => {
@@ -37,6 +38,31 @@ const groupServices = {
             }
     
             return updatedGroup;
+        } catch (error) {
+            throw new Error(`Updating group service error: ${error}`);
+        }
+    },
+    updateGroupFull: async (groupId, avatarFile, ...updateData) => {
+        try {
+          
+            const group = await findById(groupId);
+           
+            if (!group) {
+                throw new Error("Group not found.");
+            }            const avatar = group.avatar;
+            const avatarURL = avatarFile ? avatarFile.path : avatar;
+      if (
+        avatar &&
+        avatar !=
+          "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
+      ) {
+        fileDestroy(avatar, "image");
+      }
+           await group.updateOne({
+            $set: {avatar: avatarURL, ...updateData}
+           })
+    
+           return new httpResponse("updated successfully", 200);
         } catch (error) {
             throw new Error(`Updating group service error: ${error}`);
         }

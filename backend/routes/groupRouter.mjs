@@ -3,6 +3,19 @@ import groupController from "../controllers/groupController.mjs";
 import authMiddleware from "../middlewares/authMidleware.mjs";
 import roleMiddleware from "../middlewares/roleMiddleware.mjs";
 import postController from "../controllers/postController.mjs";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import { v2 } from "cloudinary";
+import multer from "multer";
+const userRouter = Router();
+
+const storage = new CloudinaryStorage({
+  cloudinary: v2,
+  params: {
+    folder: "User_avatar_files",
+    resource_type: "image",
+  },
+});
+const upload = multer({ storage });
 
 const groupRouter = Router();
 groupRouter.post(
@@ -15,6 +28,13 @@ groupRouter.put(
   authMiddleware.verifyToken,
   roleMiddleware("group",["admin"]),
   groupController.updateGroup,
+);
+groupRouter.put(
+  "/update/:groupId",
+  authMiddleware.verifyToken,
+  roleMiddleware("group",["admin"]),
+  upload.single("avatar"),
+  groupController.updateFull,
 );
 groupRouter.delete(
   "/delete/:groupId",

@@ -23,6 +23,21 @@ const projectController = {
             else return res.status(500).json(error);
         }
     },
+    updateFull: async (req, res) => {
+      try {
+        const projectId = req.params.projectId;
+        const result = await projectServices.updateProjectFull(
+          projectId,
+          req.file,
+          req.body,
+        );
+        return res.status(result.statusCode).json(result.message);
+      } catch (error) {
+        if (error instanceof httpError)
+          return res.status(error.statusCode).json(error.message);
+        else return res.status(500).json(error);
+      }
+    },
 
     deleteProject : async (req, res) => {
         try {

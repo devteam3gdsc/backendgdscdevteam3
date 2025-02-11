@@ -2,6 +2,19 @@ import { Router } from "express";
 import projectController from "../controllers/projectController.mjs";
 import authMiddleware from "../middlewares/authMidleware.mjs";
 import roleMiddleware from "../middlewares/roleMiddleware.mjs";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import { v2 } from "cloudinary";
+import multer from "multer";
+
+
+const storage = new CloudinaryStorage({
+  cloudinary: v2,
+  params: {
+    folder: "User_avatar_files",
+    resource_type: "image",
+  },
+});
+const upload = multer({ storage });
 
 const projectRouter = Router();
 projectRouter.post(
@@ -14,7 +27,14 @@ projectRouter.post(
     "/update/:projectId",
     authMiddleware.verifyToken,
     roleMiddleware("project",["leader", "admin"]),
-    projectController.updateProject,
+    projectController.updateFull,
+);
+projectRouter.put(
+  "/update/:projectId",
+  authMiddleware.verifyToken,
+  roleMiddleware("project",["leader", "admin"]),
+  upload.single("avatar"),
+  projectController.updateFull,
 );
 projectRouter.delete(
     "/delete/:projectId",

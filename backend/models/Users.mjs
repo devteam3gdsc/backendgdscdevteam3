@@ -1,4 +1,15 @@
-import mongoose from "mongoose";
+import { position } from "@cloudinary/url-gen/qualifiers/timeline";
+import mongoose, { Types } from "mongoose";
+const pinSchema = new mongoose.Schema({
+  id: mongoose.Types.ObjectId,
+  pinType:{
+    type:String,
+    enum:["group","user","project"]
+  },
+  name:String,
+  position:Number,
+  avatar:String
+},{_id:false})
 const userSchema = new mongoose.Schema(
   {
     username: {
@@ -57,6 +68,7 @@ const userSchema = new mongoose.Schema(
       type:Number,
       default:0
     },
+    pins:[pinSchema],
     resetPasswordToken: { type: String},
     resetPasswordExpires: { type: Date},
   },

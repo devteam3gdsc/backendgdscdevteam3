@@ -121,7 +121,6 @@ const postController = {
   },
   //[GET] /post/store/:postId
   storePost: async (req, res) => {
-    //cần xem lại, nếu người đó là tác giả hay đã từng lưu?,làm cho ẩn đi khi gửi
     try {
       await updateDocument(Post,1,[{_id:req.params.postId}], [{ $push: { stored: req.user.id} }]);
       return res.status(200).json("saved!");

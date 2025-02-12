@@ -7,6 +7,8 @@ import { v2 } from "cloudinary";
 import { httpError, httpResponse } from "../utils/httpResponse.mjs";
 import updateDocument from "../utils/updateDocument.mjs";
 import { fileDestroy } from "../utils/filesHelper.mjs";
+import { Group, Project } from "../models/Group.mjs";
+import mongoose from "mongoose";
 const userServices = {
   updateUserPassword: async (userId, oldPassword, newPassword) => {
     try {
@@ -87,7 +89,7 @@ const userServices = {
         {$facet:{
           users:[
             {$skip:skip},
-            {$limit:limit}
+            {$limit:Number(limit)}
           ],
           countingUsers:[
             {$count:"totalUsers"}
@@ -108,6 +110,38 @@ const userServices = {
     } catch (error) {
       if (error instanceof httpError) throw error;
       else throw new httpError(`getUsers services error:${error}`, 500);
+    }
+  },
+  addPin: async (userId,{...data})=>{
+    try {
+      const id = new mongoose.Types.ObjectId(`${data.id}`);
+    let result;
+    switch (data.type){
+      case "group":{
+        result = await findDocument(Group,{_id:id},{name:1,avatar:1,_id:0});
+        break;
+      }
+      case "user":{
+        result = await findDocument(User,{_id:id},{displayname:1,avatar:1,_id:0});
+        break;
+      }
+      case "project":{
+        result = await findDocument(Project,{_id:id},{name:1,avatar:1,_id:0});
+        break;
+      }
+    }
+    const userPins = (await findDocument(User,{_id:userId},{pins:1,_id:0})).pins
+    const newPins = {
+      position: userPins.length + 1,
+      id,
+      name:result.displayname? result.displayname: result.name,
+      avatar:result.avatar,
+      pinType: data.type
+    }
+    await User.updateOne({_id:userId},{pins:{$push:newPins}});
+    } catch (error) {
+      if (error instanceof httpError) throw error;
+      else throw new httpError(`addPin services error:${error}`, 500);
     }
   }
 };

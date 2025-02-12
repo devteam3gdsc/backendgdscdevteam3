@@ -42,4 +42,5 @@ userRouter.get("/follow/:userId",authMiddleware.verifyToken,userController.follo
 userRouter.get("/unfollow/:userId",authMiddleware.verifyToken,userController.unfollow)
 userRouter.get("/posts/:userId",authMiddleware.verifyToken,postController.getAnotherUserPost)
 userRouter.get("/getUsers",authMiddleware.verifyToken,userController.getUsers);
+userRouter.get("/pin",authMiddleware.verifyToken,userController.addPin);
 export default userRouter;

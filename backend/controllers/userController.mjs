@@ -151,6 +151,17 @@ const userController = {
         return res.status(error.statusCode).json(error.message);
       else return res.status(500).json(error);
     }
+  },
+  addPin: async (req,res)=>{
+    try {
+      const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
+      await userServices.addPin(userId,req.query);
+      return res.status(200).json("pin added")
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
   }
 };
 export default userController;

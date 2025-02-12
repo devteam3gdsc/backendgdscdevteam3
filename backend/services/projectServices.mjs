@@ -11,7 +11,7 @@ const projectServices = {
         const search = data.search || "";
         const order = data.order || "descending";
         const criteria = data.criteria || "dateCreated";
-        const user = new mongoose.Types.ObjectId(`${user}`) || "";
+        const user = new mongoose.Types.ObjectId(`${data.user}`) || "";
         switch (criteria) {
           case "dateCreated": {
             var sortValue = "createdAt";

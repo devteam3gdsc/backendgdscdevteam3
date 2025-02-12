@@ -2,7 +2,7 @@ import { Group } from "../models/Group.mjs";
 import findDocument from "../utils/findDocument.mjs";
 import User from "../models/Users.mjs";
 import mongoose from "mongoose";
-import { name } from "@cloudinary/url-gen/actions/namedTransformation";
+
 const groupServices = {
     createGroup : async (data, creatorId) => {
         try {

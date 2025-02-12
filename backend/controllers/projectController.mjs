@@ -3,6 +3,7 @@ import projectServices from "../services/projectServices.mjs";
 import { Project } from "../models/Group.mjs";
 import { httpError } from "../utils/httpResponse.mjs";
 import findDocument from "../utils/findDocument.mjs";
+import userServices from "../services/userServices.mjs";
 const projectController = {
     findProjects: async (req,res)=>{
         try {
@@ -77,7 +78,13 @@ const projectController = {
           if (error instanceof httpError) return res.status(error.statusCode).json(error.message)
             else return res.status(500).json(error); 
         }
-      }
+      },
+    getProjectPosts: async (req,res)=>{
+      const page = req.query.page || 1;
+      const limit = req.query.limit || 5;
+      const skip = (page - 1)*limit
+      if (req.query.tags)
+    }
     
 }
 

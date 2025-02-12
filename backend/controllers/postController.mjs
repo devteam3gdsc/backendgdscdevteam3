@@ -19,6 +19,8 @@ const postController = {
       const skip = (page - 1) * limit;
       const type = req.query.type || "me";
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
+      const groupId = new mongoose.Types.ObjectId(`${req.query.groupId}`) || "";
+      const projectId = new mongoose.Types.ObjectId(`${req.query.projectId}`) || ""
       let matchData = [];
       if (type == "me") {
         matchData.push({ author: userId });
@@ -26,6 +28,12 @@ const postController = {
       if (req.query.tags) {
         const tags = req.query.tags.split(",");
         matchData.push({ tags: { $all: tags } });
+      }
+      if (groupId){
+        matchData.push({group:groupId})
+      }
+      if (projectId){
+        matchData.push({projectId:projectId})
       }
       if (search) {
         matchData.push({ title: { $regex: search, $options: "i" } });
@@ -84,7 +92,7 @@ const postController = {
       const search = req.query.search || "";
       const skip = (page - 1) * limit;
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
-      let matchData = [{ visibility: "public" },{group:""}];
+      let matchData = [{visibility: "public" },{group:null}];
       if (req.query.tags) {
         const tags = req.query.tags.split(",");
         matchData.push({ tags: { $all: tags } });

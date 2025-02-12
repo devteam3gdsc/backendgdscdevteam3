@@ -60,4 +60,5 @@ postRouter.get("/setState/:postId",authMiddleware.verifyToken,postController.set
 postRouter.get("/halfDetail/:postId",authMiddleware.verifyToken,postController.halfDetail);
 
 
+
 export default postRouter;

@@ -32,11 +32,19 @@ const groupController = {
           try {
               const page = req.query.page || 1;
               const limit = req.query.limit || 5;
-              const search = req.qeury.search || "";
+              const search = req.query.search || "";
               const skip = (page-1)*limit;
               const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
               const groupId = new mongoose.Types.ObjectId(`${req.params.groupId}`);
-              const matchData = [{group:groupId,status:"approved",visibility:"public"}]
+              const matchData = [{group:groupId,visibility:"public"}]
+              if (req.query.tags) {
+                const tags = req.query.tags.split(",");
+                matchData.push({ tags: { $all: tags } });
+              }
+              if (req.query.status){
+                matchData.push({status:req.query.status})
+              }
+              else matchData.push({status:"approved"})
               if (search){
                 matchData.push({title:{$regex:search,$options:"i"}})
               }

@@ -30,7 +30,8 @@ const groupServices = {
             const search = data.search || "";
             const order = data.order || "descending";
             const criteria = data.criteria || "dateCreated";
-            const user = new mongoose.Types.ObjectId(`${data.user}`)
+            const user = data.user?new mongoose.Types.ObjectId(`${data.user}`):"";
+            console.log(1)
             switch (criteria) {
                 case "dateCreated": {
                   var sortValue = "createdAt";
@@ -55,7 +56,6 @@ const groupServices = {
                   break;
                 }
             }
-            
             const matchData = [];
             if (search){
                 matchData.push({name:{$regex:search,$options:"i"}})

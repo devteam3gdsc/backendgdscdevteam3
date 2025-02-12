@@ -3,12 +3,11 @@ import Comments from "../models/Comments.mjs";
 import Post from "../models/Posts.mjs";
 import User from "../models/Users.mjs";
 import mongoose from "mongoose";
-import { v2 } from "cloudinary";
 import { httpError } from "../utils/httpResponse.mjs";
 import findDocument from "../utils/findDocument.mjs";
 import updateDocument from "../utils/updateDocument.mjs";
 import { fileDestroy, getFiles } from "../utils/filesHelper.mjs";
-import { edit } from "@cloudinary/url-gen/actions/animated";
+import { Group } from "../models/Group.mjs";
 const postController = {
   //[GET] /me?page=...&limit=...&search=...&type=...
   getUserPost: async (req, res) => {
@@ -19,8 +18,8 @@ const postController = {
       const skip = (page - 1) * limit;
       const type = req.query.type || "me";
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
-      const groupId = new mongoose.Types.ObjectId(`${req.query.groupId}`) || "";
-      const projectId = new mongoose.Types.ObjectId(`${req.query.projectId}`) || ""
+      const groupId = req.query.groupId?new mongoose.Types.ObjectId(`${req.query.groupId}`) : "";
+      const projectId =  req.query.projectId?new mongoose.Types.ObjectId(`${req.query.projectId}`) : "";
       let matchData = [];
       if (type == "me") {
         matchData.push({ author: userId });
@@ -33,13 +32,10 @@ const postController = {
         matchData.push({group:groupId})
       }
       if (projectId){
-        matchData.push({projectId:projectId})
+        matchData.push({project:projectId})
       }
       if (search) {
         matchData.push({ title: { $regex: search, $options: "i" } });
-      }
-      if (req.query.group){
-        matchData.push({group:req.query.group})
       }
       const result = await postServices.getPosts(
         userId,
@@ -92,7 +88,7 @@ const postController = {
       const search = req.query.search || "";
       const skip = (page - 1) * limit;
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
-      let matchData = [{visibility: "public" },{group:null}];
+      let matchData = [{visibility: "public" }];
       if (req.query.tags) {
         const tags = req.query.tags.split(",");
         matchData.push({ tags: { $all: tags } });
@@ -278,13 +274,28 @@ const postController = {
     const limit = parseInt(req.query.limit)||5;
     const search = req.query.search || "";
     const skip = (page - 1) * limit;
-    const following = (await findDocument(User,{_id:req.user.id},{following:1,_id:0})).following
-    console.log(following)
+    const userId = new mongoose.Types.ObjectId(`${req.user.id}`)
+    const groups = await Group.aggregate([
+      {$match:
+        {
+         $expr:
+         {
+          $in:[userId,{$map:{input:"$members",as:"member",in:"$$member.user"}}]
+         }
+        }
+      }
+    ])
+    const groupsId = groups.map((group)=>group._id)
+    const following = (await findDocument(User,{_id:userId},{following:1,_id:0})).following
     const matchData = [{author:{$in:following}},{visibility:"public"}]
+    let groupFilter = {}
+    if (groupsId){
+      groupFilter = {group:{$in:groupsId}}
+    }
     if (search) {
       matchData.push({ title: { $regex: search, $options: "i" } });
     }
-    const result = await postServices.getPosts(req.user.id,{$and:[...matchData]},req.query.criteria,req.query.order,skip,limit);
+    const result = await postServices.getPosts(userId,{$or:[groupFilter,{$and:[...matchData]}]},req.query.criteria,req.query.order,skip,limit);
     const totalPages = Math.ceil(result.totalPosts / limit);
     const hasMore = totalPages - page > 0 ? true : false;
     res.status(200).json({

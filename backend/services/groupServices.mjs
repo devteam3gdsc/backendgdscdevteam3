@@ -1,6 +1,8 @@
 import { Group } from "../models/Group.mjs";
 import findDocument from "../utils/findDocument.mjs";
 import User from "../models/Users.mjs";
+import mongoose from "mongoose";
+import { name } from "@cloudinary/url-gen/actions/namedTransformation";
 const groupServices = {
     createGroup : async (data, creatorId) => {
         try {
@@ -25,8 +27,10 @@ const groupServices = {
             const page = data.page || 1;
             const limit = data.limit || 5
             const skip = (page - 1)*limit;
+            const search = data.search || "";
             const order = data.order || "descending";
-            const criteria = data.criteria || "dateCreated"
+            const criteria = data.criteria || "dateCreated";
+            const user = new mongoose.Types.ObjectId(`${data.user}`)
             switch (criteria) {
                 case "dateCreated": {
                   var sortValue = "createdAt";
@@ -51,18 +55,24 @@ const groupServices = {
                   break;
                 }
             }
+            
             const matchData = [];
+            if (search){
+                matchData.push({name:{$regex:search,$options:"i"}})
+            }
             if (data.role){
                 matchData.push({members:{$elemMatch:{user:userId,role:data.role}}})
             }
-            else matchData.push({members:{$elemMatch:{user:userId}}})
-            console.log(matchData[0])
+            if (user){
+                matchData.push({members:{$elemMatch:{user:user}}})
+            }
             const Data = await Group.aggregate([
-                {$match: matchData[0]},
+                {$match: matchData.length === 0?{}:{$and:matchData}},
                 {$sort: {[sortValue]:sortOrder}},
                 {$facet:{
                     groups:[
                         {$skip:skip},
+                        {$limit:limit},
                         {$addFields:{
                             joined:{ 
                                 $in: [userId,"$members.user"]

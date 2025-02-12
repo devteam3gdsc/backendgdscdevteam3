@@ -3,7 +3,7 @@ import { configDotenv } from "dotenv";
 configDotenv();
 export default function connectDB() {
   try {
-    const mongoURL = process.env.NAM_MONGO_URL;
+    const mongoURL = process.env.MONGODB_URL;
 
     // Kết nối MongoDB mà không cần các tuỳ chọn deprecated
     mongoose.connect(mongoURL);

@@ -41,4 +41,5 @@ userRouter.get("/test",authMiddleware.verifyToken,userController.test);
 userRouter.get("/follow/:userId",authMiddleware.verifyToken,userController.follow)
 userRouter.get("/unfollow/:userId",authMiddleware.verifyToken,userController.unfollow)
 userRouter.get("/posts/:userId",authMiddleware.verifyToken,postController.getAnotherUserPost)
+userRouter.get("/getUsers",authMiddleware.verifyToken,userController.getUsers);
 export default userRouter;

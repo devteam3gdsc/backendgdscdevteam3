@@ -8,6 +8,8 @@ groupRouter.post(
     authMiddleware.verifyToken,
     groupController.createGroup,
   );
-groupRouter.get("/find",authMiddleware.verifyToken,groupController.findGroups)
+groupRouter.get("/find",authMiddleware.verifyToken,groupController.findGroups);
+groupRouter.get("/users/:groupId",authMiddleware.verifyToken,groupController.getUsers)
+groupRouter.get("/posts/:groupId",authMiddleware.verifyToken,groupController.getGroupPosts)
 
 export default groupRouter;

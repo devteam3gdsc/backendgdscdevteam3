@@ -79,6 +79,37 @@ const userServices = {
       else throw new httpError(`signUp services error:${error}`, 500);
     }
   },
+  getUsers: async ([...matchData],sortValue,sortOrder,skip,limit)=>{
+    try {
+      const Data = await User.aggregate([
+        {$match:{$and:matchData}},
+        {$sort: {[sortValue]:sortOrder}},
+        {$facet:{
+          users:[
+            {$skip:skip},
+            {$limit:limit}
+          ],
+          countingUsers:[
+            {$count:"totalUsers"}
+          ]
+          }
+        }
+      ])
+      if (!Data[0].countingUsers[0]){
+        return {
+          users:[],
+          totalUsers:0
+        }
+      }
+      else return ({
+        users:Data[0].users,
+        totalUsers:Data[0].countingUsers[0].totalUsers
+      })
+    } catch (error) {
+      if (error instanceof httpError) throw error;
+      else throw new httpError(`getUsers services error:${error}`, 500);
+    }
+  }
 };
 
 export default userServices;

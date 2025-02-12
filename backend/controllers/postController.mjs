@@ -30,6 +30,9 @@ const postController = {
       if (search) {
         matchData.push({ title: { $regex: search, $options: "i" } });
       }
+      if (req.query.group){
+        matchData.push({group:req.query.group})
+      }
       const result = await postServices.getPosts(
         userId,
         { $and: [...matchData] },
@@ -81,7 +84,7 @@ const postController = {
       const search = req.query.search || "";
       const skip = (page - 1) * limit;
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
-      let matchData = [{ visibility: "public" }];
+      let matchData = [{ visibility: "public" },{group:""}];
       if (req.query.tags) {
         const tags = req.query.tags.split(",");
         matchData.push({ tags: { $all: tags } });
@@ -244,12 +247,15 @@ const postController = {
           },
         },
       ]);
-      const {title,content,authorname,avatar,...data} = post[0]
+      const {title,content,authorname,avatar,createdAt,editedAt,visibility,...data} = post[0]
       return res.status(200).json({
         title,
         content,
         authorname,
-        avatar
+        avatar,
+        createdAt,
+        editedAt,
+        visibility
       });
     } catch (error) {
       if (error instanceof httpError)

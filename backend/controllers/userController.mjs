@@ -5,6 +5,7 @@ import {httpError} from "../utils/httpResponse.mjs"
 import Post from "../models/Posts.mjs";
 import authController from "./authcontroller.mjs";
 import updateDocument from "../utils/updateDocument.mjs";
+import mongoose, { mongo } from "mongoose";
 const userController = {
   getUserBriefData: async (req, res) => {
     try {
@@ -94,6 +95,59 @@ const userController = {
     } catch (error) {
       if (error instanceof httpError) return res.status(error.statusCode).json(error.message)
        else return res.status(500).json(error);
+    }
+  },
+  getUsers: async (req,res)=>{
+    try {
+      const userId = new mongoose.Types.ObjectId(`${req.user.id}`)
+      const page = req.query.page || 1;
+      const limit = req.query.limit || 5;
+      const skip = (page-1)*limit;
+      const order = req.query.order || "descending";
+      const criteria = req.query.criteria || "dateJoined";
+      const search = req.query.search || ""
+      switch (criteria){
+        case "dateJoined":{
+          var sortValue = "createdAt";
+          break;
+        }
+        case "likes":{
+          var sortValue = "totalLikes";
+          break;
+        }
+        case "followers":{
+          var sortValue = "totalFollowers";
+          break;
+        }
+      };
+      switch (order){
+        case "descending":{
+          var sortOrder = -1;
+          break;
+        }
+        case "ascending":{
+          var sortOrder = 1;
+          break;
+        }
+      }
+      const matchData = [{_id:{$ne:userId}}];
+      if (search){
+        matchData.push({displayname:{$regex:search,$option:"i"}})
+      }
+      const result = await userServices.getUsers(matchData,sortValue,sortOrder,skip,limit);
+      const totalPages = Math.ceil(result.totalUsers/limit);
+      const hasMore = totalPages - page > 0 ? true:false
+      return res.status(200).json({
+        users:result.users,
+        totalPages,
+        currentPage:page,
+        totalUsers:result.totalUsers,
+        hasMore
+      })
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
     }
   }
 };

@@ -1,11 +1,12 @@
 import { Router } from "express";
 import groupController from "../controllers/groupController.mjs";
 import authMiddleware from "../middlewares/authMidleware.mjs";
-import roleMiddleware from "../middlewares/roleMiddleware.mjs";
+import  roleMiddleware  from "../middlewares/roleMiddleware.mjs";
 import postController from "../controllers/postController.mjs";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { v2 } from "cloudinary";
 import multer from "multer";
+import checkAdmin from "../middlewares/checkAdminMiddleware.mjs";
 const userRouter = Router();
 
 const storage = new CloudinaryStorage({
@@ -102,7 +103,12 @@ groupRouter.post(
   //roleMiddleware("group",["creator"]),
   postController.createPost, //group/project/section truyen qua body
 );
-
+groupRouter.post(
+  "/postModerate/:postId",
+  authMiddleware.verifyToken,
+  checkAdmin,
+  postController.confirmPost, 
+);
  //[GET] /group/getPosts?page=...&limit=...&search=...&group=...&status=approved
 groupRouter.get( 
   "/getPosts",

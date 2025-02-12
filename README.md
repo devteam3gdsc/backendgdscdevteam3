@@ -869,3 +869,9 @@ http://localhost:4000/group/getPosts?group=67a9cd1a45d31c5ad73a25c2&status=pendi
     "totalPosts": 7,
     "hasMore": true
 }
+
+// POST
+http://localhost:4000/group/postModerate/67ac29741005b90425137c49?accept=approve
+{
+    "message": "approved"
+}

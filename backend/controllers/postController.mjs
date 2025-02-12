@@ -170,6 +170,39 @@ const postController = {
     }
   },
   
+  confirmPost: async (req, res) => {
+    try {
+      const post = await Post.findById(req.params.postId);
+      
+      if (!post) {
+        console.log("Post not found");
+        return res.status(404).json({ message: "Post not found" });
+      }
+  
+      console.log(post);
+      
+      // Lấy ID của group/project/section theo đúng thứ tự ưu tiên
+      const typeObj = {
+        group: post.group || null,
+        project: post.project || null,
+        section: post.section || null,
+      };
+  
+      console.log(typeObj);
+  
+      const result = await postServices.confirmCreatePost(post.author, typeObj, req.params.postId, req.query.accept);
+      return res.status(200).json(result);
+      
+    } catch (error) {
+      if (error instanceof httpError) {
+        return res.status(error.statusCode).json(error.message);
+      } else {
+        return res.status(500).json({ message: "Internal Server Error", error: error.toString() });
+      }
+    }
+  },
+  
+
   //[GET] /post/store/:postId
   storePost: async (req, res) => {
     //cần xem lại, nếu người đó là tác giả hay đã từng lưu?,làm cho ẩn đi khi gửi

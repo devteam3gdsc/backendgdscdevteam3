@@ -221,6 +221,45 @@ const postServices = {
       throw new httpError(`editing post service error: ${error}`, 500);
     }
   },
+  confirmCreatePost: async (userId, { group, project, section }, postId, accept) => {
+    try {
+      const post = await Post.findById(postId);
+      if (!post) {
+        throw new Error("Post not found");
+      }
+  
+      if (post.status === "approved") {
+        throw new Error("Post already approved");
+      }
+  
+      if (post.status === "rejected") {
+        throw new Error("Post already rejected");
+      }
+  
+      // Xử lý trạng thái
+      if (accept === "approve") {
+        post.status = "approved";  // Sửa lỗi push
+      } else if (accept === "reject") {
+        post.status = "rejected";
+  
+        // Giảm số lượng bài viết nếu bị từ chối
+        if (group) {
+          await updateDocument(Group, 1, [{ _id: group }], [{ $inc: { totalPosts: -1 } }]);
+        } else if (project) {
+          await updateDocument(Project, 1, [{ _id: project }], [{ $inc: { totalPosts: -1 } }]);
+        } else if (section) {  // Sửa lỗi lặp
+          await updateDocument(Section, 1, [{ _id: section }], [{ $inc: { totalPosts: -1 } }]);
+        }
+      }
+  
+      await post.save();
+  
+      return { message: accept === "approve" ? "approved" : "rejected" };
+    } catch (error) {
+      throw new Error(`Confirm post approval error: ${error}`);
+    }
+  },
+  
 };
 
 export default postServices;

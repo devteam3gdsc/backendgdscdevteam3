@@ -3,7 +3,6 @@ import findDocument from "../utils/findDocument.mjs";
 import userServices from "../services/userServices.mjs";
 import {httpError} from "../utils/httpResponse.mjs"
 import Post from "../models/Posts.mjs";
-import authController from "./authcontroller.mjs";
 import updateDocument from "../utils/updateDocument.mjs";
 import mongoose, { mongo } from "mongoose";
 const userController = {
@@ -22,11 +21,13 @@ const userController = {
   //[GET] /user/publicInfo
   getUserPublicInfo: async (req, res) => {
     try {
-      const result = await findDocument(User,
+      const user = await findDocument(User,
         {_id:req.params.userId},
         {_id:0,username:1,displayname:1,avatar:1,totalLikes:1,totalComments:1,story:1,email:1,totalPosts:1,totalFollowers:1,totalFollowing:1,createdAt:1}
       );
-      return res.status(200).json(result);
+      console.log((await User.findOne({_id:req.user.id},{_id:0,following:1})).following.includes(req.params.userId));
+      const resultWithFollowed = {user,followed:(await User.findOne({_id:req.user.id},{_id:0,following:1})).following.includes(req.params.userId)}
+      return res.status(200).json(resultWithFollowed);
     } catch (error) {
       if (error instanceof httpError) return res.status(error.statusCode).json(error.message);
       else return res.status(500).json(error);

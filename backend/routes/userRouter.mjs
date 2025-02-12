@@ -21,7 +21,7 @@ userRouter.get(
   userController.getUserFullInfo
 );
 userRouter.get(
-  "/:userId/publicInfo",
+  "/publicInfo/:userId",
   authMiddleware.verifyToken,
   userController.getUserPublicInfo
 );

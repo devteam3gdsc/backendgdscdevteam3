@@ -8,10 +8,11 @@ import mongoose, { mongo } from "mongoose";
 const userController = {
   getUserBriefData: async (req, res) => {
     try {
-      const result = await findDocument(User,
+      const user = await findDocument(User,
         {_id:req.params.userId},
         {_id:0,displayname:1,avatar:1,email:1}
       );
+      const result = {user,followed:(await User.findOne({_id:req.user.id},{_id:0,following:1})).following.includes(req.params.userId)}
       return res.status(200).json(result);
     } catch (error) {
       if (error instanceof httpError) return res.status(error.statusCode).json(error.message);

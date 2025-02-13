@@ -88,7 +88,7 @@ const postController = {
       const search = req.query.search || "";
       const skip = (page - 1) * limit;
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
-      let matchData = [{visibility: "public" }];
+      let matchData = [{visibility: "public" },{group:null}];
       if (req.query.tags) {
         const tags = req.query.tags.split(",");
         matchData.push({ tags: { $all: tags } });
@@ -316,16 +316,30 @@ const postController = {
     const limit = req.query.limit || 5;
     const skip = (page - 1)*limit
     const search = req.query.search || "";
-    const authorId = new mongoose.Types.ObjectId(`${req.params.userId}`)
+    const authorId = new mongoose.Types.ObjectId(`${req.params.userId}`);
+    const myId = new mongoose.Types.ObjectId(`${req.user.id}`);
     const matchData = [{author:authorId},{visibility:"public"}]
     if (search){
       matchData.push({title:{$regex:search,$options:"i"}})
     }
-    console.log(matchData)
-    const result = await postServices.getPosts(req.user.id,{$and:[...matchData]},req.query.criteria,req.query.order,skip,limit);
-    console.log(result)
+    const result = await postServices.getPosts(myId,{$and:[...matchData]},req.query.criteria,req.query.order,skip,limit);
     const totalPages = result.totalPosts?Math.ceil(result.totalPosts / limit):0;
     const hasMore = totalPages - page > 0 ? true : false;
+    const author = await findDocument(User,{_id:authorId},{avatar:1,displayname:1,_id:0});
+    const me = await User.findById(myId);
+    const newRecent = me.recent.filter((pin)=>{return pin.name !== author.displayname});
+    newRecent.push({
+      id:authorId,
+      recentType:"user",
+      name: author.displayname,
+      avatar:author.avatar
+    });
+    if (newRecent.length > 3){
+      newRecent.shift();
+    }
+    me.recent = newRecent;
+    console.log(me.recent)
+    await me.save();
     res.status(200).json({
       posts: result.posts,
       currentPage: page,

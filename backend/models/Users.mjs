@@ -1,3 +1,4 @@
+import { name } from "@cloudinary/url-gen/actions/namedTransformation";
 import { position } from "@cloudinary/url-gen/qualifiers/timeline";
 import mongoose, { Types } from "mongoose";
 const pinSchema = new mongoose.Schema({
@@ -9,7 +10,18 @@ const pinSchema = new mongoose.Schema({
   name:String,
   position:Number,
   avatar:String
+},{_id:false});
+
+const recentSchema = new mongoose.Schema({
+  id:mongoose.Types.ObjectId,
+  recentType:{
+    type:String,
+    enum:["group","user","project"]
+  },
+  name:String,
+  avatar:String
 },{_id:false})
+
 const userSchema = new mongoose.Schema(
   {
     username: {
@@ -68,7 +80,8 @@ const userSchema = new mongoose.Schema(
       type:Number,
       default:0
     },
-    pins:[pinSchema],
+    pins:{type:[pinSchema],default:[]},
+    recent:{type:[recentSchema],default:[]},
     resetPasswordToken: { type: String},
     resetPasswordExpires: { type: Date},
   },

@@ -70,36 +70,36 @@ const authMiddleware = {
       return next(new Error("Unauthorized: Invalid Token"));
     }
   },
-  verifyEmail: async (req, res, next) => {
-    const { email } = req.body;
+  // verifyEmail: async (req, res, next) => {
+  //   const { email } = req.body;
 
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
-    }
+  //   if (!email) {
+  //     return res.status(400).json({ message: "Email is required" });
+  //   }
 
-    const API_KEY = process.env.KICKBOX_API_KEY; // Đặt API key trong file .env
-    const API_URL = `https://api.kickbox.com/v2/verify?email=${email}&apikey=${API_KEY}`;
+  //   const API_KEY = process.env.KICKBOX_API_KEY; // Đặt API key trong file .env
+  //   const API_URL = `https://api.kickbox.com/v2/verify?email=${email}&apikey=${API_KEY}`;
 
-    try {
-      const response = await axios.get(API_URL);
-      const { result, reason } = response.data;
+  //   try {
+  //     const response = await axios.get(API_URL);
+  //     const { result, reason } = response.data;
 
-      // Kiểm tra trạng thái email
-      if (result === "deliverable") {
-        console.log("Email is valid.");
-        next(); // Email hợp lệ, tiếp tục xử lý
-      } else {
-        console.error(`Email verification failed. Reason: ${reason}`);
-        return res.status(400).json({
-          message: "Email does not exist or is invalid.",
-          reason,
-        });
-      }
-    } catch (error) {
-      console.error("Error verifying email:", error.message);
-      return res.status(500).json({ message: "Error verifying email." });
-    }
-  },
+  //     // Kiểm tra trạng thái email
+  //     if (result === "deliverable") {
+  //       console.log("Email is valid.");
+  //       next(); // Email hợp lệ, tiếp tục xử lý
+  //     } else {
+  //       console.error(`Email verification failed. Reason: ${reason}`);
+  //       return res.status(400).json({
+  //         message: "Email does not exist or is invalid.",
+  //         reason,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.error("Error verifying email:", error.message);
+  //     return res.status(500).json({ message: "Error verifying email." });
+  //   }
+  // },
 };
 
 export default authMiddleware;

@@ -15,7 +15,6 @@ const postServices = {
     limit
   ) => {
     try {
-      console.log(matchData);
       const order = orders || "descending";
       const criteria = criterias || "date";
       switch (criteria) {

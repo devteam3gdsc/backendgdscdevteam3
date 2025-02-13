@@ -43,4 +43,6 @@ userRouter.get("/unfollow/:userId",authMiddleware.verifyToken,userController.unf
 userRouter.get("/posts/:userId",authMiddleware.verifyToken,postController.getAnotherUserPost)
 userRouter.get("/getUsers",authMiddleware.verifyToken,userController.getUsers);
 userRouter.get("/pin",authMiddleware.verifyToken,userController.addPin);
+userRouter.get("/pinned",authMiddleware.verifyToken,userController.getPin);
+userRouter.get("/unpin/:position",authMiddleware.verifyToken,userController.unPin);
 export default userRouter;

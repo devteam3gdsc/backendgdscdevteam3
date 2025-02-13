@@ -5,6 +5,7 @@ import {httpError} from "../utils/httpResponse.mjs"
 import Post from "../models/Posts.mjs";
 import updateDocument from "../utils/updateDocument.mjs";
 import mongoose, { mongo } from "mongoose";
+import { Group } from "../models/Group.mjs";
 const userController = {
   getUserBriefData: async (req, res) => {
     try {
@@ -157,6 +158,99 @@ const userController = {
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
       await userServices.addPin(userId,req.query);
       return res.status(200).json("pin added")
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  },
+  getPin: async (req,res)=>{
+    try {
+      const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
+      const pins = (await findDocument(User,{_id:userId},{pins:1,_id:0})).pins
+      return res.status(200).json(pins)
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  },
+  unPin: async (req,res)=>{
+    try {
+      const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
+      const position = req.params.position;
+      const pins = (await findDocument(User,{_id:userId},{pins:1,_id:0})).pins
+      await User.updateOne({_id:userId},{$pull:{pins:pins[position - 1]}})
+      return res.status(200).json("unpinned!")
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  },
+  getPopular: async (req,res)=>{
+    try {
+      const groups = await Group.aggregate([
+        {$sort:{totalMembers:-1}},
+        {$limit:2},
+      ])
+      const users = await User.aggregate([
+        {$sort:{totalFollowers:-1}},
+        {$limit:2}
+      ])
+      if (groups[1].totalMembers >= users[0].totalFollowers){
+        const result = groups.map((group)=>{
+          return {
+            id:group._id,
+            name:group.name,
+            avatar:group.avatar,
+            totalMembers:group.totalMembers,
+            type:"group"
+          }
+        })
+      return res.status(200).json(result)
+      }
+      else {
+        if (users[1].totalFollowers >= groups[0].totalMembers){
+          const result = users.map((user)=>{
+            return {
+              id:user._id,
+              name:user.displayname,
+              avatar:user.avatar,
+              totalFollowers:user.totalFollowers,
+              type:"user"
+            }
+          })
+          return res.status(200).json(result)
+        }
+        else return res.status(200).json([
+          {
+            id:users[0]._id,
+            name:users[0].displayname,
+            avatar:users[0].avatar,
+            totalFollowers:users[0].totalFollowers,
+            type:"user"
+          },
+          {
+            id:groups[0]._id,
+            name:groups[0].name,
+            avatar:groups[0].avatar,
+            totalMembers:groups[0].totalMembers,
+            type:"group"
+          }
+        ])
+      } 
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    } 
+  },
+  getRecent: async (req,res)=>{
+    try {
+      const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
+      const result = (await findDocument(User,{_id:userId},{recent:1,_id:0})).recent
+      return res.status(200).json(result)
     } catch (error) {
       if (error instanceof httpError)
         return res.status(error.statusCode).json(error.message);

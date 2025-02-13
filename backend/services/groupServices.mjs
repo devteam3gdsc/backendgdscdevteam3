@@ -72,7 +72,7 @@ const groupServices = {
                 {$facet:{
                     groups:[
                         {$skip:skip},
-                        {$limit:limit},
+                        {$limit:Number(limit)},
                         {$addFields:{
                             joined:{ 
                                 $in: [userId,"$members.user"]

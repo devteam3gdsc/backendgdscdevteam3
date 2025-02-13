@@ -52,7 +52,7 @@ const projectServices = {
         {$facet:{
           projects:[
                 {$skip:skip},
-                {$limit:limit},
+                {$limit:Number(limit)},
                 {$lookup: {
                   from: "groups",          
                   localField: "groupId",    

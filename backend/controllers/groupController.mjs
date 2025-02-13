@@ -5,6 +5,8 @@ import postServices from "../services/postServices.mjs";
 import findDocument from "../utils/findDocument.mjs";
 import { Group } from "../models/Group.mjs";
 import userServices from "../services/userServices.mjs";
+import User from "../models/Users.mjs";
+import { microwave } from "@cloudinary/url-gen/qualifiers/focusOn";
 
 const groupController = {
     createGroup: async (req, res) => {
@@ -48,7 +50,30 @@ const groupController = {
               if (search){
                 matchData.push({title:{$regex:search,$options:"i"}})
               }
-              const result = await postServices.getPosts(userId,{$and:[...matchData]},req.query.criteria,req.query.order,skip,limit)
+              const result = await postServices.getPosts(userId,{$and:[...matchData]},req.query.criteria,req.query.order,skip,limit);
+              const group = await findDocument(Group,{_id:groupId},{avatar:1,name:1,_id:0});
+              const me = await User.findById(userId);
+              const newRecent = me.recent.filter((pin)=>{return pin.name !== group.name});
+              newRecent.push({
+                id:groupId,
+                recentType:"group",
+                name: group.name,
+                avatar:group.avatar
+              });
+              if (newRecent.length > 3){
+                newRecent.shift();
+              }
+              me.recent = newRecent;
+              await me.save();
+              if (!result.posts[0]){
+                return res.status(200).json({
+                  posts: [],
+                  currentPage: page,
+                  totalPages: 1,
+                  totalPosts: 0,
+                  hasMore: false,
+                })
+              }
               const totalPages = Math.ceil(result.totalPosts / limit);
               const hasMore = totalPages - page > 0 ? true : false;
               return res.status(200).json({

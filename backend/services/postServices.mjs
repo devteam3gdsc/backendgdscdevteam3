@@ -155,7 +155,16 @@ const postServices = {
 
        // Kiểm tra xem bài viết thuộc cấp nào
       const postScope = group ? { group } : project ? { project } : section ? { section } : {};
-    
+    // Mặc định trạng thái bài viết
+    let status = "approved";
+
+    if (group) {
+      const groupData = await findDocument(Group, { _id: group }, { moderation: 1 });
+      if (groupData?.moderation === true) {
+        status = "pending"; // Nếu group cần kiểm duyệt, đặt trạng thái pending
+      }
+    }
+
       const newPost = await Post.create({
         ...data,
         ...postScope,
@@ -165,6 +174,7 @@ const postServices = {
         avatar: userData.avatar,
         files, // Lưu danh sách file vào post
         editedAt: Date.now(),
+        status,
       }).catch((error) => {
         throw new httpError(`creating post failed: ${error}`, 500);
       });

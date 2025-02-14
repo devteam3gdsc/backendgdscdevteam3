@@ -220,6 +220,10 @@ const NotificationServices = {
     }
   },
 
+  createPostRequestNotification: async () => {
+
+  },
+
   getNotificationsByUserId: async (
     userId,
     skip = 0,

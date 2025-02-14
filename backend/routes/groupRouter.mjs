@@ -9,7 +9,7 @@ groupRouter.post(
     groupController.createGroup,
   );
 groupRouter.get("/find",authMiddleware.verifyToken,groupController.findGroups);
-groupRouter.get("/users/:groupId",authMiddleware.verifyToken,groupController.getUsers)
-groupRouter.get("/posts/:groupId",authMiddleware.verifyToken,groupController.getGroupPosts)
-
+groupRouter.get("/users/:groupId",authMiddleware.verifyToken,groupController.getUsers);
+groupRouter.get("/posts/:groupId",authMiddleware.verifyToken,groupController.getGroupPosts);
+groupRouter.get("/suggestedUser/:groupId",authMiddleware.verifyToken,groupController.getFollowedUserNotInGroup);
 export default groupRouter;

@@ -6,7 +6,7 @@ import findDocument from "../utils/findDocument.mjs";
 import { Group } from "../models/Group.mjs";
 import userServices from "../services/userServices.mjs";
 import User from "../models/Users.mjs";
-import { microwave } from "@cloudinary/url-gen/qualifiers/focusOn";
+
 
 const groupController = {
     createGroup: async (req, res) => {
@@ -130,7 +130,7 @@ const groupController = {
                 if (search){
                   matchData.push({displayname:{$regex:search,$option:"i"}})
                 }
-                const result = await userServices.getUsers(matchData,sortValue,sortOrder,skip,limit);
+                const result = await userServices.getUsers(userId,matchData,sortValue,sortOrder,skip,limit);
                 const usersMap = new Map(result.users.map((user)=>[`${user._id}`,user]));
                 const usersWithRole = groupUsers.map((member)=>{return {
                   ...member,
@@ -149,7 +149,63 @@ const groupController = {
                 if (error instanceof httpError) return res.status(error.statusCode).json(error.message)
                   else return res.status(500).json(error); 
               }
-            }  
+            },
+      getFollowedUserNotInGroup: async (req,res)=>{
+       try {
+        const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
+        const groupId = new mongoose.Types.ObjectId(`${req.params.groupId}`);
+        const groupMembers = (await findDocument(Group,{_id:groupId},{members:1,_id:0})).members
+        const following = (await findDocument(User,{_id:userId},{following:1,_id:0})).following
+        const groupMembersId = groupMembers.map(mem=>mem.user);
+        const page = req.query.page || 1;
+        const limit = req.query.limit || 5;
+        const skip = (page-1)*limit;
+        const order = req.query.order || "descending";
+        const criteria = req.query.criteria || "dateJoined";
+        const search = req.query.search || ""
+        switch (criteria){
+          case "dateJoined":{
+            var sortValue = "createdAt";
+            break;
+          }
+          case "likes":{
+            var sortValue = "totalLikes";
+            break;
+          }
+          case "followers":{
+            var sortValue = "totalFollowers";
+            break;
+          }
+        };
+        switch (order){
+          case "descending":{
+            var sortOrder = -1;
+            break;
+          }
+          case "ascending":{
+            var sortOrder = 1;
+            break;
+          }
+        }
+        const matchData = [{_id:{$in:following}},{_id:{$nin:groupMembersId}}]
+        if (search){
+          matchData.push({displayname:{$regex:search,$option:"i"}})
+        }
+        const result = await userServices.getUsers(userId,matchData,sortValue,sortOrder,skip,limit);
+        const totalPages = Math.ceil(result.totalUsers/limit);
+        const hasMore = totalPages - page > 0 ? true:false
+        return res.status(200).json({
+          users:result.users,
+          totalPages,
+          currentPage:page,
+          totalUsers:result.totalUsers,
+          hasMore
+        })
+       } catch (error) {
+        if (error instanceof httpError) return res.status(error.statusCode).json(error.message)
+          else return res.status(500).json(error); 
+       }
+      }  
 
 }
 

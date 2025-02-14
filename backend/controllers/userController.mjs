@@ -137,7 +137,7 @@ const userController = {
       if (search){
         matchData.push({displayname:{$regex:search,$option:"i"}})
       }
-      const result = await userServices.getUsers(matchData,sortValue,sortOrder,skip,limit);
+      const result = await userServices.getUsers(userId,matchData,sortValue,sortOrder,skip,limit);
       const totalPages = Math.ceil(result.totalUsers/limit);
       const hasMore = totalPages - page > 0 ? true:false
       return res.status(200).json({

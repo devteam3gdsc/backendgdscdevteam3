@@ -112,6 +112,6 @@ const groupServices = {
         } catch (error) {
             throw new Error(`finding groups service error: ${error}`, 500);
         }
-    }
+    },
 }
 export default groupServices;

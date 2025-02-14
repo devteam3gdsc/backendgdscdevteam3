@@ -81,15 +81,19 @@ const userServices = {
       else throw new httpError(`signUp services error:${error}`, 500);
     }
   },
-  getUsers: async ([...matchData],sortValue,sortOrder,skip,limit)=>{
+  getUsers: async (userId,[...matchData],sortValue,sortOrder,skip,limit)=>{
     try {
+      const following = (await findDocument(User,{_id:userId},{_id:0,following:1})).following
       const Data = await User.aggregate([
         {$match:{$and:matchData}},
         {$sort: {[sortValue]:sortOrder}},
         {$facet:{
           users:[
             {$skip:skip},
-            {$limit:Number(limit)}
+            {$limit:Number(limit)},
+            {$addFields:{
+              followed:{$in:["$_id",following]}
+            }}
           ],
           countingUsers:[
             {$count:"totalUsers"}

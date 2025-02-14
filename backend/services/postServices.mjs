@@ -7,78 +7,79 @@ import { edit } from "@cloudinary/url-gen/actions/animated";
 import updateDocument from "../utils/updateDocument.mjs";
 import { Group, Project, Section } from "../models/Groups.mjs";
 const postServices = {
-  // getPosts: async (
-  //   userId,
-  //   { ...matchData },
-  //   criterias,
-  //   orders,
-  //   skip,
-  //   limit,
-  // ) => {
-  //   try {
-  //     console.log(matchData);
-  //     const order = orders || "descending";
-  //     const criteria = criterias || "date";
-  //     switch (criteria) {
-  //       case "date": {
-  //         var sortValue = "updatedAt";
-  //         break;
-  //       }
-  //       case "likes": {
-  //         var sortValue = "totalLikes";
-  //         break;
-  //       }
-  //       case "comments": {
-  //         var sortValue = "totalComments";
-  //         break;
-  //       }
-  //     }
-  //     switch (order) {
-  //       case "descending": {
-  //         var sortOrder = -1;
-  //         break;
-  //       }
-  //       case "ascending": {
-  //         var sortOrder = 1;
-  //         break;
-  //       }
-  //     }
-  //     const Data = await Post.aggregate([
-  //       { $match: matchData },
-  //       { $sort: { [sortValue]: sortOrder } },
-  //       {
-  //         $facet: {
-  //           posts: [
-  //             { $skip: skip },
-  //             { $limit: limit },
-  //             {
-  //               $addFields: {
-  //                 Stored: { $in: [userId, "$stored"] },
-  //                 Liked: { $in: [userId, "$likes"] },
-  //                 isAuthor: { $eq: ["$author", userId] },
-  //               },
-  //             },
-  //           ],
-  //           countingPosts: [{ $count: "totalPosts" }],
-  //         },
-  //       },
-  //     ]);
-  //     if (!Data[0].countingPosts[0]) {
-  //       return {
-  //         posts: [],
-  //       };
-  //     }
-  //     const totalPosts = Data[0].countingPosts[0].totalPosts;
-  //     const posts = Data[0].posts;
-  //     return {
-  //       posts,
-  //       totalPosts,
-  //     };
-  //   } catch (error) {
-  //     throw new httpError(`getPosts service error: ${error}`, 500);
-  //   }
-  // },
-  getPosts: async (userId, filterConditions, criterias, orders, skip, limit) => {
+  getPosts: async (
+    userId,
+    { ...matchData },
+    criterias,
+    orders,
+    skip,
+    limit,
+  ) => {
+    try {
+      console.log(matchData);
+      const order = orders || "descending";
+      const criteria = criterias || "date";
+      switch (criteria) {
+        case "date": {
+          var sortValue = "updatedAt";
+          break;
+        }
+        case "likes": {
+          var sortValue = "totalLikes";
+          break;
+        }
+        case "comments": {
+          var sortValue = "totalComments";
+          break;
+        }
+      }
+      switch (order) {
+        case "descending": {
+          var sortOrder = -1;
+          break;
+        }
+        case "ascending": {
+          var sortOrder = 1;
+          break;
+        }
+      }
+      const Data = await Post.aggregate([
+        { $match: matchData },
+        { $sort: { [sortValue]: sortOrder } },
+        {
+          $facet: {
+            posts: [
+              { $skip: skip },
+              { $limit: limit },
+              {
+                $addFields: {
+                  Stored: { $in: [userId, "$stored"] },
+                  Liked: { $in: [userId, "$likes"] },
+                  isAuthor: { $eq: ["$author", userId] },
+                },
+              },
+            ],
+            countingPosts: [{ $count: "totalPosts" }],
+          },
+        },
+      ]);
+      if (!Data[0].countingPosts[0]) {
+        return {
+          posts: [],
+        };
+      }
+      const totalPosts = Data[0].countingPosts[0].totalPosts;
+      const posts = Data[0].posts;
+      return {
+        posts,
+        totalPosts,
+      };
+    } catch (error) {
+      throw new httpError(`getPosts service error: ${error}`, 500);
+    }
+  },
+
+  getPostsInGroup: async (userId, filterConditions, criterias, orders, skip, limit) => {
     try {
       console.log("Filter conditions:", JSON.stringify(filterConditions, null, 2));
   

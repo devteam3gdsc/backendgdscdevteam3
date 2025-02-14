@@ -152,7 +152,7 @@ const postController = {
     }
 
     // Gọi postServices
-    const result = await postServices.getPosts(userId, { $and: matchData }, req.query.criteria, req.query.order, skip, limit);
+    const result = await postServices.getPostsInGroup(userId, { $and: matchData }, req.query.criteria, req.query.order, skip, limit);
 
       const totalPages = Math.ceil(result.totalPosts / limit);
       const hasMore = totalPages - page > 0 ? true : false;

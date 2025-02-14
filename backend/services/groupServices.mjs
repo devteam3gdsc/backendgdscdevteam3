@@ -89,73 +89,75 @@ const groupServices = {
         }
     },
 
-    getFullGroupData : async (groupId, userId) => {
+    getFullGroupData: async (groupId, userId) => {
         try {
             if (!mongoose.Types.ObjectId.isValid(groupId)) {
                 console.error("groupId không hợp lệ:", groupId);
-            } else {
-                console.log("groupId hợp lệ:", groupId);
+                return { message: "Invalid groupId" };
             }
-
+    
             const group = await Group.aggregate([
                 { $match: { _id: new mongoose.Types.ObjectId(groupId) } },
+                { $unwind: "$members" },
                 { 
                     $lookup: {
-                        from: "users", // Tên collection (viết thường, số nhiều)
+                        from: "users", 
                         localField: "members.user",
                         foreignField: "_id",
-                        as: "membersData"
+                        as: "userData"
                     }
                 },
+                { $unwind: { path: "$userData", preserveNullAndEmptyArrays: true } }, 
                 { 
-                    $lookup: {
-                        from: "users",
-                        localField: "creator",
-                        foreignField: "_id",
-                        as: "creatorData"
+                    $group: {
+                        _id: "$_id",
+                        name: { $first: "$name" },
+                        description: { $first: "$description" },
+                        avatar: { $first: "$avatar" },
+                        moderation: { $first: "$moderation" },
+                        private: { $first: "$private" },
+                        creatorData: { $first: "$creatorData" },
+                        members: { 
+                            $push: { 
+                                user: "$members.user", // Giữ nguyên ObjectId của user
+                                role: "$members.role",
+                                avatar: "$userData.avatar" // Lấy avatar từ `users`
+                            } 
+                        }
                     }
                 }
             ]);
-            
-            if(!group) {
-                return res.status(404).json({message: "Group not found"});
+    
+            if (!group || group.length === 0) {
+                return { message: "Group not found" };
             }
-            const numberOfProjects = await Project.countDocuments({group: groupId});
-            const numberOfPosts = await Post.countDocuments({group: groupId}); //need to edit Post model
-             // Kiểm tra nếu nhóm là private, chỉ cho phép thành viên tham gia
-             const groupData = group[0]; // Vì `aggregate()` trả về mảng
-
-             if (!groupData) {
-                 return res.status(404).json({ message: "Group not found" });
-             }
-             
-             const members = groupData.membersData || []; // Lấy members từ lookup
-             const isJoined = members.some(m => m._id.toString() === userId.toString());
-
-
-            const canJoin = group.private ? isJoined : true; // Nếu private thì phải là thành viên mới được tham gia
-           // Sắp xếp avatar theo thứ tự ưu tiên
-let sortedMembers = members.sort((a, b) => {
-    return b.following.includes(userId) - a.following.includes(userId);
-});
-// Lấy tối đa 4 avatar từ danh sách thành viên
-const memberAvatars = sortedMembers.slice(0, 4).map(m => m.avatar);
-            return ({
-    name: groupData.name,
-    bio: groupData.description,
-    avatar: groupData.avatar,
-    members: memberAvatars,
-    moderation,
-    numberOfPosts,
-    numberOfMembers: members.length,
-    numberOfProjects,
-    joined: isJoined,
-    canJoin // Chỉ tham gia nếu nhóm là public hoặc user đã là thành viên
-            });
+    
+            const groupData = group[0]; // aggregate() trả về mảng nên cần lấy phần tử đầu tiên
+            const members = groupData.members || [];
+    
+            const userRole = members.find(m => m.user.toString() === userId.toString())?.role || "guest";
+            const isJoined = members.some(m => m.user.toString() === userId.toString());
+            const canJoin = groupData.private ? isJoined : true; 
+    
+            const numberOfProjects = await Project.countDocuments({ group: groupId });
+            const numberOfPosts = await Post.countDocuments({ group: groupId });
+    
+            return {
+                name: groupData.name,
+                bio: groupData.description,
+                avatar: groupData.avatar,
+                members,
+                moderation: groupData.moderation,
+                numberOfPosts,
+                numberOfMembers: members.length,
+                numberOfProjects,
+                joined: isJoined,
+                canJoin
+            };
+    
         } catch (error) {
-            // throw new Error(`Getting  groupData service error: ${error}`);
             console.error("Error fetching group data:", error);
-            res.status(500).json({ message: "Internal server error", error: error.message });
+            return { message: "Internal server error", error: error.message };
         }
     },
 
@@ -270,7 +272,7 @@ const memberAvatars = sortedMembers.slice(0, 4).map(m => m.avatar);
             const group = await Group.findById(groupId);
             if (!group) throw new Error("Group not found");
         
-            if (group.creator.equals(userId)) throw new Error("You are creator, please choose another creator before leave");
+            if (group.creator.equals(userId)) return { success: false, message:"You are creator, please choose another creator before leave"};
         
             group.members = group.members.filter(m => !m.user.equals(userId));
             await group.save();

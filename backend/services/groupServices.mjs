@@ -145,6 +145,7 @@ const memberAvatars = sortedMembers.slice(0, 4).map(m => m.avatar);
     bio: groupData.description,
     avatar: groupData.avatar,
     members: memberAvatars,
+    moderation,
     numberOfPosts,
     numberOfMembers: members.length,
     numberOfProjects,

@@ -100,6 +100,7 @@ const projectServices = {
                       in: "$$member.avatar",
                     },
                   },
+                  groupName: { $arrayElemAt: ["$groupData.name", 0] }
                 },
               },
             ],

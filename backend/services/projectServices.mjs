@@ -12,6 +12,7 @@ const projectServices = {
       const page = data.page || 1;
       const limit = data.limit || 5;
       const skip = (page - 1) * limit;
+      const groupId = data.groupId?new mongoose.Types.ObjectId(`${data.groupId}`):""
       const search = data.search || "";
       const order = data.order || "descending";
       const criteria = data.criteria || "dateCreated";
@@ -48,6 +49,9 @@ const projectServices = {
         matchData.push({
           members: { $elemMatch: { user: userId, role: data.role } },
         });
+      }
+      if (groupId){
+        matchData.push({group:groupId})
       }
       if (user) {
         matchData.push({ members: { $elemMatch: { user: user } } });

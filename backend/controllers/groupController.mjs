@@ -46,8 +46,6 @@ const groupController = {
       else return res.status(500).json(error);
     }
   },
-
-
   updateGroup: async (req, res) => {
     try {
       await groupServices.updateGroup(

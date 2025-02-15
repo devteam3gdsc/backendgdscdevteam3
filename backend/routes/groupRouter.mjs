@@ -58,12 +58,6 @@ groupRouter.put(
   "/update/:groupId",
   authMiddleware.verifyToken,
   roleMiddleware("group",["admin"]),
-  groupController.updateGroup,
-);
-groupRouter.put(
-  "/update/:groupId",
-  authMiddleware.verifyToken,
-  roleMiddleware("group",["admin"]),
   upload.single("avatar"),
   groupController.updateFull,
 );

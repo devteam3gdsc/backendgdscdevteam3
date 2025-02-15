@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Project, Section } from "../models/Group.mjs";
+import { Project, Section } from "../models/Groups.mjs";
 import sectionServices from "../services/sectionServices.mjs";
 import userServices from "../services/userServices.mjs";
 import findDocument from "../utils/findDocument.mjs";

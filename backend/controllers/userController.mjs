@@ -5,7 +5,7 @@ import { httpError } from "../utils/httpResponse.mjs";
 import Post from "../models/Posts.mjs";
 import updateDocument from "../utils/updateDocument.mjs";
 import mongoose, { mongo } from "mongoose";
-import { Group } from "../models/Group.mjs";
+import { Group } from "../models/Groups.mjs";
 const userController = {
   getUserBriefData: async (req, res) => {
     try {

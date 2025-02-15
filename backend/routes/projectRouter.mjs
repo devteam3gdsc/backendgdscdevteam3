@@ -84,12 +84,6 @@ projectRouter.post(
     //roleMiddleware("group",["creator", "admin"]),
     projectController.createProject,
 );
-projectRouter.post(
-    "/update/:projectId",
-    authMiddleware.verifyToken,
-    roleMiddleware("project",["leader", "admin"]),
-    projectController.updateFull,
-);
 projectRouter.put(
   "/update/:projectId",
   authMiddleware.verifyToken,

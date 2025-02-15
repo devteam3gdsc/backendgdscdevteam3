@@ -3,7 +3,7 @@ import User from "../models/Users.mjs";
 import Post from "../models/Posts.mjs";
 import mongoose from "mongoose"
 import NotificationServices from "./notificationServices.mjs";
-import { httpResponse } from "../utils/httpResponse.mjs";
+import { httpError, httpResponse } from "../utils/httpResponse.mjs";
 
 const projectServices = {
 //-----------PROJECT-----------------
@@ -12,6 +12,7 @@ const projectServices = {
       const page = data.page || 1;
       const limit = data.limit || 5;
       const skip = (page - 1) * limit;
+      const groupId = data.groupId?new mongoose.Types.ObjectId(`${data.groupId}`):""
       const search = data.search || "";
       const order = data.order || "descending";
       const criteria = data.criteria || "dateCreated";
@@ -48,6 +49,9 @@ const projectServices = {
         matchData.push({
           members: { $elemMatch: { user: userId, role: data.role } },
         });
+      }
+      if (groupId){
+        matchData.push({group:groupId})
       }
       if (user) {
         matchData.push({ members: { $elemMatch: { user: user } } });
@@ -217,77 +221,82 @@ const projectServices = {
         }
     },
 
-    getFullProjectData : async (projectId, userId) => {
-        try {
-            if (!mongoose.Types.ObjectId.isValid(projectId)) {
-                console.error("projectId không hợp lệ:", projectId);
-            } else {
-                console.log("projectId hợp lệ:", projectId);
-            }
-
-            const project = await Project.aggregate([
-                { $match: { _id: new mongoose.Types.ObjectId(projectId) } },
-                { 
-                    $lookup: {
-                        from: "users", // Tên collection (viết thường, số nhiều)
-                        localField: "members.user",
-                        foreignField: "_id",
-                        as: "membersData"
-                    }
-                },
-                { 
-                    $lookup: {
-                        from: "users",
-                        localField: "creator",
-                        foreignField: "_id",
-                        as: "creatorData"
-                    }
-                }
-            ]);
-            
-            if(!project) {
-                return res.status(404).json({message: "Project not found"});
-            }
-            //const numberOfSection = await Project.countDocuments({group: groupId});
-            //const numberOfPosts = await Post.countDocuments({group: groupId}); //need to edit Post model
-             // Kiểm tra nếu nhóm là private, chỉ cho phép thành viên tham gia
-             const projectData = project[0]; // Vì `aggregate()` trả về mảng
-
-             if (!projectData) {
-                 return res.status(404).json({ message: "Project not found" });
-             }
-             
-             const members = projectData.membersData || []; // Lấy members từ lookup
-             const isJoined = members.some((m) => m._id.toString() === userId.toString());
-            const canJoin = project.private ? isJoined : true; // Nếu private thì phải là thành viên mới được tham gia
-           // Sắp xếp avatar theo thứ tự ưu tiên
-            let sortedMembers = members.sort((a, b) => {
-             return b.following.includes(userId) - a.following.includes(userId);
-           });
-            // Lấy tối đa 4 avatar từ danh sách thành viên
-            const memberAvatars = sortedMembers.slice(0, 4).map(m => m.avatar);
-
-            const sections = await Section.find({ project: projectId })
-            .select("_id name parent participants")
-            .lean();
-
-            const sectionTree = buildSectionTree(sections, null);
-            return ({
-                name: projectData.name,
-                bio: projectData.description,
-                avatar: projectData.avatar,
-                members: memberAvatars,
-                numberOfMembers: members.length,
-                sections: sectionTree,
-                joined: isJoined,
-                canJoin // Chỉ tham gia nếu nhóm là public hoặc user đã là thành viên
-                });
-        } catch (error) {
-            // throw new Error(`Getting  groupData service error: ${error}`);
-            console.error("Error fetching group data:", error);
-            res.status(500).json({ message: "Internal server error", error: error.message });
-        }
-    },
+    getFullProjectData: async (projectId, userId) => {
+      try {
+          if (!mongoose.Types.ObjectId.isValid(projectId)) {
+              console.error("projectId không hợp lệ:", projectId);
+              return { message: "Invalid projectId" };
+          }
+  
+          const project = await Project.aggregate([
+              { $match: { _id: new mongoose.Types.ObjectId(projectId) } },
+              { $unwind: "$members" },
+              {
+                  $lookup: {
+                      from: "users",
+                      localField: "members.user",
+                      foreignField: "_id",
+                      as: "userData"
+                  }
+              },
+              { $unwind: { path: "$userData", preserveNullAndEmptyArrays: true } },
+              {
+                  $group: {
+                      _id: "$_id",
+                      name: { $first: "$name" },
+                      description: { $first: "$description" },
+                      avatar: { $first: "$avatar" },
+                      private: { $first: "$private" },
+                      creator: { $first: "$creator" },
+                      members: {
+                          $push: {
+                              user: "$members.user",
+                              role: "$members.role",
+                              avatar: "$userData.avatar",
+                              role: "$members.role" // Thêm role cạnh avatar
+                          }
+                      }
+                  }
+              }
+          ]);
+  
+          if (!project || project.length === 0) {
+              return { message: "Project not found" };
+          }
+  
+          const projectData = project[0];
+          const members = projectData.members || [];
+  
+          const isJoined = members.some(m => m.user.toString() === userId.toString());
+          const canJoin = projectData.private ? isJoined : true;
+          
+          const sortedMembers = members.sort((a, b) => {
+              return b.following?.includes(userId) - a.following?.includes(userId);
+          });
+          
+          const memberAvatars = sortedMembers.slice(0, 4).map(m => ({ avatar: m.avatar, role: m.role }));
+  
+          const sections = await Section.find({ project: projectId })
+              .select("_id name parent participants")
+              .lean();
+  
+          const sectionTree = buildSectionTree(sections, null);
+  
+          return {
+              name: projectData.name,
+              bio: projectData.description,
+              avatar: projectData.avatar,
+              members: memberAvatars,
+              numberOfMembers: members.length,
+              sections: sectionTree,
+              joined: isJoined,
+              canJoin
+          };
+      } catch (error) {
+          console.error("Error fetching project data:", error);
+          return { message: "Internal server error", error: error.message };
+      }
+  },
 
     inviteMembers : async (projectId, userId, members) => {
         try {
@@ -394,7 +403,7 @@ const projectServices = {
             if(!project) {
                 throw new Error("Project not found");
             }
-        
+            
             const member = project.members.find(m => m.user.toString() === userId);
             if (member && member.role === "leader") {
                 throw new Error("You are the leader, leader cannot leave the project.");
@@ -402,6 +411,10 @@ const projectServices = {
         
             project.members = project.members.filter(m => !m.user.equals(userId));
             await project.save();
+            const sectionUpdate = await Section.updateMany({project:projectId},{$pull:{participants:userId}})
+            if (sectionUpdate.matchedCount === 0){
+              throw new httpError("cant find sections",404);
+            }
             return project;
         } catch (error) {
             throw new Error(`Leave project service error: ${error}`, 500);

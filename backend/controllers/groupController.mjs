@@ -4,7 +4,7 @@ import groupServices from "../services/groupServices.mjs";
 import mongoose from "mongoose";
 import postServices from "../services/postServices.mjs";
 import findDocument from "../utils/findDocument.mjs";
-import { Group } from "../models/Group.mjs";
+import { Group } from "../models/Groups.mjs";
 import userServices from "../services/userServices.mjs";
 import User from "../models/Users.mjs";
 
@@ -46,15 +46,13 @@ const groupController = {
       else return res.status(500).json(error);
     }
   },
-
-
   updateGroup: async (req, res) => {
     try {
-      const updatedGroup = await groupServices.updateGroup(
+      await groupServices.updateGroup(
         req.params.groupId,
         req.body,
       );
-      res.status(200).json(updatedGroup);
+      return res.status(200).json("updated success");
 
     } catch (error) {
       if (error instanceof httpError)
@@ -135,21 +133,42 @@ const groupController = {
     }
   },
 
-  updateFull: async (req, res) => {
+  updateGroupFull: async (groupId, avatarFile, ...updateData) => {
     try {
-      const groupId = req.params.groupId;
-      const result = await groupServices.updateGroupFull(
-        groupId,
-        req.file,
-        req.body,
-      );
-      return res.status(result.statusCode).json(result.message);
+        // Tìm nhóm trong database
+        const group = await Group.findById(groupId);
+        if (!group) {
+            throw new Error("Group not found.");
+        }
+
+        // Lấy avatar cũ
+        const avatar = group.avatar;
+        const avatarURL = avatarFile ? avatarFile.path : avatar;
+
+        // Nếu avatar cũ không phải ảnh mặc định, thì xóa
+        try {
+            if (avatar && avatar !== "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541") {
+                await fileDestroy(avatar, "image");
+            }
+        } catch (err) {
+            console.error("Error deleting file:", err);
+        }
+
+        // Cập nhật dữ liệu
+        await group.updateOne({
+            $set: { avatar: avatarURL, ...(updateData[0] || {}) }
+        });
+
+        // Kiểm tra lại dữ liệu sau khi cập nhật
+        const updatedGroup = await Group.findById(groupId);
+        console.log("Updated group:", updatedGroup);
+
+        return new httpResponse("Updated successfully", 200);
     } catch (error) {
-      if (error instanceof httpError)
-        return res.status(error.statusCode).json(error.message);
-      else return res.status(500).json(error);
+        console.error("Updating group service error:", error);
+        throw new Error(`Updating group service error: ${error.message}`);
     }
-  },
+},
 
   getUsers: async (req, res) => {
     try {
@@ -292,7 +311,7 @@ const groupController = {
         { _id: { $nin: groupMembersId } },
       ];
       if (search) {
-        matchData.push({ displayname: { $regex: search, $option: "i" } });
+        matchData.push({ displayname: { $regex: search, $options: "i" } });
       }
       const result = await userServices.getUsers(
         userId,
@@ -375,7 +394,7 @@ const groupController = {
       }
       const matchData = [{ _id: { $nin: groupMembersId } }];
       if (search) {
-        matchData.push({ displayname: { $regex: search, $option: "i" } });
+        matchData.push({ displayname: { $regex: search, $options: "i" } });
       }
       const result = await userServices.getUsers(
         userId,
@@ -451,8 +470,8 @@ const groupController = {
 
   leaveGroup : async (req, res) => {
     try {
-      const group = await groupServices.leaveGroup(req.params.groupId, req.user.id);
-      res.status(200).json({ message:"leave group successfully"});
+      await groupServices.leaveGroup(req.params.groupId, req.user.id);
+      return res.status(200).json({ message:"leave group successfully"});
     } catch (error) {
       if (error instanceof httpError)
         return res.status(error.statusCode).json(error.message);

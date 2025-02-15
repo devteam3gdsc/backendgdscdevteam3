@@ -1,4 +1,4 @@
-
+import { Router } from "express";
 import groupController from "../controllers/groupController.mjs";
 import authMiddleware from "../middlewares/authMidleware.mjs";
 import  roleMiddleware  from "../middlewares/roleMiddleware.mjs";
@@ -47,25 +47,20 @@ groupRouter.get(
 groupRouter.get(
   "/getUninvitedUsers/:groupId",
   authMiddleware.verifyToken,
-  groupController.getUserNotInGroup,
+  groupController.getUserNotInGroup);
 groupRouter.post(
   "/create",
   authMiddleware.verifyToken,
   upload.single("avatar"),
   groupController.createGroup,
 );
-groupRouter.put(
-  "/update/:groupId",
-  authMiddleware.verifyToken,
-  roleMiddleware("group",["admin"]),
-  groupController.updateGroup,
-);
+
 groupRouter.put(
   "/update/:groupId",
   authMiddleware.verifyToken,
   roleMiddleware("group",["admin"]),
   upload.single("avatar"),
-  groupController.updateFull,
+  groupController.updateGroupFull,
 );
 groupRouter.delete(
   "/delete/:groupId",

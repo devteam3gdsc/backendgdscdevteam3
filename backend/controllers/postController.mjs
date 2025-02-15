@@ -7,7 +7,7 @@ import { httpError } from "../utils/httpResponse.mjs";
 import findDocument from "../utils/findDocument.mjs";
 import updateDocument from "../utils/updateDocument.mjs";
 import { fileDestroy, getFiles } from "../utils/filesHelper.mjs";
-import { Group } from "../models/Group.mjs";
+import { Group } from "../models/Groups.mjs";
 const postController = {
   //[GET] /me?page=...&limit=...&search=...&type=...
   getUserPost: async (req, res) => {

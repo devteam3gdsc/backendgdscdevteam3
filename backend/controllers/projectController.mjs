@@ -1,7 +1,7 @@
 
 import mongoose from "mongoose";
 import projectServices from "../services/projectServices.mjs";
-import { Group, Project } from "../models/Group.mjs";
+import { Group, Project } from "../models/Groups.mjs";
 import User from "../models/Users.mjs";
 import { httpError } from "../utils/httpResponse.mjs";
 import findDocument from "../utils/findDocument.mjs";
@@ -68,7 +68,7 @@ const projectController = {
         { _id: { $in: projectMembersId } },
       ];
       if (search) {
-        matchData.push({ displayname: { $regex: search, $option: "i" } });
+        matchData.push({ displayname: { $regex: search, $options: "i" } });
       }
       const result = await userServices.getUsers(
         userId,
@@ -232,7 +232,7 @@ const projectController = {
         { _id: { $nin: projectMembersId } },
       ];
       if (search) {
-        matchData.push({ displayname: { $regex: search, $option: "i" } });
+        matchData.push({ displayname: { $regex: search, $options: "i" } });
       }
       const result = await userServices.getUsers(
         userId,
@@ -257,7 +257,6 @@ const projectController = {
       else return res.status(500).json(error);
     }
   },
-};
     createProject : async (req, res) => {
         try {
             const newProject = await projectServices.createProject(req.body, req.params.groupId, req.user.id);
@@ -268,7 +267,6 @@ const projectController = {
             else return res.status(500).json(error);
         }
     },
-
     updateProject : async (req, res) => {
         try {
             const updatedProject = await projectServices.updateProject(req.params.projectId, req.body);
@@ -370,8 +368,8 @@ const projectController = {
     
       leaveProject : async (req, res) => {
         try {
-          const project = await projectServices.leaveProject(req.params.projectId, req.user.id);
-          res.status(200).json({ message:"leave project successfully"});
+          await projectServices.leaveProject(req.params.projectId, req.user.id);
+          return res.status(200).json({ message:"leave project successfully"});
         } catch (error) {
           if (error instanceof httpError)
             return res.status(error.statusCode).json(error.message);

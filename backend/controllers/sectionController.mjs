@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Project, Section } from "../models/Group.mjs";
+import { Project, Section } from "../models/Groups.mjs";
 import sectionServices from "../services/sectionServices.mjs";
 import userServices from "../services/userServices.mjs";
 import findDocument from "../utils/findDocument.mjs";
@@ -90,19 +90,8 @@ const sectionController = {
     try {
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
       const userId = new mongoose.Types.ObjectId(`${req.params.userId}`);
-      const section = await Section.findById(sectionId);
-      const updateResult = await Section.updateMany(
-        { _id: { $in: section.children } },
-        { $pull: { participants: userId } },
-      );
-      if (updateResult.matchedCount === 0) {
-        return res.status(404).json("cant find section!");
-      }
-      section.participants = section.participants.filter((participant) => {
-        return !participant.equals(userId);
-      });
-      await section.save();
-      return res.status(200).json("participant removed!");
+      await sectionServices.removeUser(userId,sectionId);
+      return res.status(200).json("User removed!")
     } catch (error) {
       if (error instanceof httpError)
         return res.status(error.statusCode).json(error.message);
@@ -152,7 +141,7 @@ const sectionController = {
         { _id: { $in: section.participants } },
       ];
       if (search) {
-        matchData.push({ displayname: { $regex: search, $option: "i" } });
+        matchData.push({ displayname: { $regex: search, $options: "i" } });
       }
       const result = await userServices.getUsers(
         userId,
@@ -230,7 +219,7 @@ const sectionController = {
         { _id: { $nin: section.participants } },
       ];
       if (search) {
-        matchData.push({ displayname: { $regex: search, $option: "i" } });
+        matchData.push({ displayname: { $regex: search, $options: "i" } });
       }
       const result = await userServices.getUsers(
         userId,

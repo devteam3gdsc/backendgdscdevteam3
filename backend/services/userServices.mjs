@@ -7,7 +7,7 @@ import { v2 } from "cloudinary";
 import { httpError, httpResponse } from "../utils/httpResponse.mjs";
 import updateDocument from "../utils/updateDocument.mjs";
 import { fileDestroy } from "../utils/filesHelper.mjs";
-import { Group, Project } from "../models/Group.mjs";
+import { Group, Project } from "../models/Groups.mjs";
 import mongoose from "mongoose";
 const userServices = {
   updateUserPassword: async (userId, oldPassword, newPassword) => {

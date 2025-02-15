@@ -67,7 +67,7 @@ const projectServices = {
               {
                 $lookup: {
                   from: "groups",
-                  localField: "groupId",
+                  localField: "group",
                   foreignField: "_id",
                   as: "groupData",
                 },

@@ -54,12 +54,13 @@ groupRouter.post(
   upload.single("avatar"),
   groupController.createGroup,
 );
+
 groupRouter.put(
   "/update/:groupId",
   authMiddleware.verifyToken,
   roleMiddleware("group",["admin"]),
   upload.single("avatar"),
-  groupController.updateFull,
+  groupController.updateGroupFull,
 );
 groupRouter.delete(
   "/delete/:groupId",

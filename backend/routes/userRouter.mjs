@@ -36,11 +36,13 @@ userRouter.put(
   authMiddleware.verifyToken,
   userController.updateUserPassword,
 );
+
 userRouter.get(
   "/briefData/:userId",
   authMiddleware.verifyToken,
   userController.getUserBriefData,
 );
+
 userRouter.get("/test", authMiddleware.verifyToken, userController.test);
 userRouter.get(
   "/follow/:userId",
@@ -68,5 +70,6 @@ userRouter.get(
   "/unpin/:position",
   authMiddleware.verifyToken,
   userController.unPin,
+
 );
 export default userRouter;

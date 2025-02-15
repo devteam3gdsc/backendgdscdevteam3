@@ -447,6 +447,25 @@ http://localhost:4000/notification
 "hasMore": false
 }
 
+
+// notification invite to group 
+  {
+            "_id": "67a6e0903e412198afeb216f",
+            "userId": "6791aebf4277d1beaf39ded7",
+            "senderId": "679597b08d8bedbe78208c33",
+            "senderName": "haibabon",
+            "senderAvatar": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541",
+            "type": "invite",
+            "message": "invited you join group",
+            "relatedEntityId": "67a5e2e1560b4238c754b169",
+            "entityType": "Group",
+            "isRead": false,
+            "extraData": null,
+            "createdAt": "2025-02-08T04:41:52.212Z",
+            "__v": 0
+        }
+
+
 http://localhost:4000/notification?page=1&limit=5&filter=unread
 http://localhost:4000/notification?page=1&limit=5&filter=read
 
@@ -507,6 +526,7 @@ http://localhost:4000/auth/passwordReset/82ca52b4c5f82b3b7b60015f69c84458be8c9ef
 
 {
 "message": "Password reset successfully"
+
 }
 
 //COMMENT TREE
@@ -536,3 +556,356 @@ http://localhost:4000/auth/passwordReset/82ca52b4c5f82b3b7b60015f69c84458be8c9ef
 
 [PUT]: /comment/edit/:commentId "nhưu cũ nhữung bỏ post này kia đi"
 [DELETE]: /comment/delete/:commentId "như cũ nhưng bỏ postId này kia đi"
+=======
+}
+
+//-------------GROUP------------------
+
+// POST http://localhost:4000/group/create
+{
+    "name": "groupuser2",
+    "description": "",
+    "private": false,
+    "moderation": false,
+    "avatar": "",
+    "creator": "679597b08d8bedbe78208c33",
+    "members": [
+        {
+            "user": "679597b08d8bedbe78208c33",
+            "role": "creator",
+            "_id": "67a5cfe37221d6573c1d81f3"
+        }
+    ],
+    "projects": [],
+    "posts": [],
+    "_id": "67a5cfe37221d6573c1d81f2",
+    "createdAt": "2025-02-07T09:18:27.827Z",
+    "updatedAt": "2025-02-07T09:18:27.827Z",
+    "__v": 0
+}
+
+
+// PUT http://localhost:4000/group/update/67a5cfe37221d6573c1d81f2
+// PUT /group/update/:groupId
+{
+    "_id": "67a5cfe37221d6573c1d81f2",
+    "name": "groupuser2222",
+    "description": "",
+    "private": false,
+    "moderation": false,
+    "avatar": "",
+    "creator": "679597b08d8bedbe78208c33",
+    "members": [
+        {
+            "user": "679597b08d8bedbe78208c33",
+            "role": "creator",
+            "_id": "67a5cfe37221d6573c1d81f3"
+        }
+    ],
+    "projects": [],
+    "posts": [],
+    "createdAt": "2025-02-07T09:18:27.827Z",
+    "updatedAt": "2025-02-07T09:20:05.388Z",
+    "__v": 0
+}
+
+// GET http://localhost:4000/group/fullData/67a5cfe37221d6573c1d81f2
+
+// GET http://localhost:4000/group/fullData/:groupId
+{
+    "name": "groupuser2222",
+    "bio": "",
+    "avatar": "",
+    "members": [
+        "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
+    ],
+    "numberOfPosts": 0,
+    "numberOfMembers": 1,
+    "numberOfProjects": 0,
+    "joined": true,
+    "canJoin": true
+}
+
+// DELETE http://localhost:4000/group/delete/67a5cfe37221d6573c1d81f2
+
+// DELETE http://localhost:4000/group/delete/:groupId
+{
+    "message": "Group deleted successfully"
+}
+
+
+// POST http://localhost:4000/group/invite/67a4cfee39057ae06b9727af
+
+// POST http://localhost:4000/group/invite/:groupId
+{
+  "members": ["6786b1c520d6160de991e264", "67872550d1dd8257ea418b42"]
+}
+{
+    "message": "Invite new member successfully"
+}
+
+// DELETE http://localhost:4000/group/removeMember/67a4cfee39057ae06b9727af/67872e57d1dd8257ea418e67
+
+// DELETE http://localhost:4000/group/removeMember/:groupId/:removedUserId
+{
+  "members": ["67872e57d1dd8257ea418e67"]
+}
+{
+    "message": "Delete member successfully"
+}
+
+// POST http://localhost:4000/group/join/67a4b1a5fd48ada7ebba874c
+
+// POST http://localhost:4000/group/join/:groupId
+{
+    "message": "Join group successfully"
+}
+
+// POST http://localhost:4000/group/leave/67a4b1a5fd48ada7ebba874c
+
+// POST http://localhost:4000/group/leave/:groupId
+{
+    "message": "leave group successfully"
+}
+
+
+// POST http://localhost:4000/group/assignAdmin/67a5e2e1560b4238c754b169/67872e57d1dd8257ea418e67
+
+// POST http://localhost:4000/group/assignAdmin/:groupId/:assignAdminUserId
+{
+    "message": "assign admin group successfully"
+}
+
+// POST http://localhost:4000/group/assignCreator/67a5e767a29c317761d87ad8/67872e57d1dd8257ea418e67
+
+// POST http://localhost:4000/group/assignCreator/:groupId/:assignCreatorUserId
+{
+    "message": "assign creator group successfully"
+}
+
+
+// POST
+http://localhost:4000/group/confirmInvite/67a5e2e1560b4238c754b169?accept=true
+
+// POST http://localhost:4000/group/confirmInvite/:groupId
+{
+    "confirm": {
+        "message": "User joined the group"
+    }
+}
+
+//------------PROJECT------------
+// POST
+http://localhost:4000/project/create/67a5e2e1560b4238c754b169
+
+http://localhost:4000/project/create/:groupId
+
+
+// POST 
+http://localhost:4000/project/update/67a72552dd3d9cde964ffd6a
+
+http://localhost:4000/project/update/:projectId
+
+
+//DELETE
+http://localhost:4000/project/delete/67a72552dd3d9cde964ffd6a
+
+http://localhost:4000/project/delete/:projectId
+{
+    "message": "Deleting project successfully"
+}
+
+
+//--------------PROJECT--------------
+// POST 
+http://localhost:4000/project/create/67a5e2e1560b4238c754b169
+{
+    "project": {
+        "name": "create first project",
+        "description": "",
+        "private": false,
+        "avatar": "",
+        "creator": "679597b08d8bedbe78208c33",
+        "group": "67a5e2e1560b4238c754b169",
+        "pendingInvites": [],
+        "sections": [],
+        "_id": "67a86388ac612cf5f33de671",
+        "members": [
+            {
+                "user": "679597b08d8bedbe78208c33",
+                "role": "leader",
+                "_id": "67a86388ac612cf5f33de672"
+            }
+        ],
+        "createdAt": "2025-02-09T08:12:56.079Z",
+        "updatedAt": "2025-02-09T08:12:56.079Z",
+        "__v": 0
+    },
+    "rootSection": {
+        "name": "create first project",
+        "description": "",
+        "project": "67a86388ac612cf5f33de671",
+        "parent": null,
+        "children": [],
+        "participants": [
+            "679597b08d8bedbe78208c33"
+        ],
+        "_id": "67a86388ac612cf5f33de674",
+        "createdAt": "2025-02-09T08:12:56.154Z",
+        "updatedAt": "2025-02-09T08:12:56.154Z",
+        "__v": 0
+    }
+}
+
+// GET 
+http://localhost:4000/project/fullData/67a86388ac612cf5f33de671
+
+http://localhost:4000/project/fullData/:projectId
+{
+    "name": "create first project",
+    "bio": "",
+    "avatar": "",
+    "members": [
+        "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
+    ],
+    "numberOfMembers": 1,
+    "sections": [
+        {
+            "_id": "67a86388ac612cf5f33de674",
+            "name": "create first project",
+            "participants": [
+                "679597b08d8bedbe78208c33"
+            ],
+            "children": []
+        }
+    ],
+    "joined": true,
+    "canJoin": true
+}
+
+// POST
+http://localhost:4000/project/invite/67a86388ac612cf5f33de671
+
+
+http://localhost:4000/project/invite/:projectId
+{
+  "members": ["67872846d1dd8257ea418c48"]
+}
+{
+    "message": "Invite new member successfully"
+}
+
+// DELETE 
+http://localhost:4000/project/removeMember/67a86388ac612cf5f33de671/679597b08d8bedbe78208c33
+
+http://localhost:4000/project/removeMember/:projectId/:removedUserId
+{
+    "message": "Delete member successfully"
+}
+
+// POST 
+http://localhost:4000/project/join/67a86388ac612cf5f33de671
+
+http://localhost:4000/project/join/:projectId
+{
+    "message": "Join project successfully"
+}
+
+// POST
+http://localhost:4000/project/leave/67a86388ac612cf5f33de671
+
+http://localhost:4000/project/leave/:projectId
+{
+    "message": "leave project successfully"
+}
+
+// POST 
+http://localhost:4000/project/assignAdmin/67a86388ac612cf5f33de671/6791aebf4277d1beaf39ded7
+
+http://localhost:4000/project/assignAdmin/:projectId/:assignAdminUserId
+{
+    "message": "assign admin project successfully"
+}
+
+// POST 
+http://localhost:4000/project/removeAdmin/67a86388ac612cf5f33de671/6791aebf4277d1beaf39ded7
+
+http://localhost:4000/project/removeAdmin/:projectId/:removeAdminUserId
+{
+    "message": "Remove admin project successfully"
+}
+
+//------POST------
+// GET 
+http://localhost:4000/group/getPending?group=67a86388ac612cf5f33de671
+
+// GET // post được tạo mặc định là public, nếu không để điều kiện group = thì sẽ lấy bài viết public, khác với community là community lấy được post public không thuộc group
+http://localhost:4000/group/getPosts?group=67a9cd1a45d31c5ad73a25c2&status=pending
+{
+    "posts": [
+        {
+            "_id": "67a9d379ba029a0894fba501",
+            "title": "post 10 in group",
+            "content": "",
+            "tags": [],
+            "author": "679597b08d8bedbe78208c33",
+            "authorname": "haibabon",
+            "avatar": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541",
+            "group": "67a9cd1a45d31c5ad73a25c2",
+            "project": null,
+            "section": null,
+            "likes": [],
+            "totalLikes": 0,
+            "files": [],
+            "stored": [],
+            "totalComments": 0,
+            "editedAt": "2025-02-10T10:22:49.140Z",
+            "status": "pending",
+            "visibility": "private",
+            "createdAt": "2025-02-10T10:22:49.150Z",
+            "updatedAt": "2025-02-10T10:22:49.151Z",
+            "__v": 0,
+            "Stored": false,
+            "Liked": false,
+            "isAuthor": true
+        },
+        {
+            "_id": "67a9d0c681ea0fdb277dba62",
+            "title": "post 9 in group",
+            "content": "",
+            "tags": [],
+            "author": "679597b08d8bedbe78208c33",
+            "authorname": "haibabon",
+            "avatar": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541",
+            "group": "67a9cd1a45d31c5ad73a25c2",
+            "project": null,
+            "section": null,
+            "likes": [],
+            "totalLikes": 0,
+            "files": [],
+            "stored": [],
+            "totalComments": 0,
+            "editedAt": "2025-02-10T10:11:18.385Z",
+            "status": "pending",
+            "visibility": "private",
+            "createdAt": "2025-02-10T10:11:18.386Z",
+            "updatedAt": "2025-02-10T10:11:18.386Z",
+            "__v": 0,
+            "Stored": false,
+            "Liked": false,
+            "isAuthor": true
+        },
+      ...
+    ],
+    "currentPage": 1,
+    "totalPages": 2,
+    "totalPosts": 7,
+    "hasMore": true
+}
+
+// POST
+http://localhost:4000/group/postModerate/67ac29741005b90425137c49?accept=approve
+{
+    "message": "approved"
+}
+

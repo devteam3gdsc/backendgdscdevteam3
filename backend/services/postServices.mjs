@@ -5,6 +5,7 @@ import { httpError, httpResponse } from "../utils/httpResponse.mjs";
 import { fileDestroy, getFiles } from "../utils/filesHelper.mjs";
 import { edit } from "@cloudinary/url-gen/actions/animated";
 import updateDocument from "../utils/updateDocument.mjs";
+import { Group, Project, Section } from "../models/Groups.mjs";
 const postServices = {
   getPosts: async (
     userId,
@@ -76,7 +77,66 @@ const postServices = {
       throw new httpError(`getPosts service error: ${error}`, 500);
     }
   },
-  createPost: async (userId, { ...data }, reqfiles) => {
+
+  getPostsInGroup: async (userId, filterConditions, criterias, orders, skip, limit) => {
+    try {
+      console.log("Filter conditions:", JSON.stringify(filterConditions, null, 2));
+  
+      const order = orders || "descending";
+      const criteria = criterias || "date";
+  
+      let sortValue;
+      switch (criteria) {
+        case "date":
+          sortValue = "updatedAt";
+          break;
+        case "likes":
+          sortValue = "totalLikes";
+          break;
+        case "comments":
+          sortValue = "totalComments";
+          break;
+      }
+  
+      let sortOrder = order === "ascending" ? 1 : -1;
+  
+      let filter = filterConditions?.$and?.length ? { $and: filterConditions.$and } : {};
+  
+      const Data = await Post.aggregate([
+        { $match: filter },
+        { $sort: { [sortValue]: sortOrder } },
+        {
+          $facet: {
+            posts: [
+              { $skip: skip },
+              { $limit: limit },
+              {
+                $addFields: {
+                  Stored: { $in: [userId, "$stored"] },
+                  Liked: { $in: [userId, "$likes"] },
+                  isAuthor: { $eq: ["$author", userId] },
+                },
+              },
+            ],
+            countingPosts: [{ $count: "totalPosts" }],
+          },
+        },
+      ]);
+  
+      if (!Data[0].countingPosts[0]) {
+        return { posts: [], totalPosts: 0 };
+      }
+  
+      const totalPosts = Data[0].countingPosts[0].totalPosts;
+      const posts = Data[0].posts;
+  
+      return { posts, totalPosts };
+    } catch (error) {
+      throw new httpError(`getPosts service error: ${error}`, 500);
+    }
+  },
+
+  createPost: async (userId, {group, project, section, ...data }, reqfiles) => {
     try {
       let tags = [];
       if (data.tags) {
@@ -92,17 +152,39 @@ const postServices = {
         { avatar: 1, displayname: 1 },
       );
       const files = getFiles(reqfiles, "code_files");
+
+       // Kiểm tra xem bài viết thuộc cấp nào
+      const postScope = group ? { group } : project ? { project } : section ? { section } : {};
+    // Mặc định trạng thái bài viết
+    let status = "approved";
+
+    if (group) {
+      const groupData = await findDocument(Group, { _id: group }, { moderation: 1 });
+      if (groupData?.moderation === true) {
+        status = "pending"; // Nếu group cần kiểm duyệt, đặt trạng thái pending
+      }
+    }
+
       const newPost = await Post.create({
         ...data,
+        ...postScope,
         tags,
         author: userId,
         authorname: userData.displayname,
         avatar: userData.avatar,
         files, // Lưu danh sách file vào post
         editedAt: Date.now(),
+        status,
       }).catch((error) => {
         throw new httpError(`creating post failed: ${error}`, 500);
       });
+      if(group) {
+        await updateDocument(Group, 1, [{ _id: group }], [{ $inc: { totalPosts: 1 }}]);
+      } else if (project) {
+        await updateDocument(Project, 1, [{ _id: project }], [{ $inc: { totalPosts: 1 }}]);
+      } else if (project) {
+        await updateDocument(Section, 1, [{ _id: section }], [{ $inc: { totalPosts: 1 }}]);
+      }
       return newPost._id;
     } catch (error) {
       throw new httpError(`creating post service error: ${error}`, 500);
@@ -149,6 +231,45 @@ const postServices = {
       throw new httpError(`editing post service error: ${error}`, 500);
     }
   },
+  confirmCreatePost: async (userId, { group, project, section }, postId, accept) => {
+    try {
+      const post = await Post.findById(postId);
+      if (!post) {
+        throw new Error("Post not found");
+      }
+  
+      if (post.status === "approved") {
+        throw new Error("Post already approved");
+      }
+  
+      if (post.status === "rejected") {
+        throw new Error("Post already rejected");
+      }
+  
+      // Xử lý trạng thái
+      if (accept === "approve") {
+        post.status = "approved";  // Sửa lỗi push
+      } else if (accept === "reject") {
+        post.status = "rejected";
+  
+        // Giảm số lượng bài viết nếu bị từ chối
+        if (group) {
+          await updateDocument(Group, 1, [{ _id: group }], [{ $inc: { totalPosts: -1 } }]);
+        } else if (project) {
+          await updateDocument(Project, 1, [{ _id: project }], [{ $inc: { totalPosts: -1 } }]);
+        } else if (section) {  // Sửa lỗi lặp
+          await updateDocument(Section, 1, [{ _id: section }], [{ $inc: { totalPosts: -1 } }]);
+        }
+      }
+  
+      await post.save();
+  
+      return { message: accept === "approve" ? "approved" : "rejected" };
+    } catch (error) {
+      throw new Error(`Confirm post approval error: ${error}`);
+    }
+  },
+  
 };
 
 export default postServices;

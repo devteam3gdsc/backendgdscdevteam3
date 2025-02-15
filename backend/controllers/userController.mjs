@@ -30,11 +30,13 @@ const userController = {
   //[GET] /user/publicInfo
   getUserPublicInfo: async (req, res) => {
     try {
+
       const user = await findDocument(
         User,
         { _id: req.params.userId },
         {
           _id: 0,
+
           username: 1,
           displayname: 1,
           avatar: 1,
@@ -73,6 +75,7 @@ const userController = {
         User,
         { _id: req.user.id },
         {
+
           _id: 1,
           displayname: 1,
           email: 1,
@@ -363,5 +366,6 @@ const userController = {
       else return res.status(500).json(error);
     }
   },
+
 };
 export default userController;

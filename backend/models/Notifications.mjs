@@ -22,6 +22,7 @@ const notificationSchema = new mongoose.Schema({
     enum: [
       "like",
       "comments",
+      "invite",
       "reply",
       "follow",
       "friend_request",
@@ -54,6 +55,7 @@ const notificationSchema = new mongoose.Schema({
       "Comments",
       "User",
       "Group",
+      "Project",
       "Message",
       "Achievement",
       "Invoice",

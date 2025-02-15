@@ -3,6 +3,7 @@ import { position } from "@cloudinary/url-gen/qualifiers/timeline";
 import mongoose, { Types } from "mongoose";
 const pinSchema = new mongoose.Schema(
   {
+
     id: mongoose.Types.ObjectId,
     pinType: {
       type: String,
@@ -88,6 +89,7 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
     pins: { type: [pinSchema], default: [] },
     recent: { type: [recentSchema], default: [] },
     resetPasswordToken: { type: String },

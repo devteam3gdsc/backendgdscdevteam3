@@ -65,7 +65,7 @@ const postController = {
     }
   },
 
-  //[POST] /post/create
+
   createPost: async (req, res) => {
     try {
       const newPostId = await postServices.createPost(
@@ -97,7 +97,8 @@ const postController = {
       const search = req.query.search || "";
       const skip = (page - 1) * limit;
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
-      let matchData = [{ visibility: "public" }, { group: null }];
+      let matchData = [{ visibility: "public" }];
+      matchData.push({ group: { $exists: false }, project: { $exists: false }, section: { $exists: false } });
       if (req.query.tags) {
         const tags = req.query.tags.split(",");
         matchData.push({ tags: { $all: tags } });
@@ -107,7 +108,7 @@ const postController = {
       }
       const result = await postServices.getPosts(
         userId,
-        { $and: [...matchData] },
+        { $and: matchData },
         req.query.criteria,
         req.query.order,
         skip,
@@ -128,6 +129,91 @@ const postController = {
       else return res.status(500).json(error);
     }
   },
+
+  //[GET] /group/getPosts?page=...&limit=...&search=...&group=...&status=pending
+  getPostsInGroupProjectSection: async (req, res) => {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 5;
+      const search = req.query.search || "";
+      const skip = (page - 1) * limit;
+      const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
+      const { group, project, section, status } = req.query;
+
+    // Mảng điều kiện lọc
+    let matchData = [{ visibility: "public" }];
+
+    // Lọc theo group, project, section nếu có
+    if (group) matchData.push({ group: new mongoose.Types.ObjectId(group) });
+    if (project) matchData.push({ project: new mongoose.Types.ObjectId(project) });
+    if (section) matchData.push({ section: new mongoose.Types.ObjectId(section) });
+
+    // Lọc theo trạng thái nếu có
+    if (status) matchData.push({ status });
+
+    // Lọc theo tags nếu có
+    if (req.query.tags) {
+      const tags = req.query.tags.split(",");
+      matchData.push({ tags: { $all: tags } });
+    }
+
+    // Lọc theo tiêu đề (tìm kiếm)
+    if (search) {
+      matchData.push({ title: { $regex: search, $options: "i" } });
+    }
+
+    // Gọi postServices
+    const result = await postServices.getPostsInGroup(userId, { $and: matchData }, req.query.criteria, req.query.order, skip, limit);
+
+      const totalPages = Math.ceil(result.totalPosts / limit);
+      const hasMore = totalPages - page > 0 ? true : false;
+      res.status(200).json({
+        posts: result.posts,
+        currentPage: page,
+        totalPages,
+        totalPosts: result.totalPosts,
+        hasMore,
+      });
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  },
+  
+  confirmPost: async (req, res) => {
+    try {
+      const post = await Post.findById(req.params.postId);
+      
+      if (!post) {
+        console.log("Post not found");
+        return res.status(404).json({ message: "Post not found" });
+      }
+  
+      console.log(post);
+      
+      // Lấy ID của group/project/section theo đúng thứ tự ưu tiên
+      const typeObj = {
+        group: post.group || null,
+        project: post.project || null,
+        section: post.section || null,
+      };
+  
+      console.log(typeObj);
+  
+      const result = await postServices.confirmCreatePost(post.author, typeObj, req.params.postId, req.query.accept);
+      return res.status(200).json(result);
+      
+    } catch (error) {
+      if (error instanceof httpError) {
+        return res.status(error.statusCode).json(error.message);
+      } else {
+        return res.status(500).json({ message: "Internal Server Error", error: error.toString() });
+      }
+    }
+  },
+  
+
   //[GET] /post/store/:postId
   storePost: async (req, res) => {
     try {
@@ -217,6 +303,7 @@ const postController = {
   //[GET] /post/like/:postId
   likePost: async (req, res) => {
     try {
+
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
       const post = await Post.findOneAndUpdate(
         { _id: req.params.postId },
@@ -306,6 +393,7 @@ const postController = {
           },
         },
       ]);
+
       const {
         title,
         content,
@@ -332,6 +420,7 @@ const postController = {
     }
   },
   //[GET] /following?page=...&limit=...&search=...
+
   getFeedPosts: async (req, res) => {
     try {
       const page = parseInt(req.query.page) || 1;
@@ -365,6 +454,7 @@ const postController = {
         { author: { $in: following } },
         { visibility: "public" },
       ];
+
       let groupFilter = {};
       if (groupsId) {
         groupFilter = { group: { $in: groupsId } };
@@ -407,6 +497,7 @@ const postController = {
       if (search) {
         matchData.push({ title: { $regex: search, $options: "i" } });
       }
+
       const result = await postServices.getPosts(
         myId,
         { $and: [...matchData] },
@@ -419,6 +510,7 @@ const postController = {
         ? Math.ceil(result.totalPosts / limit)
         : 0;
       const hasMore = totalPages - page > 0 ? true : false;
+
       const author = await findDocument(
         User,
         { _id: authorId },
@@ -440,7 +532,7 @@ const postController = {
       me.recent = newRecent;
       console.log(me.recent);
       await me.save();
-      res.status(200).json({
+      return res.status(200).json({
         posts: result.posts,
         currentPage: page,
         totalPages,

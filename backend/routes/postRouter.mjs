@@ -64,6 +64,7 @@ postRouter.put(
   cpUpload,
   postController.editPost,
 );
+
 postRouter.get(
   "/setState/:postId",
   authMiddleware.verifyToken,
@@ -73,6 +74,7 @@ postRouter.get(
   "/halfDetail/:postId",
   authMiddleware.verifyToken,
   postController.halfDetail,
+
 );
 
 export default postRouter;

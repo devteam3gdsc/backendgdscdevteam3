@@ -23,4 +23,5 @@ pageRouter.get(
 );
 pageRouter.get("/recent", authMiddleware.verifyToken, userController.getRecent);
 
+
 export default pageRouter;

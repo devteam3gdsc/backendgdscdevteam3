@@ -53,7 +53,7 @@ projectRouter.delete(
   authMiddleware.verifyToken,
   sectionController.deleteSection,
 );
-projectRouter.get(
+projectRouter.post(
   "/section/:sectionId/addingParticipant/:userId",
   authMiddleware.verifyToken,
   sectionController.addParticipant,

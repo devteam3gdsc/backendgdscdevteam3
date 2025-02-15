@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import projectServices from "../services/projectServices.mjs";
-import { Project } from "../models/Group.mjs";
+import { Group, Project } from "../models/Group.mjs";
 import User from "../models/Users.mjs";
 import { httpError } from "../utils/httpResponse.mjs";
 import findDocument from "../utils/findDocument.mjs";
@@ -141,15 +141,70 @@ const projectController = {
           else return res.status(500).json(error);
         }
     },
-    createSection: async (req,res)=>{
+    getUninvitedUsers: async (req,res)=>{
       try {
-        await sectionServices.createSection(req.body);
+        const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
+        const projectId = new mongoose.Types.ObjectId(`${req.params.projectId}`);
+        const project = await Project.findById(projectId);
+        if (!project){
+          return res.status(404).json("Invalid projectId")
+        }
+        const groupMembers = (await findDocument(Group,{_id:project.group},{members:1,_id:0})).members
+        if (!groupMembers){
+          return res.status(404).json("cant find group")
+        }
+        const projectMembersId = project.members.map((member)=>{return member.user})
+        const groupMembersId = groupMembers.map((member)=>{return member.users})
+        const page = req.query.page || 1;
+        const limit = req.query.limit || 5;
+        const skip = (page-1)*limit;
+        const order = req.query.order || "descending";
+        const criteria = req.query.criteria || "dateJoined";
+        const search = req.query.search || ""
+        switch (criteria){
+          case "dateJoined":{
+            var sortValue = "createdAt";
+            break;
+          }
+          case "likes":{
+            var sortValue = "totalLikes";
+            break;
+          }
+          case "followers":{
+            var sortValue = "totalFollowers";
+            break;
+          }
+        };
+        switch (order){
+          case "descending":{
+            var sortOrder = -1;
+            break;
+          }
+          case "ascending":{
+            var sortOrder = 1;
+            break;
+          }
+        }
+        const matchData = [{_id:{$in:groupMembersId}},{_id:{$nin:projectMembersId}}]
+        if (search){
+          matchData.push({displayname:{$regex:search,$option:"i"}})
+        }
+        const result = await userServices.getUsers(userId,matchData,sortValue,sortOrder,skip,limit);
+        const totalPages = Math.ceil(result.totalUsers/limit);
+        const hasMore = totalPages - page > 0 ? true:false
+        return res.status(200).json({
+          users:result.users,
+          totalPages,
+          currentPage:page,
+          totalUsers:result.totalUsers,
+          hasMore
+        })
       } catch (error) {
-        if (error instanceof httpError)
-          return res.status(error.statusCode).json(error.message);
-        else return res.status(500).json(error);
+        if (error instanceof httpError) return res.status(error.statusCode).json(error.message)
+          else return res.status(500).json(error); 
       }
     }
+    
 }
 
 export default projectController

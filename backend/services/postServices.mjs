@@ -49,7 +49,7 @@ const postServices = {
           $facet: {
             posts: [
               { $skip: skip },
-              { $limit: limit },
+              { $limit: Number(limit) },
               {
                 $addFields: {
                   Stored: { $in: [userId, "$stored"] },

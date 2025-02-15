@@ -68,16 +68,17 @@ const sectionController = {
   addParticipant: async (req, res) => {
     try {
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
-      const userId = new mongoose.Types.ObjectId(`${req.params.userId}`);
+      const usersId = req.body.usersId;
+      const Ids = usersId.map((id)=>{return new mongoose.Types.ObjectId(`${id}`)})
       const section = await Section.findById(sectionId);
       const updateResult = await Section.updateMany(
         { _id: { $in: section.children } },
-        { $push: { participants: userId } },
+        { $push: { participants:{$each:Ids} } },
       );
       if (updateResult.matchedCount === 0) {
         return res.status(404).json("cant find section!");
       }
-      section.participants.push(userId);
+      section.participants.concat(usersId);
       await section.save();
       return res.status(200).json("participant added!");
     } catch (error) {

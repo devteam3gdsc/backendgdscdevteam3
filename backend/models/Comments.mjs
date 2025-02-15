@@ -13,22 +13,22 @@ const commentSchema = new mongoose.Schema(
     },
     hostId: {
       type: mongoose.Schema.Types.ObjectId,
-      require: true
+      require: true,
     },
     editedAt: {
-      type: Date
+      type: Date,
     },
-    totalComments:{
-      type:Number,
-      default: 0
+    totalComments: {
+      type: Number,
+      default: 0,
     },
-    totalLikes:{
-      type:Number,
-      default: 0
-    }
+    totalLikes: {
+      type: Number,
+      default: 0,
+    },
     // authorname: String
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 commentSchema.pre("save", function (next) {
   this.updatedAt = Date.now();

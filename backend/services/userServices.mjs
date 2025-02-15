@@ -7,10 +7,12 @@ import { v2 } from "cloudinary";
 import { httpError, httpResponse } from "../utils/httpResponse.mjs";
 import updateDocument from "../utils/updateDocument.mjs";
 import { fileDestroy } from "../utils/filesHelper.mjs";
+import { Group, Project } from "../models/Group.mjs";
+import mongoose from "mongoose";
 const userServices = {
   updateUserPassword: async (userId, oldPassword, newPassword) => {
     try {
-      const user = await findDocument(User, { _id: userId },{});
+      const user = await findDocument(User, { _id: userId }, {});
       if (await authServices.passwordCheck(oldPassword, user.password)) {
         const hashed = await authServices.createHashedPassword(newPassword);
         await user.updateOne({ $set: { password: hashed } });
@@ -24,10 +26,18 @@ const userServices = {
   updateUserFullInfo: async (
     userId,
     avatarFile,
-    { displayname,totalLikes,totalComments,totalFollowing,totalFollowers,totalPosts, ...updatedData }
+    {
+      displayname,
+      totalLikes,
+      totalComments,
+      totalFollowing,
+      totalFollowers,
+      totalPosts,
+      ...updatedData
+    },
   ) => {
     try {
-      const user = await findDocument(User,{ _id: userId},{});
+      const user = await findDocument(User, { _id: userId }, {});
       const avatar = user.avatar;
       const avatarURL = avatarFile ? avatarFile.path : avatar;
       if (
@@ -42,11 +52,11 @@ const userServices = {
       });
       await Post.updateMany(
         { author: userId },
-        { $set: { authorname: displayname, avatar: avatarURL } }
+        { $set: { authorname: displayname, avatar: avatarURL } },
       );
       await Comments.updateMany(
         { author: userId },
-        { $set: { authorname: displayname, avatar: avatarURL } }
+        { $set: { authorname: displayname, avatar: avatarURL } },
       );
       return new httpResponse("updated successfully", 200);
     } catch (error) {
@@ -55,7 +65,7 @@ const userServices = {
         throw new httpError(`updateFullUserInfo service error:${error}`, 500);
     }
   },
-  
+
   signUpUser: async ({ ...data }) => {
     try {
       const { username, password, email } = data;
@@ -77,6 +87,97 @@ const userServices = {
     } catch (error) {
       if (error instanceof httpError) throw error;
       else throw new httpError(`signUp services error:${error}`, 500);
+    }
+  },
+  getUsers: async (
+    userId,
+    [...matchData],
+    sortValue,
+    sortOrder,
+    skip,
+    limit,
+  ) => {
+    try {
+      const following = (
+        await findDocument(User, { _id: userId }, { _id: 0, following: 1 })
+      ).following;
+      const Data = await User.aggregate([
+        { $match: { $and: matchData } },
+        { $sort: { [sortValue]: sortOrder } },
+        {
+          $facet: {
+            users: [
+              { $skip: skip },
+              { $limit: Number(limit) },
+              {
+                $addFields: {
+                  followed: { $in: ["$_id", following] },
+                },
+              },
+            ],
+            countingUsers: [{ $count: "totalUsers" }],
+          },
+        },
+      ]);
+      if (!Data[0].countingUsers[0]) {
+        return {
+          users: [],
+          totalUsers: 0,
+        };
+      } else
+        return {
+          users: Data[0].users,
+          totalUsers: Data[0].countingUsers[0].totalUsers,
+        };
+    } catch (error) {
+      if (error instanceof httpError) throw error;
+      else throw new httpError(`getUsers services error:${error}`, 500);
+    }
+  },
+  addPin: async (userId, { ...data }) => {
+    try {
+      const id = new mongoose.Types.ObjectId(`${data.id}`);
+      let result;
+      switch (data.type) {
+        case "group": {
+          result = await findDocument(
+            Group,
+            { _id: id },
+            { name: 1, avatar: 1, _id: 0 },
+          );
+          break;
+        }
+        case "user": {
+          result = await findDocument(
+            User,
+            { _id: id },
+            { displayname: 1, avatar: 1, _id: 0 },
+          );
+          break;
+        }
+        case "project": {
+          result = await findDocument(
+            Project,
+            { _id: id },
+            { name: 1, avatar: 1, _id: 0 },
+          );
+          break;
+        }
+      }
+      const userPins = (
+        await findDocument(User, { _id: userId }, { pins: 1, _id: 0 })
+      ).pins;
+      const newPins = {
+        position: userPins.length + 1,
+        id,
+        name: result.displayname ? result.displayname : result.name,
+        avatar: result.avatar,
+        pinType: data.type,
+      };
+      await User.updateOne({ _id: userId }, { $push: { pins: newPins } });
+    } catch (error) {
+      if (error instanceof httpError) throw error;
+      else throw new httpError(`addPin services error:${error}`, 500);
     }
   },
 };

@@ -1,50 +1,56 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Socket.IO Test</title>
-    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script> <!-- Include Socket.IO -->
-</head>
-<body>
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <!-- Include Socket.IO -->
+  </head>
+  <body>
     <h1>Socket.IO Test</h1>
     <button id="connectButton">Connect</button>
     <button id="sendNotificationButton">Send Notification</button>
     <div id="notifications"></div>
 
     <script>
-        // Replace with your own token (if needed)
-        const userToken = "your-access-token-here"; // Ensure you have a valid token
+      // Replace with your own token (if needed)
+      const userToken = "your-access-token-here"; // Ensure you have a valid token
 
-        // Connect to the Socket.IO server
-        const socket = io("http://localhost:4000", {
-            withCredentials: true,
-            auth: {
-                token: userToken
-            }
-        });
+      // Connect to the Socket.IO server
+      const socket = io("http://localhost:4000", {
+        withCredentials: true,
+        auth: {
+          token: userToken,
+        },
+      });
 
-        // Display notifications when received
-        socket.on("newNotification", (notification) => {
-            console.log("New notification received:", notification);
-            const notificationsDiv = document.getElementById("notifications");
-            const notificationElement = document.createElement("div");
-            notificationElement.textContent = notification.message;
-            notificationsDiv.appendChild(notificationElement);
-        });
+      // Display notifications when received
+      socket.on("newNotification", (notification) => {
+        console.log("New notification received:", notification);
+        const notificationsDiv = document.getElementById("notifications");
+        const notificationElement = document.createElement("div");
+        notificationElement.textContent = notification.message;
+        notificationsDiv.appendChild(notificationElement);
+      });
 
-        // Send a "userConnected" event with a user ID when the Connect button is clicked
-        document.getElementById("connectButton").addEventListener("click", () => {
-            const userId = "user-id-123";  // Example user ID
-            socket.emit("connection", userId);
-            console.log(`User ${userId} connected`);
-        });
+      // Send a "userConnected" event with a user ID when the Connect button is clicked
+      document.getElementById("connectButton").addEventListener("click", () => {
+        const userId = "user-id-123"; // Example user ID
+        socket.emit("connection", userId);
+        console.log(`User ${userId} connected`);
+      });
 
-        // Simulate sending a notification (to trigger the backend to emit a newNotification)
-        document.getElementById("sendNotificationButton").addEventListener("click", () => {
-            // Here, you can make a real API call to create a notification or just emit from frontend
-            socket.emit("sendTestNotification", { userId: "user-id-123", message: "Test Notification" });
+      // Simulate sending a notification (to trigger the backend to emit a newNotification)
+      document
+        .getElementById("sendNotificationButton")
+        .addEventListener("click", () => {
+          // Here, you can make a real API call to create a notification or just emit from frontend
+          socket.emit("sendTestNotification", {
+            userId: "user-id-123",
+            message: "Test Notification",
+          });
         });
     </script>
-</body>
+  </body>
 </html>

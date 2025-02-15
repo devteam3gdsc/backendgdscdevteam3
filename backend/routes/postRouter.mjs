@@ -1,7 +1,7 @@
 import { Router } from "express";
 import authMiddleware from "../middlewares/authMidleware.mjs";
 import commentsController from "../controllers/commentsController.mjs";
-import commentRouter from "./commentRouter.mjs"
+import commentRouter from "./commentRouter.mjs";
 import postController from "../controllers/postController.mjs";
 import { v2 } from "cloudinary";
 import multer from "multer";
@@ -26,39 +26,53 @@ postRouter.post(
   "/create",
   authMiddleware.verifyToken,
   cpUpload,
-  postController.createPost
+  postController.createPost,
 );
 postRouter.get(
   "/store/:postId",
   authMiddleware.verifyToken,
-  postController.storePost
+  postController.storePost,
 );
 postRouter.get(
   "/unstored/:postId",
   authMiddleware.verifyToken,
-  postController.unStorePost
+  postController.unStorePost,
 );
 postRouter.get(
   "/like/:postId",
   authMiddleware.verifyToken,
-  postController.likePost
+  postController.likePost,
 );
-postRouter.get("/unlike/:postId",authMiddleware.verifyToken, postController.unLikePost);
-postRouter.get("/detail/:postId",authMiddleware.verifyToken, postController.detailPost);
+postRouter.get(
+  "/unlike/:postId",
+  authMiddleware.verifyToken,
+  postController.unLikePost,
+);
+postRouter.get(
+  "/detail/:postId",
+  authMiddleware.verifyToken,
+  postController.detailPost,
+);
 postRouter.delete(
   "/delete/:postId",
   authMiddleware.verifyToken,
-  postController.deletePost
+  postController.deletePost,
 );
 postRouter.put(
   "/edit/:postId",
   authMiddleware.verifyToken,
   cpUpload,
-  postController.editPost
+  postController.editPost,
 );
-postRouter.get("/setState/:postId",authMiddleware.verifyToken,postController.setState);
-postRouter.get("/halfDetail/:postId",authMiddleware.verifyToken,postController.halfDetail);
-
-
+postRouter.get(
+  "/setState/:postId",
+  authMiddleware.verifyToken,
+  postController.setState,
+);
+postRouter.get(
+  "/halfDetail/:postId",
+  authMiddleware.verifyToken,
+  postController.halfDetail,
+);
 
 export default postRouter;

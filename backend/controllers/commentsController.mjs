@@ -18,14 +18,23 @@ const commentsController = {
         authorname: user.displayname,
         avatar: user.avatar,
         code: code,
-        editedAt:Date.now(),
+        editedAt: Date.now(),
         text: text,
         hostId: hostId,
       });
       await newComment.save();
-      const data = (await Post.findOneAndUpdate({_id:hostId},{$inc:{ totalComments:1 }},{new:false})) 
-                || (await Comments.findOneAndUpdate({_id:hostId},{$inc:{ totalComments:1 }},{new:false}))
-      await User.findByIdAndUpdate(data.author, { $inc: { totalComments: 1 } })
+      const data =
+        (await Post.findOneAndUpdate(
+          { _id: hostId },
+          { $inc: { totalComments: 1 } },
+          { new: false },
+        )) ||
+        (await Comments.findOneAndUpdate(
+          { _id: hostId },
+          { $inc: { totalComments: 1 } },
+          { new: false },
+        ));
+      await User.findByIdAndUpdate(data.author, { $inc: { totalComments: 1 } });
       return res.status(200).json({
         message: "comment created successfully!",
         commentId: newComment._id,
@@ -43,22 +52,37 @@ const commentsController = {
         author: userId,
         _id: commentId,
       });
-      console.log(comment)
-      
+      console.log(comment);
+
       if (!comment) {
-        return res.status(403).json("You are not the author of the comment or comment doesnt existed");
+        return res
+          .status(403)
+          .json(
+            "You are not the author of the comment or comment doesnt existed",
+          );
       } else {
-        await Comments.deleteMany({hostId:comment._id})
-        const post = await Post.findOneAndUpdate({_id:comment.hostId},{$inc:{ totalComments:-1 }},{new:false})
-        if (post){
-          await User.findByIdAndUpdate(post.author, { $inc: { totalComments: -1 } })
+        await Comments.deleteMany({ hostId: comment._id });
+        const post = await Post.findOneAndUpdate(
+          { _id: comment.hostId },
+          { $inc: { totalComments: -1 } },
+          { new: false },
+        );
+        if (post) {
+          await User.findByIdAndUpdate(post.author, {
+            $inc: { totalComments: -1 },
+          });
+          return res.status(200).json("Comment delete successfully!");
+        } else {
+          const hostComment = await Comments.findOneAndUpdate(
+            { _id: comment.hostId },
+            { $inc: { totalComments: -1 } },
+            { new: false },
+          );
+          await User.findByIdAndUpdate(hostComment.author, {
+            $inc: { totalComments: -1 },
+          });
           return res.status(200).json("Comment delete successfully!");
         }
-        else {
-          const hostComment = await Comments.findOneAndUpdate({_id:comment.hostId},{$inc:{ totalComments:-1 }},{new:false})
-          await User.findByIdAndUpdate(hostComment.author, { $inc: { totalComments: -1 } })
-          return res.status(200).json("Comment delete successfully!");
-        }   
       }
     } catch (error) {
       return res.status(500).json(error);
@@ -72,7 +96,7 @@ const commentsController = {
       const { text, code } = req.body;
       const comment = await Comments.updateOne(
         { author: userId, _id: commentId },
-        { $set: { text: text, code: code, editedAt: Date.now() } }
+        { $set: { text: text, code: code, editedAt: Date.now() } },
       );
       if (comment.matchedCount === 0) {
         return res.status(403).json("You are not the author of the comment");
@@ -132,10 +156,13 @@ const commentsController = {
       return res.status(500).json(error);
     }
   },
-  likeComments: async (req,res)=>{
+  likeComments: async (req, res) => {
     try {
-      const userId = new mongoose.Types.ObjectId(`${req.user.id}`)
-      await Comments.updateOne({_id:req.params.commentId},{$inc:{totalLikes:1}});
+      const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
+      await Comments.updateOne(
+        { _id: req.params.commentId },
+        { $inc: { totalLikes: 1 } },
+      );
       return res.status(200).json("liked!");
     } catch (error) {
       if (error instanceof httpError)
@@ -143,17 +170,20 @@ const commentsController = {
       else return res.status(500).json(error);
     }
   },
-  unlikeComments: async (req,res)=>{
+  unlikeComments: async (req, res) => {
     try {
-      const userId = new mongoose.Types.ObjectId(`${req.user.id}`)
-      await Comments.updateOne({_id:req.params.commentId},{$inc:{totalLikes:-1}});
+      const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
+      await Comments.updateOne(
+        { _id: req.params.commentId },
+        { $inc: { totalLikes: -1 } },
+      );
       return res.status(200).json("unliked!");
     } catch (error) {
       if (error instanceof httpError)
         return res.status(error.statusCode).json(error.message);
       else return res.status(500).json(error);
     }
-  }
+  },
 };
 
 export default commentsController;

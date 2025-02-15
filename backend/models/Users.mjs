@@ -1,26 +1,32 @@
 import { name } from "@cloudinary/url-gen/actions/namedTransformation";
 import { position } from "@cloudinary/url-gen/qualifiers/timeline";
 import mongoose, { Types } from "mongoose";
-const pinSchema = new mongoose.Schema({
-  id: mongoose.Types.ObjectId,
-  pinType:{
-    type:String,
-    enum:["group","user","project"]
+const pinSchema = new mongoose.Schema(
+  {
+    id: mongoose.Types.ObjectId,
+    pinType: {
+      type: String,
+      enum: ["group", "user", "project"],
+    },
+    name: String,
+    position: Number,
+    avatar: String,
   },
-  name:String,
-  position:Number,
-  avatar:String
-},{_id:false});
+  { _id: false },
+);
 
-const recentSchema = new mongoose.Schema({
-  id:mongoose.Types.ObjectId,
-  recentType:{
-    type:String,
-    enum:["group","user","project"]
+const recentSchema = new mongoose.Schema(
+  {
+    id: mongoose.Types.ObjectId,
+    recentType: {
+      type: String,
+      enum: ["group", "user", "project"],
+    },
+    name: String,
+    avatar: String,
   },
-  name:String,
-  avatar:String
-},{_id:false})
+  { _id: false },
+);
 
 const userSchema = new mongoose.Schema(
   {
@@ -52,42 +58,43 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
     refreshTokens: { type: [String], default: [] },
-    totalLikes:{
-      type:Number,
-      default:0
+    totalLikes: {
+      type: Number,
+      default: 0,
     },
-    totalComments:{
-      type:Number,
-      default:0
+    totalComments: {
+      type: Number,
+      default: 0,
     },
-    totalFollowers:{
-      type:Number,
-      default:0
+    totalFollowers: {
+      type: Number,
+      default: 0,
     },
-    following:[{
-      type:mongoose.Types.ObjectId,
-      ref:"User",
-      default:[]
-    }],
-    totalFollowing:{
-      type:Number,
-      default:0
+    following: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "User",
+        default: [],
+      },
+    ],
+    totalFollowing: {
+      type: Number,
+      default: 0,
     },
-    story:{
-      type:String
+    story: {
+      type: String,
     },
-    totalPosts:{
-      type:Number,
-      default:0
+    totalPosts: {
+      type: Number,
+      default: 0,
     },
-    pins:{type:[pinSchema],default:[]},
-    recent:{type:[recentSchema],default:[]},
-    resetPasswordToken: { type: String},
-    resetPasswordExpires: { type: Date},
+    pins: { type: [pinSchema], default: [] },
+    recent: { type: [recentSchema], default: [] },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
-
 
 const User = mongoose.model("Users", userSchema);
 export default User;

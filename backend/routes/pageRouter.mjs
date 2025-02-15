@@ -9,10 +9,18 @@ pageRouter.get("/me", authMiddleware.verifyToken, postController.getUserPost);
 pageRouter.get(
   "/community",
   authMiddleware.verifyToken,
-  postController.getCommunityPosts
+  postController.getCommunityPosts,
 );
-pageRouter.get("/feed", authMiddleware.verifyToken,postController.getFeedPosts);
-pageRouter.get("/popular",authMiddleware.verifyToken,userController.getPopular);
-pageRouter.get("/recent",authMiddleware.verifyToken,userController.getRecent)
+pageRouter.get(
+  "/feed",
+  authMiddleware.verifyToken,
+  postController.getFeedPosts,
+);
+pageRouter.get(
+  "/popular",
+  authMiddleware.verifyToken,
+  userController.getPopular,
+);
+pageRouter.get("/recent", authMiddleware.verifyToken, userController.getRecent);
 
 export default pageRouter;

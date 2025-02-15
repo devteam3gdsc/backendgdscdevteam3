@@ -21,7 +21,7 @@ const authServices = {
       if (await authServices.passwordCheck(password, user.password)) {
         const newAccessToken = tokensAndCookies.createNewAccessToken(user._id);
         const newRefreshToken = tokensAndCookies.createNewRefreshToken(
-          user._id
+          user._id,
         );
         await user.updateOne({ $push: { refreshTokens: newRefreshToken } });
         return {
@@ -34,7 +34,7 @@ const authServices = {
       else {
         throw new httpError(
           `Login services error: ${error.message || error}`,
-          500
+          500,
         );
       }
     }
@@ -46,7 +46,7 @@ const authServices = {
         User,
         1,
         [{ refreshTokens: { $in: [refreshToken] } }],
-        [{ $pull: { refreshTokens: refreshToken } }]
+        [{ $pull: { refreshTokens: refreshToken } }],
       );
       return new httpResponse("Logged Out!", 200);
     } catch (error) {
@@ -54,7 +54,7 @@ const authServices = {
       else {
         throw new httpError(
           `loggout services error: ${error.message || error}`,
-          500
+          500,
         );
       }
     }
@@ -66,17 +66,17 @@ const authServices = {
       const newAccessToken = tokensAndCookies.createNewAccessToken(userId);
       const newRefreshToken = tokensAndCookies.createNewRefreshToken(userId);
       let userRefreshTokens = (
-        await findDocument(User, { _id: userId }, { refreshTokens: 1,_id:0 })
+        await findDocument(User, { _id: userId }, { refreshTokens: 1, _id: 0 })
       ).refreshTokens;
       userRefreshTokens = userRefreshTokens.filter(
-        (token) => token !== refreshToken
+        (token) => token !== refreshToken,
       );
       userRefreshTokens.push(newRefreshToken);
       await updateDocument(
         User,
         1,
         [{ _id: userId }],
-        [{ $set: { refreshTokens: userRefreshTokens } }]
+        [{ $set: { refreshTokens: userRefreshTokens } }],
       );
       return {
         newAccessToken: newAccessToken,
@@ -87,7 +87,7 @@ const authServices = {
       else {
         throw new httpError(
           `refreshtoken services error: ${error.message || error}`,
-          500
+          500,
         );
       }
     }

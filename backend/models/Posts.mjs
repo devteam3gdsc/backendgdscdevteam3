@@ -47,12 +47,14 @@ const postSchema = new mongoose.Schema(
       ref: "Section",
       default: null,
     },
-    // Trạng thái bài viết (chờ duyệt hay đã duyệt) 
+    // Trạng thái bài viết (chờ duyệt hay đã duyệt)
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],
       default: function () {
-        return this.group || this.project || this.section ? "pending" : "approved"; // Nếu bài viết thuộc group thì "pending", ngược lại là "approved"
+        return this.group || this.project || this.section
+          ? "pending"
+          : "approved"; // Nếu bài viết thuộc group thì "pending", ngược lại là "approved"
       },
     },
     // comments: [
@@ -94,7 +96,7 @@ const postSchema = new mongoose.Schema(
       type: Date,
       default: Date.now(),
     },
-    refId:{type:mongoose.Types.ObjectId}
+    refId: { type: mongoose.Types.ObjectId },
   },
   { timestamps: true },
 );

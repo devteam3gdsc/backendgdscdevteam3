@@ -179,30 +179,43 @@ const projectServices = {
         }
     },
     updateProjectFull: async (projectId, avatarFile, ...updateData) => {
-        try {
-          
-            const project = await findById(projectId);
-           
-            if (!project) {
-                throw new Error("Project not found.");
-            }            const avatar = project.avatar;
-            const avatarURL = avatarFile ? avatarFile.path : avatar;
-      if (
-        avatar &&
-        avatar !=
-          "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
-      ) {
-        fileDestroy(avatar, "image");
+      try {
+          const project = await Project.findById(projectId);
+          if (!project) {
+              throw new Error("Project not found.");
+          }
+  
+          const avatar = project.avatar;
+          const avatarURL = avatarFile ? avatarFile.path : avatar;
+  
+          // Xóa avatar cũ nếu không phải avatar mặc định
+          try {
+              if (avatar && avatar !== "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541") {
+                  await fileDestroy(avatar, "image");
+              }
+          } catch (err) {
+              console.error("Error deleting file:", err);
+          }
+  
+          // Gán dữ liệu mới
+          project.avatar = avatarURL;
+          Object.keys(updateData[0] || {}).forEach((key) => {
+              project[key] = updateData[0][key];
+              project.markModified(key);
+          });
+  
+          await project.save();
+  
+          // Kiểm tra lại sau khi cập nhật
+          const checkProject = await Project.findById(projectId);
+          console.log("Updated project:", checkProject);
+  
+          return new httpResponse("updated successfully", 200);
+      } catch (error) {
+          console.error("Updating group service error:", error);
+          throw new Error(`Updating group service error: ${error.message}`);
       }
-           await project.updateOne({
-            $set: {avatar: avatarURL, ...updateData}
-           })
-    
-           return new httpResponse("updated successfully", 200);
-        } catch (error) {
-            throw new Error(`Updating group service error: ${error}`);
-        }
-    },
+  },
 
     deleteProject: async (projectId) => {
         try {

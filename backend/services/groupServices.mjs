@@ -143,27 +143,38 @@ const groupServices = {
     },
     updateGroupFull: async (groupId, avatarFile, ...updateData) => {
         try {
-          
-            const group = await findById(groupId);
-           
+            // Tìm nhóm trong database
+            const group = await Group.findById(groupId);
             if (!group) {
                 throw new Error("Group not found.");
-            }            const avatar = group.avatar;
-            const avatarURL = avatarFile ? avatarFile.path : avatar;
-      if (
-        avatar &&
-        avatar !=
-          "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
-      ) {
-        fileDestroy(avatar, "image");
-      }
-           await group.updateOne({
-            $set: {avatar: avatarURL, ...updateData}
-           })
+            }
     
-           return new httpResponse("updated successfully", 200);
+            // Lấy avatar cũ
+            const avatar = group.avatar;
+            const avatarURL = avatarFile ? avatarFile.path : avatar;
+    
+            // Nếu avatar cũ không phải ảnh mặc định, thì xóa
+            try {
+                if (avatar && avatar !== "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541") {
+                    await fileDestroy(avatar, "image");
+                }
+            } catch (err) {
+                console.error("Error deleting file:", err);
+            }
+    
+            // Cập nhật dữ liệu
+            await group.updateOne({
+                $set: { avatar: avatarURL, ...(updateData[0] || {}) }
+            });
+    
+            // Kiểm tra lại dữ liệu sau khi cập nhật
+            const updatedGroup = await Group.findById(groupId);
+            console.log("Updated group:", updatedGroup);
+    
+            return new httpResponse("Updated successfully", 200);
         } catch (error) {
-            throw new Error(`Updating group service error: ${error}`);
+            console.error("Updating group service error:", error);
+            throw new Error(`Updating group service error: ${error.message}`);
         }
     },
 

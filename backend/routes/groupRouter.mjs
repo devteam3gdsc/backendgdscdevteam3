@@ -60,7 +60,7 @@ groupRouter.put(
   authMiddleware.verifyToken,
   roleMiddleware("group",["admin"]),
   upload.single("avatar"),
-  groupController.updateGroupFull,
+  groupController.updateFull,
 );
 groupRouter.delete(
   "/delete/:groupId",

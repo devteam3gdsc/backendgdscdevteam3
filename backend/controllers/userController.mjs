@@ -36,7 +36,6 @@ const userController = {
         { _id: req.params.userId },
         {
           _id: 0,
-
           username: 1,
           displayname: 1,
           avatar: 1,
@@ -75,7 +74,6 @@ const userController = {
         User,
         { _id: req.user.id },
         {
-
           _id: 1,
           displayname: 1,
           email: 1,

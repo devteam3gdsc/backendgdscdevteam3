@@ -451,8 +451,8 @@ const groupController = {
 
   leaveGroup : async (req, res) => {
     try {
-      const group = await groupServices.leaveGroup(req.params.groupId, req.user.id);
-      res.status(200).json({ message:"leave group successfully"});
+      await groupServices.leaveGroup(req.params.groupId, req.user.id);
+      return res.status(200).json({ message:"leave group successfully"});
     } catch (error) {
       if (error instanceof httpError)
         return res.status(error.statusCode).json(error.message);

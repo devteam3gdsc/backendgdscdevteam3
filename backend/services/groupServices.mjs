@@ -7,6 +7,7 @@ import Post from "../models/Posts.mjs";
 import mongoose from "mongoose"
 import NotificationServices from "./notificationServices.mjs";
 import { httpResponse } from "../utils/httpResponse.mjs";
+import sectionServices from "./sectionServices.mjs";
 const groupServices = {
     //-----------GROUP-----------------
     createGroup: async (data, creatorId, avatarFile) => {
@@ -249,6 +250,7 @@ const groupServices = {
                 numberOfMembers: members.length,
                 numberOfProjects,
                 joined: isJoined,
+                role:userRole,
                 canJoin
             };
     
@@ -346,6 +348,10 @@ const groupServices = {
     joinGroup : async (groupId, userId) => {
         try {
             const group = await Group.findById(groupId);
+            const userAvatar = (await findDocument(User,{_id:userId},{avatar:1,_id:0})).avatar
+            if (!userAvatar){
+                throw new Error("Invalid userId")
+            }
             if(!group) {
                 throw new Error("Group not found");
             };
@@ -355,7 +361,7 @@ const groupServices = {
             }
 
             if(!group.members.some(m => m.user.equals(userId))) {
-                group.members.push({ user: userId, role: "member" });
+                group.members.push({ user: userId, role: "member" ,avatar:userAvatar});
                 await group.save();
             }
             return group;
@@ -364,16 +370,17 @@ const groupServices = {
         }
     },
 
-    leaveGroup : async(groupId, userId) => {
+    leaveGroup : async(Id, userId) => {
         try {
-            const group = await Group.findById(groupId);
-            if (!group) throw new Error("Group not found");
-        
+            const groupId = new mongoose.Types.ObjectId(`${Id}`)
+            const group = await Group.updateOne({_id:groupId},{$pull:{members:{user:userId}}})
+            if (group.matchedCount === 0) throw new Error("Group not found");
             if (group.creator.equals(userId)) return { success: false, message:"You are creator, please choose another creator before leave"};
-        
-            group.members = group.members.filter(m => !m.user.equals(userId));
-            await group.save();
-            return group;
+            const projectsId = (await Project.find({group:groupId,"members.user":userId},{_id:1}))._id;
+            const updateResult = await Project.updateMany({_id:{$in:projectsId}},{$pull:{members:{user:userId}}})
+            if (updateResult.matchedCount === 0) throw new Error("Projects not found");
+            const updateSection = await Section.updateMany({project:projectsId},{$pull:{participants:userId}})
+            if (updateSection.matchedCount === 0) throw new Error("sections not found");
         } catch (error) {
             throw new Error(`Leave group service error: ${error}`, 500);
         }

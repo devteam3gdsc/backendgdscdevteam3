@@ -90,19 +90,8 @@ const sectionController = {
     try {
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
       const userId = new mongoose.Types.ObjectId(`${req.params.userId}`);
-      const section = await Section.findById(sectionId);
-      const updateResult = await Section.updateMany(
-        { _id: { $in: section.children } },
-        { $pull: { participants: userId } },
-      );
-      if (updateResult.matchedCount === 0) {
-        return res.status(404).json("cant find section!");
-      }
-      section.participants = section.participants.filter((participant) => {
-        return !participant.equals(userId);
-      });
-      await section.save();
-      return res.status(200).json("participant removed!");
+      await sectionServices.removeUser(userId,sectionId);
+      return res.status(200).json("User removed!")
     } catch (error) {
       if (error instanceof httpError)
         return res.status(error.statusCode).json(error.message);

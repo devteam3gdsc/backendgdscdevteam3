@@ -3,7 +3,7 @@ import User from "../models/Users.mjs";
 import Post from "../models/Posts.mjs";
 import mongoose from "mongoose"
 import NotificationServices from "./notificationServices.mjs";
-import { httpResponse } from "../utils/httpResponse.mjs";
+import { httpError, httpResponse } from "../utils/httpResponse.mjs";
 
 const projectServices = {
 //-----------PROJECT-----------------
@@ -394,7 +394,7 @@ const projectServices = {
             if(!project) {
                 throw new Error("Project not found");
             }
-        
+            
             const member = project.members.find(m => m.user.toString() === userId);
             if (member && member.role === "leader") {
                 throw new Error("You are the leader, leader cannot leave the project.");
@@ -402,6 +402,10 @@ const projectServices = {
         
             project.members = project.members.filter(m => !m.user.equals(userId));
             await project.save();
+            const sectionUpdate = await Section.updateMany({project:projectId},{$pull:{participants:userId}})
+            if (sectionUpdate.matchedCount === 0){
+              throw new httpError("cant find sections",404);
+            }
             return project;
         } catch (error) {
             throw new Error(`Leave project service error: ${error}`, 500);

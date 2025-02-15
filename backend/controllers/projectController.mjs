@@ -368,8 +368,8 @@ const projectController = {
     
       leaveProject : async (req, res) => {
         try {
-          const project = await projectServices.leaveProject(req.params.projectId, req.user.id);
-          res.status(200).json({ message:"leave project successfully"});
+          await projectServices.leaveProject(req.params.projectId, req.user.id);
+          return res.status(200).json({ message:"leave project successfully"});
         } catch (error) {
           if (error instanceof httpError)
             return res.status(error.statusCode).json(error.message);

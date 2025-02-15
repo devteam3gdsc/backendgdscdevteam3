@@ -50,11 +50,11 @@ const groupController = {
 
   updateGroup: async (req, res) => {
     try {
-      const updatedGroup = await groupServices.updateGroup(
+      await groupServices.updateGroup(
         req.params.groupId,
         req.body,
       );
-      res.status(200).json(updatedGroup);
+      return res.status(200).json("updated success");
 
     } catch (error) {
       if (error instanceof httpError)

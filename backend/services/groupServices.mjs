@@ -130,17 +130,13 @@ const groupServices = {
 
     updateGroup: async (groupId, updateData) => {
         try {
-            const updatedGroup = await Group.findByIdAndUpdate(
-                groupId, 
-                { $set: updateData }, // Use $set to merge updates instead of replacing the document
-                { new: true, upsert: false, runValidators: true } // Ensure validation and no unintended document creation
-            );
+            const Id = new mongoose.Types.ObjectId(`${groupId}`)
+            const updatedGroup = await Group.updateOne({_id:Id},{$set:updateData})
             
-            if (!updatedGroup) {
+            if (updatedGroup.matchedCount === 0) {
                 throw new Error("Group not found.");
             }
     
-            return updatedGroup;
         } catch (error) {
             throw new Error(`Updating group service error: ${error}`);
         }

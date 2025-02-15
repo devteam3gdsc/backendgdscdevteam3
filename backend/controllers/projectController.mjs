@@ -68,7 +68,7 @@ const projectController = {
         { _id: { $in: projectMembersId } },
       ];
       if (search) {
-        matchData.push({ displayname: { $regex: search, $option: "i" } });
+        matchData.push({ displayname: { $regex: search, $options: "i" } });
       }
       const result = await userServices.getUsers(
         userId,
@@ -232,7 +232,7 @@ const projectController = {
         { _id: { $nin: projectMembersId } },
       ];
       if (search) {
-        matchData.push({ displayname: { $regex: search, $option: "i" } });
+        matchData.push({ displayname: { $regex: search, $options: "i" } });
       }
       const result = await userServices.getUsers(
         userId,
@@ -257,7 +257,6 @@ const projectController = {
       else return res.status(500).json(error);
     }
   },
-};
     createProject : async (req, res) => {
         try {
             const newProject = await projectServices.createProject(req.body, req.params.groupId, req.user.id);
@@ -268,7 +267,6 @@ const projectController = {
             else return res.status(500).json(error);
         }
     },
-
     updateProject : async (req, res) => {
         try {
             const updatedProject = await projectServices.updateProject(req.params.projectId, req.body);

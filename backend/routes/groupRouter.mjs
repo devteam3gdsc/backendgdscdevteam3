@@ -47,7 +47,7 @@ groupRouter.get(
 groupRouter.get(
   "/getUninvitedUsers/:groupId",
   authMiddleware.verifyToken,
-  groupController.getUserNotInGroup,
+  groupController.getUserNotInGroup);
 groupRouter.post(
   "/create",
   authMiddleware.verifyToken,

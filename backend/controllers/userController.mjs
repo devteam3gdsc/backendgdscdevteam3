@@ -229,7 +229,7 @@ const userController = {
       }
       const matchData = [{ _id: { $ne: userId } }];
       if (search) {
-        matchData.push({ displayname: { $regex: search, $option: "i" } });
+        matchData.push({ displayname: { $regex: search, $options: "i" } });
       }
       const result = await userServices.getUsers(
         userId,

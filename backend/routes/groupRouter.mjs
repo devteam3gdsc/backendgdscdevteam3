@@ -77,7 +77,7 @@ groupRouter.get(
 groupRouter.post(
   "/invite/:groupId",
   authMiddleware.verifyToken,
-  roleMiddleware("group",["admin"]),
+  // roleMiddleware("group",["admin"]),
   groupController.inviteMembers,
 );
 groupRouter.post(

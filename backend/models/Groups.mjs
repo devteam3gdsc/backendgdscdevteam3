@@ -6,9 +6,11 @@ const groupSchema = new mongoose.Schema(
     description: { type: String, default: "" },
     private: { type: Boolean, default: false },
     moderation: { type: Boolean, default: false },
-    avatar: { type: String, 
+    avatar: {
+      type: String,
       default:
-      "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541", },
+        "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541",
+    },
     creator: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -23,15 +25,21 @@ const groupSchema = new mongoose.Schema(
           default: "member",
           required: true,
         },
+        avatar: String,
       },
+      { _id: false },
     ],
     pendingInvites: [
       {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      }
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
     ],
     projects: [{ type: mongoose.Schema.Types.ObjectId, ref: "Project" }],
+    totalMembers: {
+      type: Number,
+      default: 0,
+    },
     totalPosts: {
       type: Number,
       default: 0,
@@ -47,8 +55,11 @@ const projectSchema = new mongoose.Schema(
     name: { type: String, required: true },
     description: { type: String, default: "" },
     private: { type: Boolean, default: false },
-    avatar: { type: String, default:
-      "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541",},
+    avatar: {
+      type: String,
+      default:
+        "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541",
+    },
     creator: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -65,20 +76,26 @@ const projectSchema = new mongoose.Schema(
           type: mongoose.Schema.Types.ObjectId,
           ref: "User",
         },
+        avatar: String,
         role: {
           type: String,
-          enum: ["leader", "admin", "participant"], 
+          enum: ["leader", "admin", "participant"],
           default: "participant",
         },
       },
+      { _id: false },
     ],
     pendingInvites: [
       {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      }
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
     ],
     sections: [{ type: mongoose.Schema.Types.ObjectId, ref: "Section" }],
+    totalMembers: {
+      type: Number,
+      default: 0,
+    },
     totalPosts: {
       type: Number,
       default: 0,
@@ -93,10 +110,22 @@ const sectionSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     description: { type: String, default: "" },
-    project: { type: mongoose.Schema.Types.ObjectId, ref: "Project", required: true },
-    parent: { type: mongoose.Schema.Types.ObjectId, ref: "Section", default: null },
+    project: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Project",
+      required: true,
+    },
+    parent: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Section",
+      default: null,
+    },
     children: [{ type: mongoose.Schema.Types.ObjectId, ref: "Section" }],
     participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Danh sách người có quyền trong section
+    totalMembers: {
+      type: Number,
+      default: 0,
+    },
     totalPosts: {
       type: Number,
       default: 0,

@@ -1,7 +1,7 @@
 
 import mongoose from "mongoose";
 import projectServices from "../services/projectServices.mjs";
-import { Group, Project } from "../models/Group.mjs";
+import { Group, Project } from "../models/Groups.mjs";
 import User from "../models/Users.mjs";
 import { httpError } from "../utils/httpResponse.mjs";
 import findDocument from "../utils/findDocument.mjs";

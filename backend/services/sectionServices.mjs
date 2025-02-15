@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Section } from "../models/Group.mjs";
+import { Section } from "../models/Groups.mjs";
 import { httpError } from "../utils/httpResponse.mjs";
 import findDocument from "../utils/findDocument.mjs";
 

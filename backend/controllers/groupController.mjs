@@ -4,7 +4,7 @@ import groupServices from "../services/groupServices.mjs";
 import mongoose from "mongoose";
 import postServices from "../services/postServices.mjs";
 import findDocument from "../utils/findDocument.mjs";
-import { Group } from "../models/Group.mjs";
+import { Group } from "../models/Groups.mjs";
 import userServices from "../services/userServices.mjs";
 import User from "../models/Users.mjs";
 

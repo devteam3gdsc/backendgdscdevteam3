@@ -94,6 +94,7 @@ const postSchema = new mongoose.Schema(
       type: Date,
       default: Date.now(),
     },
+    refId: { type: mongoose.Types.ObjectId },
   },
   { timestamps: true },
 );

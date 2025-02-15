@@ -19,8 +19,6 @@ const findDocument = async (model, { ...criterias }, { ...keys }) => {
     // else {
     //     result = await model.findOne(filterData,keysNeeded).exec();
     // }
-    console.log(keys);
-    console.log(criterias);
     const result = await model.findOne(criterias, keys);
     if (!result) {
       throw new httpError(`${model} not found!`, 404);

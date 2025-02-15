@@ -1,6 +1,7 @@
 import { Router } from "express";
 import postController from "../controllers/postController.mjs";
 import authMiddleware from "../middlewares/authMidleware.mjs";
+import userController from "../controllers/userController.mjs";
 const pageRouter = Router();
 
 // postRouter.get("/",)
@@ -11,9 +12,16 @@ pageRouter.get(
   postController.getCommunityPosts,
 );
 pageRouter.get(
-  "/following",
+  "/feed",
   authMiddleware.verifyToken,
-  postController.getFollowedPost,
+  postController.getFeedPosts,
 );
+pageRouter.get(
+  "/popular",
+  authMiddleware.verifyToken,
+  userController.getPopular,
+);
+pageRouter.get("/recent", authMiddleware.verifyToken, userController.getRecent);
+
 
 export default pageRouter;

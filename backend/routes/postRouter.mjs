@@ -1,6 +1,7 @@
 import { Router } from "express";
 import authMiddleware from "../middlewares/authMidleware.mjs";
 import commentsController from "../controllers/commentsController.mjs";
+import commentRouter from "./commentRouter.mjs";
 import postController from "../controllers/postController.mjs";
 import { v2 } from "cloudinary";
 import multer from "multer";
@@ -63,7 +64,8 @@ postRouter.put(
   cpUpload,
   postController.editPost,
 );
-postRouter.put(
+
+postRouter.get(
   "/setState/:postId",
   authMiddleware.verifyToken,
   postController.setState,
@@ -72,28 +74,7 @@ postRouter.get(
   "/halfDetail/:postId",
   authMiddleware.verifyToken,
   postController.halfDetail,
-);
 
-//comment:
-postRouter.get(
-  "/detail/:postId/comment",
-  authMiddleware.verifyToken,
-  commentsController.getComments,
-);
-postRouter.post(
-  "/:postId/comment/create",
-  authMiddleware.verifyToken,
-  commentsController.createComment,
-);
-postRouter.delete(
-  "/:postId/comment/delete/:commentId",
-  authMiddleware.verifyToken,
-  commentsController.deleteComment,
-);
-postRouter.put(
-  "/:postId/comment/edit/:commentId",
-  authMiddleware.verifyToken,
-  commentsController.editComment,
 );
 
 export default postRouter;

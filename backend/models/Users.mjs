@@ -1,13 +1,34 @@
-import mongoose from "mongoose";
-const contactLinksSchema = new mongoose.Schema(
+import { name } from "@cloudinary/url-gen/actions/namedTransformation";
+import { position } from "@cloudinary/url-gen/qualifiers/timeline";
+import mongoose, { Types } from "mongoose";
+const pinSchema = new mongoose.Schema(
   {
-    facebook: { type: String },
-    youtube: { type: String },
-    github: { type: String },
-    email: { type: String },
+
+    id: mongoose.Types.ObjectId,
+    pinType: {
+      type: String,
+      enum: ["group", "user", "project"],
+    },
+    name: String,
+    position: Number,
+    avatar: String,
   },
   { _id: false },
 );
+
+const recentSchema = new mongoose.Schema(
+  {
+    id: mongoose.Types.ObjectId,
+    recentType: {
+      type: String,
+      enum: ["group", "user", "project"],
+    },
+    name: String,
+    avatar: String,
+  },
+  { _id: false },
+);
+
 const userSchema = new mongoose.Schema(
   {
     username: {
@@ -64,11 +85,13 @@ const userSchema = new mongoose.Schema(
     story: {
       type: String,
     },
-    contactLinks: contactLinksSchema,
     totalPosts: {
       type: Number,
       default: 0,
     },
+
+    pins: { type: [pinSchema], default: [] },
+    recent: { type: [recentSchema], default: [] },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date },
   },

@@ -447,6 +447,7 @@ http://localhost:4000/notification
 "hasMore": false
 }
 
+
 // notification invite to group 
   {
             "_id": "67a6e0903e412198afeb216f",
@@ -463,6 +464,7 @@ http://localhost:4000/notification
             "createdAt": "2025-02-08T04:41:52.212Z",
             "__v": 0
         }
+
 
 http://localhost:4000/notification?page=1&limit=5&filter=unread
 http://localhost:4000/notification?page=1&limit=5&filter=read
@@ -524,6 +526,37 @@ http://localhost:4000/auth/passwordReset/82ca52b4c5f82b3b7b60015f69c84458be8c9ef
 
 {
 "message": "Password reset successfully"
+
+}
+
+//COMMENT TREE
+
+[POST] /comment/create/:hostId (tạo comment trong post và trong comment là như nhau, đều dùng api này, chỉ thay postId với commentID bằng hostId)
+
+[GET] /comment/getComments/:hostId
+{
+"comments": [
+{
+"_id": "67a1934f9979753b8b936c6f",
+"authorname": "kiii",
+"avatar": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541",
+"author": "67a18d0956a5a7eab298d5dc",
+"hostId": "67a1917aab1a23dff4175cfe",
+"editedAt": "2025-02-04T04:10:11.163Z",
+"totalComments": 0,
+"totalLikes": 0,
+"createdAt": "2025-02-04T04:10:55.682Z",
+"updatedAt": "2025-02-04T04:10:55.682Z",
+"__v": 0,
+"isAuthor": true
+}
+],
+"hasMore": false
+}
+
+[PUT]: /comment/edit/:commentId "nhưu cũ nhữung bỏ post này kia đi"
+[DELETE]: /comment/delete/:commentId "như cũ nhưng bỏ postId này kia đi"
+=======
 }
 
 //-------------GROUP------------------
@@ -875,3 +908,4 @@ http://localhost:4000/group/postModerate/67ac29741005b90425137c49?accept=approve
 {
     "message": "approved"
 }
+

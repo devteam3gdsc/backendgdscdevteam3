@@ -154,6 +154,7 @@ const NotificationServices = {
     }
   },
 
+
   GroupInviteNotification : async (groupId, senderId, receiveId) => {
     try {
       const senderUser = await User.findById(senderId);
@@ -223,6 +224,7 @@ const NotificationServices = {
   createPostRequestNotification: async () => {
 
   },
+
 
   getNotificationsByUserId: async (
     userId,

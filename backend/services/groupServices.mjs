@@ -22,7 +22,7 @@ const groupServices = {
                 avatar: avatarURL,
                 members: [{
                     user: creatorId,
-                    role: "admin"
+                    role: "creator"
                 }]
             });
     

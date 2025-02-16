@@ -522,7 +522,7 @@ const postController = {
       });
       newRecent.push({
         id: authorId,
-        recentType: "user",
+        pinType: "user",
         name: author.displayname,
         avatar: author.avatar,
       });

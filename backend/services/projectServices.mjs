@@ -4,6 +4,7 @@ import Post from "../models/Posts.mjs";
 import mongoose from "mongoose"
 import NotificationServices from "./notificationServices.mjs";
 import { httpError, httpResponse } from "../utils/httpResponse.mjs";
+import findDocument from "../utils/findDocument.mjs";
 
 const projectServices = {
 //-----------PROJECT-----------------
@@ -135,28 +136,16 @@ const projectServices = {
         try {
             const group = await Group.findById(groupId);
             if(!group) {
-                throw new httpErrorError("Group not found",404);
+                throw new httpError("Group not found",404);
             }
-
-            const newProject = new Project({
+            console.log(group)
+            const userAvatar = (await User.findById(userId,{avatar:1})).avatar
+            await Project.create({
                 ...data,
                 group: groupId,
                 creator: userId,
+                members:[{ user: userId, role: "leader", avatar: userAvatar}]
             });
-            newProject.members.push({ user: userId, role: "leader"});
-
-            await newProject.save();
-
-            // Tạo section gốc khi tạo project mới
-            const rootSection = new Section({
-                name: newProject.name,
-                project: newProject._id,
-                parent: null,
-                participants: [userId],
-            })
-            await rootSection.save();
-
-            return {project: newProject, rootSection};
         } catch (error) {
             throw new Error(`Creating project service error: ${error}`, 500);
         }

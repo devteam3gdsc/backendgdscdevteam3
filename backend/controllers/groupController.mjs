@@ -99,7 +99,7 @@ const groupController = {
       });
       newRecent.push({
         id: groupId,
-        recentType: "group",
+        pinType: "group",
         name: group.name,
         avatar: group.avatar,
       });

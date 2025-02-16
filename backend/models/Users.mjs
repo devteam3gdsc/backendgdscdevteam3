@@ -19,7 +19,7 @@ const pinSchema = new mongoose.Schema(
 const recentSchema = new mongoose.Schema(
   {
     id: mongoose.Types.ObjectId,
-    recentType: {
+    pinType: {
       type: String,
       enum: ["group", "user", "project"],
     },

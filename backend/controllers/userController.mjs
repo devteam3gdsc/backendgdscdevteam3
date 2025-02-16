@@ -311,7 +311,7 @@ const userController = {
             name: group.name,
             avatar: group.avatar,
             totalMembers: group.totalMembers,
-            type: "group",
+            pinType: "group",
           };
         });
         return res.status(200).json(result);
@@ -323,7 +323,7 @@ const userController = {
               name: user.displayname,
               avatar: user.avatar,
               totalFollowers: user.totalFollowers,
-              type: "user",
+              pinType: "user",
             };
           });
           return res.status(200).json(result);
@@ -334,14 +334,14 @@ const userController = {
               name: users[0].displayname,
               avatar: users[0].avatar,
               totalFollowers: users[0].totalFollowers,
-              type: "user",
+              pinType: "user",
             },
             {
               id: groups[0]._id,
               name: groups[0].name,
               avatar: groups[0].avatar,
               totalMembers: groups[0].totalMembers,
-              type: "group",
+              pinType: "group",
             },
           ]);
       }

@@ -140,7 +140,7 @@ const projectController = {
       });
       newRecent.push({
         id: projectId,
-        recentType: "project",
+        pinType: "project",
         name: project.name,
         avatar: project.avatar,
       });
@@ -259,9 +259,10 @@ const projectController = {
   },
     createProject : async (req, res) => {
         try {
-            const groupId = new mongoose.Types.ObjectId(`${req.params.groupId}`)
-            const newProject = await projectServices.createProject(req.body, groupId, req.user.id);
-            res.status(200).json(newProject);
+            const groupId = new mongoose.Types.ObjectId(`${req.params.groupId}`);
+            const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
+            await projectServices.createProject(req.body, groupId, userId);
+            return res.status(200).json("project created!");
         } catch (error) {
             if (error instanceof httpError)
                 return res.status(error.statusCode).json(error.message);

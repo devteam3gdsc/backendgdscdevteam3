@@ -202,7 +202,7 @@ const groupServices = {
             }
     
             const group = await Group.aggregate([
-                { $match: { _id: new mongoose.Types.ObjectId(groupId) } },
+                { $match: { _id: new mongoose.Types.ObjectId(`${groupId}`) } },
                 { $unwind: "$members" },
                 { 
                     $lookup: {

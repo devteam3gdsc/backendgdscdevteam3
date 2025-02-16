@@ -14,7 +14,7 @@ const groupController = {
     try {
         const avatarFile = req.file; // Lấy file avatar từ request (nếu có)
         const newGroup = await groupServices.createGroup(req.body, req.user.id, avatarFile);
-        res.status(201).json(newGroup);
+        return res.status(201).json(newGroup);
     } catch (error) {
         if (error instanceof httpError) {
             return res.status(error.statusCode).json(error.message);
@@ -403,7 +403,6 @@ const groupController = {
   inviteMembers : async (req, res) => {
     try {
       const group = await groupServices.inviteMembers(req.params.groupId, req.user.id, req.body.members);//{ "members": ["userId1", "userId2", "userId3"]
-     console.log(group)
       res.status(200).json({ message:"Invite new member successfully"});
     } catch (error) {
       if (error instanceof httpError)

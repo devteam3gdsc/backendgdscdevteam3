@@ -15,17 +15,17 @@ const groupServices = {
             const avatarURL = avatarFile 
                 ? avatarFile.path 
                 : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541";
-    
+            const userAvatar = (await User.findById(creatorId,{avatar:1})).avatar
             const newGroup = new Group({
                 ...data,
                 creator: creatorId,
                 avatar: avatarURL,
                 members: [{
                     user: creatorId,
+                    avatar:userAvatar,
                     role: "creator"
                 }]
             });
-    
             await newGroup.save();
             return newGroup;
         } catch (error) {

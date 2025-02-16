@@ -261,7 +261,8 @@ const projectController = {
         try {
             const groupId = new mongoose.Types.ObjectId(`${req.params.groupId}`);
             const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
-            await projectServices.createProject(req.body, groupId, userId);
+            const avatarFile = req.file;
+            await projectServices.createProject(req.body,avatarFile, groupId, userId);
             return res.status(200).json("project created!");
         } catch (error) {
             if (error instanceof httpError)

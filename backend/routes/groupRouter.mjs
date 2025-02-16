@@ -7,7 +7,6 @@ import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { v2 } from "cloudinary";
 import multer from "multer";
 import checkAdmin from "../middlewares/checkAdminMiddleware.mjs";
-const userRouter = Router();
 
 const storage = new CloudinaryStorage({
   cloudinary: v2,
@@ -19,11 +18,6 @@ const storage = new CloudinaryStorage({
 const upload = multer({ storage });
 
 const groupRouter = Router();
-groupRouter.post(
-  "/create",
-  authMiddleware.verifyToken,
-  groupController.createGroup,
-);
 groupRouter.get(
   "/find",
   authMiddleware.verifyToken,

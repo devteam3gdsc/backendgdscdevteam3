@@ -81,6 +81,7 @@ projectRouter.get(
 projectRouter.post(
     "/create/:groupId",
     authMiddleware.verifyToken,
+    upload.single('avatar'),
     //roleMiddleware("group",["creator", "admin"]),
     projectController.createProject,
 );

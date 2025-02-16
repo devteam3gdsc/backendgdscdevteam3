@@ -201,6 +201,7 @@ const userController = {
       const order = req.query.order || "descending";
       const criteria = req.query.criteria || "dateJoined";
       const search = req.query.search || "";
+      const followId = req.query.following? new mongoose.Types.ObjectId(`${req.query.following}`) : "";
       switch (criteria) {
         case "dateJoined": {
           var sortValue = "createdAt";
@@ -225,9 +226,13 @@ const userController = {
           break;
         }
       }
+      const usersFollowing = (await User.findById(followId,{following:1})).following
       const matchData = [{ _id: { $ne: userId } }];
       if (search) {
         matchData.push({ displayname: { $regex: search, $options: "i" } });
+      }
+      if (following){
+        matchData.push({_id:{$in:usersFollowing}})
       }
       const result = await userServices.getUsers(
         userId,

@@ -1,5 +1,18 @@
 import mongoose from "mongoose";
 import User from "./Users.mjs";
+const memberSchema = new mongoose.Schema(
+  {
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    role: {
+      type: String,
+      enum: ["creator", "admin", "member"],
+      default: "member",
+      required: true,
+    },
+    avatar: String,
+  },
+  { _id: false }
+)
 const groupSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
@@ -17,17 +30,7 @@ const groupSchema = new mongoose.Schema(
       required: true,
     },
     members: [
-      {
-        user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-        role: {
-          type: String,
-          enum: ["creator", "admin", "member"],
-          default: "member",
-          required: true,
-        },
-        avatar: String,
-      },
-      { _id: false },
+      memberSchema
     ],
     pendingInvites: [
       {

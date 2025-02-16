@@ -194,15 +194,12 @@ const groupServices = {
         }
     },
 
-    getFullGroupData: async (groupId, userId) => {
+    getFullGroupData: async (Id, userId) => {
         try {
-            if (!mongoose.Types.ObjectId.isValid(groupId)) {
-                console.error("groupId không hợp lệ:", groupId);
-                return { message: "Invalid groupId" };
-            }
-    
+            
+            const groupId = new mongoose.Types.ObjectId(`${Id}`);
             const group = await Group.aggregate([
-                { $match: { _id: new mongoose.Types.ObjectId(`${groupId}`) } },
+                { $match: { _id: groupId } },
                 { $unwind: "$members" },
                 { 
                     $lookup: {
@@ -232,11 +229,9 @@ const groupServices = {
                     }
                 }
             ]);
-    
             if (!group || group.length === 0) {
                 return { message: "Group not found" };
             }
-    
             const groupData = group[0]; // aggregate() trả về mảng nên cần lấy phần tử đầu tiên
             const members = groupData.members || [];
     

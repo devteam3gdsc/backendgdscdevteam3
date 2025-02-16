@@ -99,7 +99,7 @@ const postController = {
       const skip = (page - 1) * limit;
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
       let matchData = [{ visibility: "public" }];
-      matchData.push({ group: { $exists: false }, project: { $exists: false }, section: { $exists: false } });
+      matchData.push({ group: null, project: null, section: null });
       if (req.query.tags) {
         const tags = req.query.tags.split(",");
         matchData.push({ tags: { $all: tags } });

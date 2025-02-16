@@ -120,6 +120,7 @@ const userServices = {
                 avatar:1,
                 totalFollowers:1,
                 totalLikes:1,
+                followed:1,
                 _id:1
               }}
             ],

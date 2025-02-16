@@ -226,13 +226,14 @@ const userController = {
           break;
         }
       }
-      const usersFollowing = (await User.findById(followId,{following:1})).following
+      
       const matchData = [{ _id: { $ne: userId } }];
       if (search) {
         matchData.push({ displayname: { $regex: search, $options: "i" } });
       }
-      if (following){
-        matchData.push({_id:{$in:usersFollowing}})
+      if (followId){
+        const usersFollowing = (await User.findById(followId,{following:1})).following
+        matchData.push({_id:{$in:usersFollowing}});
       }
       const result = await userServices.getUsers(
         userId,
@@ -315,7 +316,7 @@ const userController = {
             id: group._id,
             name: group.name,
             avatar: group.avatar,
-            totalMembers: group.totalMembers,
+            total: group.totalMembers,
             pinType: "group",
           };
         });
@@ -327,7 +328,7 @@ const userController = {
               id: user._id,
               name: user.displayname,
               avatar: user.avatar,
-              totalFollowers: user.totalFollowers,
+              total: user.totalFollowers,
               pinType: "user",
             };
           });
@@ -338,14 +339,14 @@ const userController = {
               id: users[0]._id,
               name: users[0].displayname,
               avatar: users[0].avatar,
-              totalFollowers: users[0].totalFollowers,
+              total: users[0].totalFollowers,
               pinType: "user",
             },
             {
               id: groups[0]._id,
               name: groups[0].name,
               avatar: groups[0].avatar,
-              totalMembers: groups[0].totalMembers,
+              total: groups[0].totalMembers,
               pinType: "group",
             },
           ]);

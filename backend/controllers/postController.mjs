@@ -8,6 +8,7 @@ import findDocument from "../utils/findDocument.mjs";
 import updateDocument from "../utils/updateDocument.mjs";
 import { fileDestroy, getFiles } from "../utils/filesHelper.mjs";
 import { Group } from "../models/Groups.mjs";
+import userServices from "../services/userServices.mjs";
 const postController = {
   //[GET] /me?page=...&limit=...&search=...&type=...
   getUserPost: async (req, res) => {
@@ -451,6 +452,7 @@ const postController = {
         await findDocument(User, { _id: userId }, { following: 1, _id: 0 })
       ).following;
       const matchData = [
+        { author: { $ne: userId}},
         { author: { $in: following } },
         { visibility: "public" },
       ];

@@ -316,6 +316,17 @@ const sectionController = {
       else return res.status(500).json(error);
     }
   },
+  getSections: async (req,res)=>{
+    try {
+      const projectId = new mongoose.Types.ObjectId(`${req.params.projectId}`);
+      const sections = await Section.find({project:projectId});
+      return res.status(200).json(sections);
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  }
 };
 
 export default sectionController;

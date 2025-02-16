@@ -12,6 +12,7 @@ const pinSchema = new mongoose.Schema(
     name: String,
     position: Number,
     avatar: String,
+    total:Number
   },
   { _id: false },
 );
@@ -25,6 +26,7 @@ const recentSchema = new mongoose.Schema(
     },
     name: String,
     avatar: String,
+    total:Number
   },
   { _id: false },
 );

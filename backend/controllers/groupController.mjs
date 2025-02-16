@@ -193,7 +193,6 @@ const groupController = {
         }
       }
       const matchData = [
-        { _id: { $ne: userId } },
         { _id: { $in: groupMembersId } },
       ];
       if (search) {

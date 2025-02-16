@@ -114,21 +114,30 @@ const userServices = {
                   followed: { $in: ["$_id", following] },
                 },
               },
+              {$project:{
+                displayname:1,
+                username:1,
+                avatar:1,
+                totalFollowers:1,
+                totalLikes:1,
+                _id:1
+              }}
             ],
             countingUsers: [{ $count: "totalUsers" }],
           },
         },
       ]);
       if (!Data[0].countingUsers[0]) {
+        console.log(1)
         return {
           users: [],
           totalUsers: 0,
         };
-      } else
+      } else{
         return {
           users: Data[0].users,
           totalUsers: Data[0].countingUsers[0].totalUsers,
-        };
+        };}
     } catch (error) {
       if (error instanceof httpError) throw error;
       else throw new httpError(`getUsers services error:${error}`, 500);

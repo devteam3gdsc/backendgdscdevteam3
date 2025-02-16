@@ -1,5 +1,5 @@
 
-import mongoose from "mongoose";
+import mongoose, { mongo } from "mongoose";
 import projectServices from "../services/projectServices.mjs";
 import { Group, Project } from "../models/Groups.mjs";
 import User from "../models/Users.mjs";
@@ -259,7 +259,8 @@ const projectController = {
   },
     createProject : async (req, res) => {
         try {
-            const newProject = await projectServices.createProject(req.body, req.params.groupId, req.user.id);
+            const groupId = new mongoose.Types.ObjectId(`${req.params.groupId}`)
+            const newProject = await projectServices.createProject(req.body, groupId, req.user.id);
             res.status(200).json(newProject);
         } catch (error) {
             if (error instanceof httpError)

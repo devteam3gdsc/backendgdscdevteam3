@@ -135,7 +135,7 @@ const projectServices = {
         try {
             const group = await Group.findById(groupId);
             if(!group) {
-                throw new Error("Group not found");
+                throw new httpErrorError("Group not found",404);
             }
 
             const newProject = new Project({

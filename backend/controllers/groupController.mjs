@@ -206,6 +206,15 @@ const groupController = {
         skip,
         limit,
       );
+      if (result.totalUsers === 0){
+        return res.status(200).json({
+          users: [],
+          totalPages:0,
+          currentPage: page,
+          totalUsers: 0,
+          hasMore:false,
+        })
+      }
       const usersMap = new Map(
         result.users.map((user) => [`${user._id}`, user]),
       );

@@ -226,7 +226,6 @@ const userController = {
           break;
         }
       }
-      
       const matchData = [{ _id: { $ne: userId } }];
       if (search) {
         matchData.push({ displayname: { $regex: search, $options: "i" } });
@@ -310,6 +309,35 @@ const userController = {
         { $sort: { totalFollowers: -1 } },
         { $limit: 2 },
       ]);
+      if (!groups){
+        if (!users[0]){
+          return res.status(200).json()
+        }
+        else {
+          const result = users.map((user) => {
+            return {
+              id: user._id,
+              name: user.displayname,
+              avatar: user.avatar,
+              total: user.totalFollowers,
+              pinType: "user",
+            };
+          });
+          return res.status(200).json(result);
+        }
+      }
+      if (!users[0]){
+        const result = groups.map((group) => {
+          return {
+            id: group._id,
+            name: group.name,
+            avatar: group.avatar,
+            total: group.totalMembers,
+            pinType: "group",
+          };
+        });
+        return res.status(200).json(result);
+      }
       if (groups[1].totalMembers >= users[0].totalFollowers) {
         const result = groups.map((group) => {
           return {

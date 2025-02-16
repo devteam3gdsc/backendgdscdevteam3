@@ -326,6 +326,49 @@ const userController = {
           return res.status(200).json(result);
         }
       }
+      if (!groups[1]){
+        if (!users[0]){
+          const result = groups.map((group) => {
+            return {
+              id: group._id,
+              name: group.name,
+              avatar: group.avatar,
+              total: group.totalMembers,
+              pinType: "group",
+            };
+          });
+          return res.status(200).json(result);}
+        else {
+          if (users[1].totalFollowers >= groups[0].totalMembers) {
+            const result = users.map((user) => {
+              return {
+                id: user._id,
+                name: user.displayname,
+                avatar: user.avatar,
+                total: user.totalFollowers,
+                pinType: "user",
+              };
+            });
+            return res.status(200).json(result);
+          } else
+            return res.status(200).json([
+              {
+                id: users[0]._id,
+                name: users[0].displayname,
+                avatar: users[0].avatar,
+                total: users[0].totalFollowers,
+                pinType: "user",
+              },
+              {
+                id: groups[0]._id,
+                name: groups[0].name,
+                avatar: groups[0].avatar,
+                total: groups[0].totalMembers,
+                pinType: "group",
+              },
+            ]);
+        }
+      }
       if (!users[0]){
         const result = groups.map((group) => {
           return {

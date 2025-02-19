@@ -1,5 +1,6 @@
+import mongoose from "mongoose";
 import { Group, Project, Section } from "../models/Groups.mjs";
-
+import Post from "../models/Posts.mjs"
 const roleMiddleware = (level, roles) => {
   return async (req, res, next) => {
     try {
@@ -8,15 +9,15 @@ const roleMiddleware = (level, roles) => {
 
       // Xác định model và tham số dựa trên level
       if (level === "group") {
-        itemId = req.params.groupId;
+        itemId = new mongoose.Types.ObjectId(`${req.params.itemId}`)
         if (!itemId) return res.status(400).json({ message: "Group ID is required." });
         item = await Group.findById(itemId);
       } else if (level === "project") {
         itemId = req.params.projectId;
         if (!itemId) return res.status(400).json({ message: "Project ID is required." });
         item = await Project.findById(itemId);
-      } else if (level === "team") {
-        itemId = req.params.teamId;
+      } else if (level === "section") {
+        itemId = new mongoose.Types.ObjectId(`${req.params.itemId}`)
         if (!itemId) return res.status(400).json({ message: "Team ID is required." });
         item = await Team.findById(itemId);
       } else {

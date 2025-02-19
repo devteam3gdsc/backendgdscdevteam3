@@ -29,7 +29,7 @@ const checkAdmin = async (req, res, next) => {
 
     const userRole = entity.members.find(m => m.user.toString() === req.user.id);
     console.log(userRole)
-    if (userRole.role !== "admin") {
+    if (userRole.role !== "admin"|| userRole.role !== "creator") {
       return res.status(403).json({ message: "You are not authorized to moderate this post" });
     }
     req.entity = entity;

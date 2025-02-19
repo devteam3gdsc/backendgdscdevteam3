@@ -186,6 +186,7 @@ const postController = {
     try {
       const postId = new mongoose.Types.ObjectId(`${req.params.postId}`)
       const post = await Post.findById(postId);
+      console.log(post)
       
       if (!post) {
         console.log("Post not found");

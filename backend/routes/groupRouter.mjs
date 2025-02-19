@@ -1,6 +1,7 @@
 import { Router } from "express";
 import groupController from "../controllers/groupController.mjs";
 import authMiddleware from "../middlewares/authMidleware.mjs";
+import roleMiddleware from "../middlewares/roleMiddleware.mjs"
 import postController from "../controllers/postController.mjs";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { v2 } from "cloudinary";
@@ -130,7 +131,7 @@ groupRouter.post(
 groupRouter.get( 
   "/getPosts",
   authMiddleware.verifyToken,
-  //roleMiddleware("group",["creator"]),
+  // roleMiddleware("group",["creator"]),
   postController.getPostsInGroupProjectSection,
 
 );

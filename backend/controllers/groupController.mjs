@@ -327,12 +327,10 @@ const groupController = {
 
   getFullGroupData: async (req, res) => {
     try {
-      console.log(req.params.groupId, req.user.id);
       const group = await groupServices.getFullGroupData(
         req.params.groupId,
         req.user.id,
       );
-
        return res.status(200).json(group);
     } catch (error) {
       if (error instanceof httpError)

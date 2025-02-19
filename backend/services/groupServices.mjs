@@ -198,64 +198,41 @@ const groupServices = {
         try {
             
             const groupId = new mongoose.Types.ObjectId(`${Id}`);
-            const group = await Group.aggregate([
-                { $match: { _id: groupId } },
-                { $unwind: "$members" },
-                { 
-                    $lookup: {
-                        from: "users", 
-                        localField: "members.user",
-                        foreignField: "_id",
-                        as: "userData"
-                    }
-                },
-                { $unwind: { path: "$userData", preserveNullAndEmptyArrays: true } }, 
-                { 
-                    $group: {
-                        _id: "$_id",
-                        name: { $first: "$name" },
-                        description: { $first: "$description" },
-                        avatar: { $first: "$avatar" },
-                        moderation: { $first: "$moderation" },
-                        private: { $first: "$private" },
-                        creatorData: { $first: "$creatorData" },
-                        members: { 
-                            $push: { 
-                                user: "$members.user", // Giữ nguyên ObjectId của user
-                                role: "$members.role",
-                                avatar: "$userData.avatar" // Lấy avatar từ `users`
-                            } 
-                        }
-                    }
-                }
-            ]);
-            if (!group || group.length === 0) {
+            const groupData = await Group.findById(groupId,
+                { name:1,
+                description:1,
+                moderation:1,
+                totalPosts:1,
+                totalMembers:1,
+                avatar:1,
+                members:1}
+            )
+            console.log(groupData);
+            if (!groupData) {
                 return { message: "Group not found" };
             }
-            const groupData = group[0]; // aggregate() trả về mảng nên cần lấy phần tử đầu tiên
             const members = groupData.members || [];
-    
             const userRole = members.find(m => m.user.toString() === userId.toString())?.role || "guest";
             const isJoined = members.some(m => m.user.toString() === userId.toString());
             const canJoin = groupData.private ? isJoined : true; 
-    
             const numberOfProjects = await Project.countDocuments({ group: groupId });
-            const numberOfPosts = await Post.countDocuments({ group: groupId });
-    
+            // const posts = await Post.find({group:groupId})
+            // console.log(posts)
+            const numberOfPostsApproved = await Post.countDocuments({ group: groupId,status:"approved" });
             return {
                 name: groupData.name,
                 bio: groupData.description,
                 avatar: groupData.avatar,
                 members,
                 moderation: groupData.moderation,
-                numberOfPosts,
+                totalPosts:groupData.totalPosts,
+                numberOfPostsApproved,
                 numberOfMembers: members.length,
                 numberOfProjects,
                 joined: isJoined,
                 role:userRole,
                 canJoin
             };
-    
         } catch (error) {
             console.error("Error fetching group data:", error);
             return { message: "Internal server error", error: error.message };

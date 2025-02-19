@@ -161,7 +161,10 @@ const postServices = {
     if (group) {
       const groupData = await findDocument(Group, { _id: group }, { moderation: 1 });
       if (groupData?.moderation === true) {
-        status = "pending"; // Nếu group cần kiểm duyệt, đặt trạng thái pending
+        if (data?.role === "creator" || data?.role === "admin"){
+          status = "approved"
+        }
+        else status = "pending"; // Nếu group cần kiểm duyệt, đặt trạng thái pending
       }
     }
 

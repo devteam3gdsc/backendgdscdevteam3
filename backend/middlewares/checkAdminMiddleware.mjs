@@ -1,8 +1,10 @@
 import { Group, Project, Section } from "../models/Groups.mjs";
 import Post from "../models/Posts.mjs";
+import mongoose from "mongoose";
 const checkAdmin = async (req, res, next) => {
   try {
-    const post = await Post.findById(req.params.postId);
+    const postId = new mongoose.Types.ObjectId(`${req.params.postId}`)
+    const post = await Post.findById(postId);
     if(!post) {
       return res.status(404).json({ message: "Post not found"});
     }

@@ -21,15 +21,11 @@ const checkAdmin = async (req, res, next) => {
       entity = await Section.findById( section );
       entityType = "Section";
     }
-   
-    
     if(!entity) {
       return res.status(404).json({ message: "Associated entity not found" });
     }
-
-    const userRole = entity.members.find(m => m.user.toString() === req.user.id);
-    console.log(userRole)
-    if (userRole.role !== "admin"|| userRole.role !== "creator") {
+    const userRole = entity.members.find((m) => {return (m.user.toString()) === (req.user.id.toString())});
+    if (userRole.role !== "admin"&& userRole.role !== "creator") {
       return res.status(403).json({ message: "You are not authorized to moderate this post" });
     }
     req.entity = entity;

@@ -184,7 +184,8 @@ const postController = {
   
   confirmPost: async (req, res) => {
     try {
-      const post = await Post.findById(req.params.postId);
+      const postId = new mongoose.Types.ObjectId(`${req.params.postId}`)
+      const post = await Post.findById(postId);
       
       if (!post) {
         console.log("Post not found");
@@ -202,7 +203,7 @@ const postController = {
   
       console.log(typeObj);
   
-      const result = await postServices.confirmCreatePost(post.author, typeObj, req.params.postId, req.query.accept);
+      const result = await postServices.confirmCreatePost(post.author, typeObj, postId, req.query.accept);
       return res.status(200).json(result);
       
     } catch (error) {

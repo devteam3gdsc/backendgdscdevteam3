@@ -41,7 +41,7 @@ const groupSchema = new mongoose.Schema(
     projects: [{ type: mongoose.Schema.Types.ObjectId, ref: "Project" }],
     totalMembers: {
       type: Number,
-      default: 0,
+      default: 1,
     },
     totalPosts: {
       type: Number,
@@ -97,7 +97,7 @@ const projectSchema = new mongoose.Schema(
     sections: [{ type: mongoose.Schema.Types.ObjectId, ref: "Section" }],
     totalMembers: {
       type: Number,
-      default: 0,
+      default: 1,
     },
     totalPosts: {
       type: Number,
@@ -127,7 +127,7 @@ const sectionSchema = new mongoose.Schema(
     participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Danh sách người có quyền trong section
     totalMembers: {
       type: Number,
-      default: 0,
+      default: 1,
     },
     totalPosts: {
       type: Number,

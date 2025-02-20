@@ -1,6 +1,5 @@
 
 import findDocument from "../utils/findDocument.mjs";
-import { sofa } from "@cloudinary/url-gen/qualifiers/focusOn";
 import {Group, Project, Section} from "../models/Groups.mjs"
 import User from "../models/Users.mjs";
 import Post from "../models/Posts.mjs";
@@ -227,7 +226,7 @@ const groupServices = {
                 moderation: groupData.moderation,
                 totalPosts:groupData.totalPosts,
                 numberOfPostsApproved,
-                numberOfMembers: members.length,
+                numberOfMembers: groupData.totalMembers,
                 numberOfProjects,
                 joined: isJoined,
                 role:userRole,
@@ -299,10 +298,9 @@ const groupServices = {
             if (accept) {
                 group.members.push({ user: userId, role: "member"});
             }
-
+            group.totalMembers = group.totalMembers + 1;
             group.pendingInvites = group.pendingInvites.filter(id => !id.equals(userId));
             await group.save();
-
             return {message: accept ? "User joined the group" : "Invite declined"};
         } catch (error) {
             throw new Error(`Confirm invite service error: ${error}`, 500);
@@ -315,8 +313,8 @@ const groupServices = {
             if(!group) {
                 throw new Error("Group not found");
             };
-
             group.members = group.members.filter(m => !m.user.equals(removedUserId));
+            group.totalMembers = group.totalMembers - 1;
             await group.save();
             return group;
         } catch (error) {
@@ -338,9 +336,9 @@ const groupServices = {
             if(group.private) {
                 throw new Error("Group is private");
             }
-
             if(!group.members.some(m => m.user.equals(userId))) {
                 group.members.push({ user: userId, role: "member" ,avatar:userAvatar});
+                group.totalMembers = group.totalMembers + 1;
                 await group.save();
             }
             return group;
@@ -352,14 +350,13 @@ const groupServices = {
     leaveGroup : async(Id, userId) => {
         try {
             const groupId = new mongoose.Types.ObjectId(`${Id}`)
-            const group = await Group.updateOne({_id:groupId},{$pull:{members:{user:userId}}})
+            const group = await Group.updateOne({_id:groupId},{$pull:{members:{user:userId}},$inc:{totalMembers:-1}})
             if (group.matchedCount === 0) throw new Error("Group not found");
             if (group.creator.equals(userId)) return { success: false, message:"You are creator, please choose another creator before leave"};
             const projectsId = (await Project.find({group:groupId,"members.user":userId},{_id:1}))._id;
-            const updateResult = await Project.updateMany({_id:{$in:projectsId}},{$pull:{members:{user:userId}}})
+            const updateResult = await Project.updateMany({_id:{$in:projectsId}},{$pull:{members:{user:userId}},$inc:{totalMembers:-1}})
             if (updateResult.matchedCount === 0) throw new Error("Projects not found");
-            const updateSection = await Section.updateMany({project:projectsId},{$pull:{participants:userId}})
-            if (updateSection.matchedCount === 0) throw new Error("sections not found");
+            await Section.updateMany({project:projectsId},{$pull:{participants:userId},$inc:{totalMembers:-1}})
         } catch (error) {
             throw new Error(`Leave group service error: ${error}`, 500);
         }

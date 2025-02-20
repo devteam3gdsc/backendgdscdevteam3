@@ -144,6 +144,5 @@ projectRouter.post(
     roleMiddleware("project",["admin", "leader"]),
     projectController.removeAdmin,
   );
-projectRouter.get("/sections/:projectId",authMiddleware.verifyToken,sectionController.getSections)
 export default projectRouter;
 

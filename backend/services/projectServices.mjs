@@ -1,10 +1,9 @@
 import {Group, Project, Section} from "../models/Groups.mjs"
 import User from "../models/Users.mjs";
-import Post from "../models/Posts.mjs";
 import mongoose from "mongoose"
 import NotificationServices from "./notificationServices.mjs";
 import { httpError, httpResponse } from "../utils/httpResponse.mjs";
-import findDocument from "../utils/findDocument.mjs";
+
 
 const projectServices = {
 //-----------PROJECT-----------------
@@ -232,43 +231,19 @@ const projectServices = {
               return { message: "Invalid projectId" };
           }
   
-          const project = await Project.aggregate([
-              { $match: { _id: new mongoose.Types.ObjectId(projectId) } },
-              { $unwind: "$members" },
-              {
-                  $lookup: {
-                      from: "users",
-                      localField: "members.user",
-                      foreignField: "_id",
-                      as: "userData"
-                  }
-              },
-              { $unwind: { path: "$userData", preserveNullAndEmptyArrays: true } },
-              {
-                  $group: {
-                      _id: "$_id",
-                      name: { $first: "$name" },
-                      description: { $first: "$description" },
-                      avatar: { $first: "$avatar" },
-                      private: { $first: "$private" },
-                      creator: { $first: "$creator" },
-                      members: {
-                          $push: {
-                              user: "$members.user",
-                              role: "$members.role",
-                              avatar: "$userData.avatar",
-                              role: "$members.role" // Thêm role cạnh avatar
-                          }
-                      }
-                  }
-              }
-          ]);
+         const projectData = await Project.findById(projectId,{
+            name:1,
+            description:1,
+            totalPosts:1,
+            totalMembers:1,
+            avatar:1,
+            members:1,
+            private:1
+         })
   
-          if (!project || project.length === 0) {
+          if (!projectData) {
               return { message: "Project not found" };
           }
-  
-          const projectData = project[0];
           const members = projectData.members || [];
   
           const isJoined = members.some(m => m.user.toString() === userId.toString());
@@ -292,6 +267,7 @@ const projectServices = {
               avatar: projectData.avatar,
               members: memberAvatars,
               numberOfMembers: members.length,
+              totalPosts:projectData.totalPosts,
               sections: sectionTree,
               joined: isJoined,
               canJoin
@@ -356,6 +332,7 @@ const projectServices = {
             }
 
             project.pendingInvites = project.pendingInvites.filter(id => !id.equals(userId));
+            project.totalMembers = project.totalMembers + 1
             await project.save();
 
             console.log(project)
@@ -371,7 +348,7 @@ const projectServices = {
             if(!project) {
                 throw new Error("Project not found");
             }
-
+            project.totalMembers = project.totalMembers - 1
             project.members = project.members.filter(m => !m.user.equals(removedUserId));
             await project.save();
             return project;
@@ -392,6 +369,7 @@ const projectServices = {
             }
 
             if(!project.members.some(m => m.user.equals(userId))) {
+                project.totalMembers = project.totalMembers + 1
                 project.members.push({ user: userId, role: "participant" });
                 await project.save();
             }

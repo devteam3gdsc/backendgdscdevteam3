@@ -8,6 +8,7 @@ const sectionController = {
   createSection: async (req, res) => {
     try {
       await sectionServices.createSection(req.body);
+      return res.status(200).json("created!");
     } catch (error) {
       if (error instanceof httpError)
         return res.status(error.statusCode).json(error.message);
@@ -310,17 +311,6 @@ const sectionController = {
         totalPosts: result.totalPosts,
         hasMore,
       });
-    } catch (error) {
-      if (error instanceof httpError)
-        return res.status(error.statusCode).json(error.message);
-      else return res.status(500).json(error);
-    }
-  },
-  getSections: async (req,res)=>{
-    try {
-      const projectId = new mongoose.Types.ObjectId(`${req.params.projectId}`);
-      const sections = await Section.find({project:projectId});
-      return res.status(200).json(sections);
     } catch (error) {
       if (error instanceof httpError)
         return res.status(error.statusCode).json(error.message);

@@ -7,8 +7,8 @@ import User from "../models/Users.mjs";
 const sectionController = {
   createSection: async (req, res) => {
     try {
-      await sectionServices.createSection(req.body);
-      return res.status(200).json("created!");
+      const result =await sectionServices.createSection(req.body);
+      return res.status(200).json(result);
     } catch (error) {
       if (error instanceof httpError)
         return res.status(error.statusCode).json(error.message);

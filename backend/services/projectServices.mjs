@@ -260,7 +260,7 @@ const projectServices = {
               .lean();
   
           const sectionTree = buildSectionTree(sections, null);
-  
+          const userRole = members.find(m => m.user.toString() === userId.toString())?.role || "guest";
           return {
               name: projectData.name,
               bio: projectData.description,
@@ -270,7 +270,8 @@ const projectServices = {
               totalPosts:projectData.totalPosts,
               sections: sectionTree,
               joined: isJoined,
-              canJoin
+              canJoin,
+              role: userRole
           };
       } catch (error) {
           console.error("Error fetching project data:", error);

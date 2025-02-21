@@ -225,6 +225,15 @@ const groupController = {
         };
       });
       const totalPages = Math.ceil(result.totalUsers / limit);
+      if (page > totalPages) {
+        return res.status(200).json({
+          users: [],
+          totalPages,
+          currentPage: page,
+          totalUsers: result.totalUsers,
+          hasMore: false,
+        });
+      }
       const hasMore = totalPages - page > 0 ? true : false;
       return res.status(200).json({
         users: usersWithRole,

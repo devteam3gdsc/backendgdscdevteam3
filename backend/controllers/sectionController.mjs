@@ -45,20 +45,42 @@ const sectionController = {
       else return res.status(500).json(error);
     }
   },
+  // deleteSection: async (req, res) => {
+  //   try {
+  //     const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
+  //     const deleteResult = await Section.deleteOne({ _id: sectionId });
+  //     if (deleteResult.deletedCount === 0) {
+  //       return res.status(404).json("cant find the section!");
+  //     }
+  //     const parentSectionUpdate = await Section.updateMany(
+  //       { children: { $in: sectionId } },
+  //       { $pull: { children: sectionId } },
+  //     );
+  //     if (parentSectionUpdate.matchedCount === 0) {
+  //       return res.status(404).json("cant find parent section!");
+  //     }
+  //     return res.status(200).json("section deleted!");
+  //   } catch (error) {
+  //     if (error instanceof httpError)
+  //       return res.status(error.statusCode).json(error.message);
+  //     else return res.status(500).json(error);
+  //   }
+  // },
   deleteSection: async (req, res) => {
     try {
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
       const deleteResult = await Section.deleteOne({ _id: sectionId });
+
       if (deleteResult.deletedCount === 0) {
         return res.status(404).json("cant find the section!");
       }
-      const parentSectionUpdate = await Section.updateMany(
+
+      // Xóa section khỏi danh sách children của parent (nếu có)
+      await Section.updateMany(
         { children: { $in: sectionId } },
-        { $pull: { children: sectionId } },
+        { $pull: { children: sectionId } }
       );
-      if (parentSectionUpdate.matchedCount === 0) {
-        return res.status(404).json("cant find parent section!");
-      }
+
       return res.status(200).json("section deleted!");
     } catch (error) {
       if (error instanceof httpError)
@@ -66,6 +88,7 @@ const sectionController = {
       else return res.status(500).json(error);
     }
   },
+
   addParticipant: async (req, res) => {
     try {
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);

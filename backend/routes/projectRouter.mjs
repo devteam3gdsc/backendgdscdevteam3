@@ -49,7 +49,7 @@ projectRouter.put(
   sectionController.updateSection,
 );
 projectRouter.delete(
-  "/sectionUpdate/:sectionId",
+  "/sectionDelete/:sectionId",
   authMiddleware.verifyToken,
   sectionController.deleteSection,
 );

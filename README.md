@@ -907,3 +907,41 @@ http://localhost:4000/group/postModerate/67ac29741005b90425137c49?accept=approve
     "message": "approved"
 }
 
+//-----------SECTION-----------
+// POST 
+http://localhost:4000/project/sectionCreate
+{
+    "name":"Section 21/2",
+    "projectId":"67b84188c33de1c3b62518c9"
+}
+"created!"
+nếu có parentId thì truyền vào body
+		
+// PUT
+http://localhost:4000/project/sectionUpdate/67b84271c33de1c3b62518cc
+// /sectionUpdate/:sectionId
+{
+    "name":"section after edit 21/2"
+}
+{
+    "message": "Section updated successfully",
+    "data": {
+        "_id": "67b84271c33de1c3b62518cc",
+        "name": "section after edit 21/2",
+        "description": "",
+        "project": "67b84188c33de1c3b62518c9",
+        "parent": null,
+        "children": [],
+        "participants": [],
+        "totalMembers": 1,
+        "totalPosts": 0,
+        "createdAt": "2025-02-21T09:08:01.924Z",
+        "updatedAt": "2025-02-21T09:09:55.936Z",
+        "__v": 0
+    }
+}
+
+// DELETE 
+http://localhost:4000/project/sectionDelete/67b843c4fa67e42b9e307013
+///sectionDelete/:sectionId
+"section deleted!"

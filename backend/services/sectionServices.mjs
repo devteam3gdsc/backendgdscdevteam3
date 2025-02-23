@@ -35,7 +35,7 @@ const sectionServices = {
   //     else throw new httpError("createSection service error", 500);
   //   }
   // },
-  createSection: async ({ ...data }) => {
+  createSection: async ({ ...data }, userId) => {
     try {
       const id = data.parentId
         ? new mongoose.Types.ObjectId(`${data.parentId}`)
@@ -65,6 +65,7 @@ const sectionServices = {
           ...data,
           project: id,
           parent: null,
+          participants:userId,
           children: [],
         });
       }

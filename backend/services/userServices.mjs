@@ -129,7 +129,7 @@ const userServices = {
         },
       ]);
       if (!Data[0].countingUsers[0]) {
-        console.log(1)
+        
         return {
           users: [],
           totalUsers: 0,

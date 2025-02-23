@@ -139,13 +139,14 @@ const projectServices = {
             }
             const avatarURL = avatarFile?avatarFile.path:"https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541";
             const userAvatar = (await User.findById(userId,{avatar:1})).avatar
-            await Project.create({
+            const newProject = await Project.create({
                 ...data,
                 avatar:avatarURL,
                 group: groupId,
                 creator: userId,
                 members:[{ user: userId, role: "leader", avatar: userAvatar}]
             });
+            return newProject;
         } catch (error) {
             throw new Error(`Creating project service error: ${error}`, 500);
         }

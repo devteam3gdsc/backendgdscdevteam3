@@ -4,10 +4,11 @@ import sectionServices from "../services/sectionServices.mjs";
 import userServices from "../services/userServices.mjs";
 import findDocument from "../utils/findDocument.mjs";
 import User from "../models/Users.mjs";
+import { httpError } from "../utils/httpResponse.mjs";
 const sectionController = {
   createSection: async (req, res) => {
     try {
-      const result =await sectionServices.createSection(req.body);
+      const result =await sectionServices.createSection(req.body, req.user.id);
       return res.status(200).json(result);
     } catch (error) {
       if (error instanceof httpError)
@@ -128,6 +129,8 @@ const sectionController = {
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
       const section = await Section.findById(sectionId);
+   
+      const sectionParticipants = section.participants || []
       if (!section) {
         return res.status(404).json("Invalid section Id!");
       }
@@ -161,10 +164,7 @@ const sectionController = {
           break;
         }
       }
-      const matchData = [
-        { _id: { $ne: userId } },
-        { _id: { $in: section.participants } },
-      ];
+      const matchData = [{ _id: { $in: sectionParticipants } }];
       if (search) {
         matchData.push({ displayname: { $regex: search, $options: "i" } });
       }
@@ -176,7 +176,35 @@ const sectionController = {
         skip,
         limit,
       );
+      console.log(result)
+      if (result.totalUsers === 0){
+        return res.status(200).json({
+          users: [],
+          totalPages:0,
+          currentPage: page,
+          totalUsers: 0,
+          hasMore:false,
+        })
+      }
+      const usersMap = new Map(
+        result.users.map((user) => [`${user._id}`, user]),
+      );
+      // const usersWithRole = projectUsers.map((member) => {
+      //   return {
+      //     ...member,
+      //     ...(usersMap.get(member._id) || {}),
+      //   };
+      // });
       const totalPages = Math.ceil(result.totalUsers / limit);
+      if (page > totalPages) {
+        return res.status(200).json({
+          users: [],
+          totalPages,
+          currentPage: page,
+          totalUsers: result.totalUsers,
+          hasMore: false,
+        });
+      }
       const hasMore = totalPages - page > 0 ? true : false;
       return res.status(200).json({
         users: result.users,

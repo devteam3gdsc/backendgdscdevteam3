@@ -136,7 +136,7 @@ const postServices = {
     }
   },
 
-  createPost: async (userId, {group, project, section, ...data }, reqfiles) => {
+  createPost: async (userId, {...data }, reqfiles) => {
     try {
       let tags = [];
       if (data.tags) {
@@ -154,9 +154,9 @@ const postServices = {
       const files = getFiles(reqfiles, "code_files");
 
        // Kiểm tra xem bài viết thuộc cấp nào
-      const group = group?group:null;
-      const project = project?project:null;
-      const section = section?section:null;
+      const group = data.group?data.group:null;
+      const project = data.project?data.project:null;
+      const section = data.section?data.section:null;
     // Mặc định trạng thái bài viết
     let status = "approved";
 

@@ -154,7 +154,9 @@ const postServices = {
       const files = getFiles(reqfiles, "code_files");
 
        // Kiểm tra xem bài viết thuộc cấp nào
-      const postScope = group ? { group } : project ? { project } : section ? { section } : {};
+      const group = group?group:null;
+      const project = project?project:null;
+      const section = section?section:null;
     // Mặc định trạng thái bài viết
     let status = "approved";
 
@@ -170,7 +172,9 @@ const postServices = {
 
       const newPost = await Post.create({
         ...data,
-        ...postScope,
+        group,
+        project,
+        section,
         tags,
         author: userId,
         authorname: userData.displayname,

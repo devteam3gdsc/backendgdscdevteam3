@@ -4,7 +4,7 @@ import groupServices from "../services/groupServices.mjs";
 import mongoose from "mongoose";
 import postServices from "../services/postServices.mjs";
 import findDocument from "../utils/findDocument.mjs";
-import { Group } from "../models/Groups.mjs";
+import { Group, Project } from "../models/Groups.mjs";
 import userServices from "../services/userServices.mjs";
 import User from "../models/Users.mjs";
 
@@ -69,7 +69,7 @@ const groupController = {
       const skip = (page - 1) * limit;
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
       const groupId = new mongoose.Types.ObjectId(`${req.params.groupId}`);
-      const matchData = [{ group: groupId, visibility: "public" }];
+      const matchData = [{ group: groupId, visibility: "public", project:null,section:null }];
       if (req.query.tags) {
         const tags = req.query.tags.split(",");
         matchData.push({ tags: { $all: tags } });

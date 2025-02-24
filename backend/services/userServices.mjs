@@ -50,6 +50,12 @@ const userServices = {
       await user.updateOne({
         $set: { displayname, avatar: avatarURL, ...updatedData },
       });
+      await User.updateMany({pins:{$elemMatch:{id:userId,pinType:"user"}}},
+                            {$set:{"pins.$.name":displayname,"pins.$.avatar":avatarURL}}
+      )
+      await User.updateMany({recent:{$elemMatch:{id:userId,pinType:"user"}}},
+        {$set:{"recent.$.name":displayname,"recent.$.avatar":avatarURL}}
+)
       await Post.updateMany(
         { author: userId },
         { $set: { authorname: displayname, avatar: avatarURL } },
@@ -58,6 +64,7 @@ const userServices = {
         { author: userId },
         { $set: { authorname: displayname, avatar: avatarURL } },
       );
+      
       return new httpResponse("updated successfully", 200);
     } catch (error) {
       if (error instanceof httpError) throw error;

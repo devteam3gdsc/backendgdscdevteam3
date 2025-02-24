@@ -246,7 +246,7 @@ const projectController = {
       );
       const me = await User.findById(userId);
       const newRecent = me.recent.filter((pin) => {
-        return pin.name !== group.name;
+        return pin.name !== project.name;
       });
       newRecent.push({
         id: projectId,

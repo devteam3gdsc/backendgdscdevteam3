@@ -185,9 +185,7 @@ const postServices = {
         await updateDocument(Group, 1, [{ _id: group }], [{ $inc: { totalPosts: 1 }}]);
       } else if (project) {
         await updateDocument(Project, 1, [{ _id: project }], [{ $inc: { totalPosts: 1 }}]);
-      } else if (project) {
-        await updateDocument(Section, 1, [{ _id: section }], [{ $inc: { totalPosts: 1 }}]);
-      }
+      } 
       return newPost._id;
     } catch (error) {
       throw new httpError(`creating post service error: ${error}`, 500);

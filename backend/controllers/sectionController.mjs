@@ -5,6 +5,7 @@ import userServices from "../services/userServices.mjs";
 import findDocument from "../utils/findDocument.mjs";
 import User from "../models/Users.mjs";
 import { httpError } from "../utils/httpResponse.mjs";
+import postServices from "../services/postServices.mjs";
 const sectionController = {
   createSection: async (req, res) => {
     try {
@@ -306,6 +307,7 @@ const sectionController = {
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
       const matchData = [{ section: sectionId, visibility: "public" }];
+      
       if (req.query.tags) {
         const tags = req.query.tags.split(",");
         matchData.push({ tags: { $all: tags } });

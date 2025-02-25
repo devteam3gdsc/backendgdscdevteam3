@@ -100,7 +100,10 @@ const projectServices = {
                       in: "$$member.avatar",
                     },
                   },
-                  groupName: { $arrayElemAt: ["$groupData.name", 0] }
+                  groupName: { $arrayElemAt: ["$groupData.name", 0] },
+                  joined: {
+                    $in: [userId, "$members.user"], // 🔹 Kiểm tra xem userId có trong members không
+                  },
                 },
               },
             ],

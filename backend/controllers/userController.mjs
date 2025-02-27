@@ -260,8 +260,8 @@ const userController = {
   addPin: async (req, res) => {
     try {
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
-      await userServices.addPin(userId, req.query);
-      return res.status(200).json("pin added");
+      const result = await userServices.addPin(userId, req.query);
+      return res.status(200).json(result);
     } catch (error) {
       if (error instanceof httpError)
         return res.status(error.statusCode).json(error.message);

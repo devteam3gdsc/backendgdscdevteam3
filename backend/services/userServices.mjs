@@ -192,6 +192,7 @@ const userServices = {
         pinType: data.type,
       };
       await User.updateOne({ _id: userId }, { $push: { pins: newPins } });
+      return newPins;
     } catch (error) {
       if (error instanceof httpError) throw error;
       else throw new httpError(`addPin services error:${error}`, 500);

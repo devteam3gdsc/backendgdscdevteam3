@@ -6,6 +6,7 @@ import findDocument from "../utils/findDocument.mjs";
 import User from "../models/Users.mjs";
 import { httpError } from "../utils/httpResponse.mjs";
 import postServices from "../services/postServices.mjs";
+import Post from "../models/Posts.mjs";
 const sectionController = {
   createSection: async (req, res) => {
     try {
@@ -71,18 +72,11 @@ const sectionController = {
   deleteSection: async (req, res) => {
     try {
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
-      const deleteResult = await Section.deleteOne({ _id: sectionId });
-
-      if (deleteResult.deletedCount === 0) {
-        return res.status(404).json("cant find the section!");
-      }
-
-      // Xóa section khỏi danh sách children của parent (nếu có)
       await Section.updateMany(
         { children: { $in: sectionId } },
         { $pull: { children: sectionId } }
       );
-
+      await sectionServices.deleteSections(sectionId)
       return res.status(200).json("section deleted!");
     } catch (error) {
       if (error instanceof httpError)
@@ -96,16 +90,7 @@ const sectionController = {
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
       const usersId = req.body.usersId;
       const Ids = usersId.map((id)=>{return new mongoose.Types.ObjectId(`${id}`)})
-      const section = await Section.findById(sectionId);
-      const updateResult = await Section.updateMany(
-        { _id: { $in: section.children } },
-        { $push: { participants:{$each:Ids} } },
-      );
-      if (updateResult.matchedCount === 0) {
-        return res.status(404).json("cant find section!");
-      }
-      section.participants.concat(usersId);
-      await section.save();
+      await sectionServices.addParticipant(Ids,sectionId);
       return res.status(200).json("participant added!");
     } catch (error) {
       if (error instanceof httpError)
@@ -304,10 +289,24 @@ const sectionController = {
       const limit = req.query.limit || 5;
       const search = req.query.search || "";
       const skip = (page - 1) * limit;
+      const mode = req.query.mode || "only"
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
-      const matchData = [{ section: sectionId, visibility: "public" }];
-      
+      let sectionIds;
+      if (mode !== "only"){
+        const sections = await Section.aggregate([
+          {$match:{_id:sectionId}},
+          {$graphLookup:{
+            from:"sections",
+            startWith:"$_id",
+            connectFromField:"_id",
+            connectToField:"parent",
+            as:"allSections"
+          }}
+        ]);
+        sectionIds = sections[0].allSections.map(section=>section._id).concat(sectionId)
+      }
+      const matchData = mode === "only" ?[{ section: sectionId, visibility: "public" }]:[{section:{$in:sectionIds} ,visibility:"public"}]
       if (req.query.tags) {
         const tags = req.query.tags.split(",");
         matchData.push({ tags: { $all: tags } });

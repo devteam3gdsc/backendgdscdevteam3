@@ -103,6 +103,48 @@ const sectionServices = {
     else throw new httpError("removeUser service error", 500);
   }
 },
+  deleteSections: async (sectionId)=>{
+   try {
+    const section = await Section.findById(sectionId);
+    if (!section){
+      throw new httpError(404,"deleteSectionService error: cant find section!");
+    }
+    else {
+      await section.deleteOne();
+      if (section.children){
+        section.children.map((section)=>{sectionServices.deleteSections(section)})
+      }
+      else return ;
+    }
+   } catch (error) {
+    if (error instanceof httpError) throw error;
+    else throw new httpError("deleteSection service error", 500);
+   }
+  },
+  addParticipant: async (usersId,sectionId)=>{
+    try {
+      const sections = await Section.aggregate([
+        {$match:{_id:sectionId}},
+        {$graphLookup:{
+          from:"sections",
+          startWith:"$_id",
+          connectFromField:"_id",
+          connectToField:"parent",
+          as:"allSections"
+        }}
+      ])
+      const sectionIds = sections[0].allSections.map(s => s._id).concat(sectionId);
+      const updateResult = await Section.updateMany(
+        { _id: { $in: sectionIds } },
+        { $push: { participants:{$each:usersId} } },
+      );
+      if (updateResult.matchedCount === 0) {
+        throw new httpError("cant find section", 404);}
+    } catch (error) {
+      if (error instanceof httpError) throw error;
+      else throw new httpError("deleteSection service error", 500);
+    }
+  }
 };
 
 export default sectionServices;

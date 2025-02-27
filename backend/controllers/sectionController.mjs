@@ -85,7 +85,6 @@ const sectionController = {
     }
   },
 
-  - 
 addParticipant: async (req, res) => {
     try {
         const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);

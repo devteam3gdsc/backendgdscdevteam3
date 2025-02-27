@@ -441,7 +441,7 @@ const groupController = {
 
   removeMember : async (req, res) => {
     try {
-      const group = await groupServices.removeMember(req.params.groupId, req.params.removedUserId);
+      const group = await groupServices.removeMember(req.params.groupId, req.params.removedUserId, req.user.id);
       res.status(200).json({ message:"Delete member successfully"});
     } catch (error) {
       if (error instanceof httpError)
@@ -474,7 +474,7 @@ const groupController = {
 
   assignAdmin : async (req, res) => {
     try {
-      const group = await groupServices.assignAdmin(req.params.groupId, req.params.assignAdminUserId);
+      const group = await groupServices.assignAdmin(req.params.groupId, req.params.assignAdminUserId, req.user.id);
       res.status(200).json({ message:"assign admin group successfully"});
     } catch (error) {
       if (error instanceof httpError)
@@ -485,7 +485,7 @@ const groupController = {
 
   removeAdmin : async (req, res) => {
     try {
-      const group = await groupServices.removeAdmin(req.params.groupId, req.params.removeAdminUserId);
+      const group = await groupServices.removeAdmin(req.params.groupId, req.params.removeAdminUserId, req.user.id);
       res.status(200).json({ message:"Remove admin group successfully"});
     } catch (error) {
       if (error instanceof httpError)
@@ -496,7 +496,7 @@ const groupController = {
 
   assignCreator : async (req, res) => {
     try {
-      const group = await groupServices.assignCreator(req.params.groupId, req.params.assignCreatorUserId);
+      const group = await groupServices.assignCreator(req.params.groupId, req.params.assignCreatorUserId, req.user.id);
       res.status(200).json({ message:"assign creator group successfully"});
     } catch (error) {
       if (error instanceof httpError)

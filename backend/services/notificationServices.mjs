@@ -2,6 +2,7 @@ import Notification from "../models/Notifications.mjs";
 import mongoose from "mongoose";
 import { httpError } from "../utils/httpResponse.mjs";
 import Post from "../models/Posts.mjs";
+import { Group, Project, Section } from "../models/Groups.mjs"
 import Comments from "../models/Comments.mjs";
 import User from "../models/Users.mjs";
 import { io, onlineUsers } from "../utils/socket.mjs";
@@ -27,7 +28,7 @@ const NotificationServices = {
   // display name
   // avatar
 
-  createLikeNotification: async ({ postId, senderId }) => {
+  createLikeNotification: async ({ postId, senderId }) => { // phải gừi thông báo đến người chủ post following 
     try {
       const post = await Post.findById(postId);
       if (!post) throw new httpError("Post not found", 404);
@@ -51,11 +52,11 @@ const NotificationServices = {
       }
 
       // check senderUser isFollowing postOwnerId
-      const isFollowing = await User.exists({
-        _id: senderId,
-        following: postOwnerId,
+      const isPostOwnerFollowingSenderUser = await User.exists({
+        _id: postOwnerId,
+        following: senderId,
       });
-      if (!isFollowing) return null;
+      if (!isPostOwnerFollowingSenderUser) return null;
 
       // check first like
       const hasLiked = post.likes.includes(senderId);
@@ -72,6 +73,7 @@ const NotificationServices = {
         message: `liked your post`,
         relatedEntityId: postId,
         entityType: "Post",
+        category: "following",
       });
 
       const savedNotification = await notification.save();
@@ -117,11 +119,12 @@ const NotificationServices = {
       }
 
       // check senderUser isFollowing postOwnerId
-      const isFollowing = await User.exists({
-        _id: senderId,
-        following: postOwnerId,
+      // check senderUser isFollowing postOwnerId
+      const isPostOwnerFollowingSenderUser = await User.exists({
+        _id: postOwnerId,
+        following: senderId,
       });
-      if (!isFollowing) return null;
+      if (!isPostOwnerFollowingSenderUser) return null;
 
       // check first like
       const hasLiked = post.likes.includes(senderId);
@@ -153,78 +156,359 @@ const NotificationServices = {
       throw new httpError("Failed to create comment notification", 500);
     }
   },
+  createUpdateUserFollowingNotification: async ({ senderId }) => { 
+    try {    
+      const senderUser = await User.findById(senderId);
+      if (!senderUser) throw new Error("Sender user not found");
+  
+      // Tìm danh sách những người đang theo dõi `senderId`
+      const users = await User.find({ following: senderId });
+  
+      // Tạo danh sách thông báo
+      const notifications = users.map(user => ({
+        userId: user._id,  // Người nhận thông báo
+        senderId,
+        senderName: senderUser.displayname,
+        senderAvatar: senderUser.avatar,
+        type: "update_profile",
+        message: `updated profile.`,
+        relatedEntityId: senderId,
+        entityType: "User",
+        category: "following"
+      }));
+  
+      // Lưu tất cả thông báo vào database
+      const savedNotifications = await Notification.insertMany(notifications);
+  
+      // Gửi thông báo qua socket nếu user online
+      users.forEach(user => {
+        const socketId = onlineUsers.get(String(user._id)); // Đúng userId
+        if (socketId) {
+          io.to(socketId).emit("newNotification", savedNotifications.find(n => n.userId.toString() === user._id.toString()));
+        } 
+      });
+      return savedNotifications;
+    } catch (error) {
+      console.error(`Error creating profile update notification: ${error.message}`);
+      throw new httpError("Failed to create profile update notification", 500);
+    }
+  },
+  
 
+  // GroupInviteNotification : async (groupId, senderId, receiveId) => {
+  //   try {
+  //     const senderUser = await User.findById(senderId);
+  //     if(!senderUser) {
+  //       throw new Error("SenderUser not found");
+  //     }
 
-  GroupInviteNotification : async (groupId, senderId, receiveId) => {
+  //     const notification = new Notification({
+  //       userId: receiveId,
+  //       senderId,
+  //       senderName: senderUser.displayname,
+  //       senderAvatar: senderUser.avatar,
+  //       type: "invite",
+  //       message: `invited you join group`,
+  //       relatedEntityId: groupId,
+  //       entityType: "Group",
+  //       category : "groups",
+  //     });
+
+  //     const savedNotification = await notification.save();
+
+  //     // Emit the notification to the user if they are online
+  //     const socketId = onlineUsers.get(receiveId);
+  //     if (socketId) {
+  //       io.to(socketId).emit("newNotification", savedNotification);
+  //     }
+
+  //     return savedNotification;
+  //   } catch (error) {
+  //     console.error(`Error creating invite notification: ${error.message}`);
+  //     throw new httpError("Failed to create invite notification", 500);
+  //   }
+  // },
+
+  // ProjectInviteNotification : async (projectId, senderId, receiveId) => {
+  //   try {
+  //     const senderUser = await User.findById(senderId);
+  //     if(!senderUser) {
+  //       throw new Error("SenderUser not found");
+  //     }
+
+  //     const notification = new Notification({
+  //       userId: receiveId,
+  //       senderId,
+  //       senderName: senderUser.displayname,
+  //       senderAvatar: senderUser.avatar,
+  //       type: "invite",
+  //       message: `invited you join project`,
+  //       relatedEntityId: projectId,
+  //       entityType: "Project",
+  //       category : "groups",
+  //     });
+
+  //     const savedNotification = await notification.save();
+
+  //     // Emit the notification to the user if they are online
+  //     const socketId = onlineUsers.get(receiveId);
+  //     if (socketId) {
+  //       io.to(socketId).emit("newNotification", savedNotification);
+  //     }
+
+  //     return savedNotification;
+  //   } catch (error) {
+  //     console.error(`Error creating invite notification: ${error.message}`);
+  //     throw new httpError("Failed to create invite notification", 500);
+  //   }
+  // },
+
+  // addAdminGroupNotif : async (groupId, senderId, receiveId) => {
+  //   try {
+  //     const senderUser = await User.findById(senderId);
+  //     if(!senderUser) {
+  //       throw new Error("SenderUser not found");
+  //     }
+  //     const group= await Group.findById(groupId);
+  //     if(!group) throw new httpError("Group not found", 404);
+      
+  //     const notification = new Notification({
+  //       userId: receiveId,
+  //       senderId,
+  //       senderName: senderUser.displayname,
+  //       senderAvatar: senderUser.avatar,
+  //       type: "group_admin_add",
+  //       message: `added you to admin in group "${group.name}"`,
+  //       relatedEntityId: projectId,
+  //       entityType: "Group",
+  //       category : "groups",
+  //     });
+  //     const savedNotification = await notification.save();
+
+  //     // Emit the notification to the user if they are online
+  //     const socketId = onlineUsers.get(receiveId);
+  //     if (socketId) {
+  //       io.to(socketId).emit("newNotification", savedNotification);
+  //     }
+
+  //     return savedNotification;
+  //   } catch (error) {
+  //     console.error(`Error creating invite notification: ${error.message}`);
+  //     throw new httpError("Failed to create invite notification", 500);
+  //   }
+  // },
+
+  // addAdminProjectNotif : async (projectId, senderId, receiveId) => {
+  //   try {
+  //     const senderUser = await User.findById(senderId);
+  //     if(!senderUser) {
+  //       throw new Error("SenderUser not found");
+  //     }
+  //     const project= await Project.findById(projectId);
+  //     if(!project) throw new httpError("Project not found", 404);
+      
+  //     const notification = new Notification({
+  //       userId: receiveId,
+  //       senderId,
+  //       senderName: senderUser.displayname,
+  //       senderAvatar: senderUser.avatar,
+  //       type: "project_admin_add",
+  //       message: `added you to admin in project "${project.name}"`,
+  //       relatedEntityId: projectId,
+  //       entityType: "Project",
+  //       category : "groups",
+  //     });
+  //     const savedNotification = await notification.save();
+
+  //     // Emit the notification to the user if they are online
+  //     const socketId = onlineUsers.get(receiveId);
+  //     if (socketId) {
+  //       io.to(socketId).emit("newNotification", savedNotification);
+  //     }
+
+  //     return savedNotification;
+  //   } catch (error) {
+  //     console.error(`Error creating invite notification: ${error.message}`);
+  //     throw new httpError("Failed to create invite notification", 500);
+  //   }
+  // },
+  
+  // removeAdminGroupNotif : async (groupId, senderId, receiveId) => {
+  //   try {
+  //     const senderUser = await User.findById(senderId);
+  //     if(!senderUser) {
+  //       throw new Error("SenderUser not found");
+  //     }
+  //     const group= await Group.findById(groupId);
+  //     if(!group) throw new httpError("Group not found", 404);
+      
+  //     const notification = new Notification({
+  //       userId: receiveId,
+  //       senderId,
+  //       senderName: senderUser.displayname,
+  //       senderAvatar: senderUser.avatar,
+  //       type: "group_admin_remove",
+  //       message: `removed you as an admin in group "${group.name}"`,
+  //       relatedEntityId: projectId,
+  //       entityType: "Group",
+  //       category : "groups",
+  //     });
+  //     const savedNotification = await notification.save();
+
+  //     // Emit the notification to the user if they are online
+  //     const socketId = onlineUsers.get(receiveId);
+  //     if (socketId) {
+  //       io.to(socketId).emit("newNotification", savedNotification);
+  //     }
+
+  //     return savedNotification;
+  //   } catch (error) {
+  //     console.error(`Error creating invite notification: ${error.message}`);
+  //     throw new httpError("Failed to create invite notification", 500);
+  //   }
+  // },
+
+  // removeAdminProjectNotif : async (projectId, senderId, receiveId) => {
+  //   try {
+  //     const senderUser = await User.findById(senderId);
+  //     if(!senderUser) {
+  //       throw new Error("SenderUser not found");
+  //     }
+  //     const project= await Project.findById(projectId);
+  //     if(!project) throw new httpError("Project not found", 404);
+      
+  //     const notification = new Notification({
+  //       userId: receiveId,
+  //       senderId,
+  //       senderName: senderUser.displayname,
+  //       senderAvatar: senderUser.avatar,
+  //       type: "project_admin_remove",
+  //       message: `removed you as an admin in project "${project.name}"`,
+  //       relatedEntityId: projectId,
+  //       entityType: "Project",
+  //       category : "groups",
+  //     });
+  //     const savedNotification = await notification.save();
+
+  //     // Emit the notification to the user if they are online
+  //     const socketId = onlineUsers.get(receiveId);
+  //     if (socketId) {
+  //       io.to(socketId).emit("newNotification", savedNotification);
+  //     }
+
+  //     return savedNotification;
+  //   } catch (error) {
+  //     console.error(`Error creating invite notification: ${error.message}`);
+  //     throw new httpError("Failed to create invite notification", 500);
+  //   }
+  // },
+
+  // addParticipantSectionNotif : async (sectionId, senderId, receiveId) => {
+  //   try {
+  //     const senderUser = await User.findById(senderId);
+  //     if(!senderUser) {
+  //       throw new Error("SenderUser not found");
+  //     }
+  //     const section= await Section.findById(sectionId);
+  //     if(!section) throw new httpError("Section not found", 404);
+      
+  //     const notification = new Notification({
+  //       userId: receiveId,
+  //       senderId,
+  //       senderName: senderUser.displayname,
+  //       senderAvatar: senderUser.avatar,
+  //       type: "section_participant_add",
+  //       message: `added you to participant in section "${section.name}"`,
+  //       relatedEntityId: projectId,
+  //       entityType: "Section",
+  //       category : "groups",
+  //     });
+  //     const savedNotification = await notification.save();
+
+  //     // Emit the notification to the user if they are online
+  //     const socketId = onlineUsers.get(receiveId);
+  //     if (socketId) {
+  //       io.to(socketId).emit("newNotification", savedNotification);
+  //     }
+
+  //     return savedNotification;
+  //   } catch (error) {
+  //     console.error(`Error creating invite notification: ${error.message}`);
+  //     throw new httpError("Failed to create invite notification", 500);
+  //   }
+  // },
+  // removeParticipantSectionNotif : async (sectionId, senderId, receiveId) => {
+  //   try {
+  //     const senderUser = await User.findById(senderId);
+  //     if(!senderUser) {
+  //       throw new Error("SenderUser not found");
+  //     }
+  //     const section= await Section.findById(sectionId);
+  //     if(!section) throw new httpError("Section not found", 404);
+      
+  //     const notification = new Notification({
+  //       userId: receiveId,
+  //       senderId,
+  //       senderName: senderUser.displayname,
+  //       senderAvatar: senderUser.avatar,
+  //       type: "section_participant_add",
+  //       message: `removed you as a participant in section "${section.name}"`,
+  //       relatedEntityId: projectId,
+  //       entityType: "Section",
+  //       category : "groups",
+  //     });
+  //     const savedNotification = await notification.save();
+
+  //     // Emit the notification to the user if they are online
+  //     const socketId = onlineUsers.get(receiveId);
+  //     if (socketId) {
+  //       io.to(socketId).emit("newNotification", savedNotification);
+  //     }
+
+  //     return savedNotification;
+  //   } catch (error) {
+  //     console.error(`Error creating invite notification: ${error.message}`);
+  //     throw new httpError("Failed to create invite notification", 500);
+  //   }
+  // },
+
+  sendNotification : async ({receiveId, senderId, entityId, entityType, notificationType, category, CusMessage}) => {
     try {
       const senderUser = await User.findById(senderId);
-      if(!senderUser) {
-        throw new Error("SenderUser not found");
-      }
+      if(!senderUser) throw new Error("SenderUser not found");
+      let entityModel;
+      if(entityType === "Group") entityModel = Group;
+      else if(entityType === "Project") entityModel = Project;
+      else if(entityType === "Section") entityModel = Section;
+
+      const entity = await entityModel?.findById(entityId);
+      if(!entity) throw new httpError(`${entityType} not found`, 404);
 
       const notification = new Notification({
         userId: receiveId,
         senderId,
         senderName: senderUser.displayname,
         senderAvatar: senderUser.avatar,
-        type: "invite",
-        message: `invited you join group`,
-        relatedEntityId: groupId,
-        entityType: "Group",
-      });
+        type: notificationType,
+        message: customMessage.replace("{entityName}", entity.name),
+        relatedEntityId: entityId,
+        entityType,
+        category,
+    });
 
-      const savedNotification = await notification.save();
+    const savedNotification = await notification.save();
 
-      // Emit the notification to the user if they are online
-      const socketId = onlineUsers.get(receiveId);
-      if (socketId) {
-        io.to(socketId).emit("newNotification", savedNotification);
-      }
+    // Gửi thông báo qua socket nếu người dùng đang online
+    const socketId = onlineUsers.get(receiveId);
+    if (socketId) io.to(socketId).emit("newNotification", savedNotification);
+  
+    return savedNotification;
 
-      return savedNotification;
     } catch (error) {
       console.error(`Error creating invite notification: ${error.message}`);
-      throw new httpError("Failed to create invite notification", 500);
+      throw new httpError("Failed to create custom notification", 500);
     }
   },
-
-  ProjectInviteNotification : async (projectId, senderId, receiveId) => {
-    try {
-      const senderUser = await User.findById(senderId);
-      if(!senderUser) {
-        throw new Error("SenderUser not found");
-      }
-
-      const notification = new Notification({
-        userId: receiveId,
-        senderId,
-        senderName: senderUser.displayname,
-        senderAvatar: senderUser.avatar,
-        type: "invite",
-        message: `invited you join project`,
-        relatedEntityId: projectId,
-        entityType: "Project",
-      });
-
-      const savedNotification = await notification.save();
-
-      // Emit the notification to the user if they are online
-      const socketId = onlineUsers.get(receiveId);
-      if (socketId) {
-        io.to(socketId).emit("newNotification", savedNotification);
-      }
-
-      return savedNotification;
-    } catch (error) {
-      console.error(`Error creating invite notification: ${error.message}`);
-      throw new httpError("Failed to create invite notification", 500);
-    }
-  },
-
-  createPostRequestNotification: async () => {
-
-  },
-
 
   getNotificationsByUserId: async (
     userId,

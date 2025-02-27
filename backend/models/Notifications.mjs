@@ -56,10 +56,16 @@ const notificationSchema = new mongoose.Schema({
       "User",
       "Group",
       "Project",
+      "Section",
       "Message",
       "Achievement",
       "Invoice",
     ], // Loại thực thể liên quan
+  },
+  category: {
+    type: String,
+    enum: ["all", "system", "following", "groups"],
+    required: true,
   },
   isRead: {
     type: Boolean,

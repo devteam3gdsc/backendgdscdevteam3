@@ -274,7 +274,16 @@ const groupServices = {
                 await group.save();
 
                 newInvites.forEach(async (memberId) => {
-                    await NotificationServices.GroupInviteNotification(groupId, userId, memberId);
+                    //await NotificationServices.GroupInviteNotification(groupId, userId, memberId);
+                    await NotificationServices.sendNotification({
+                        receiveId: memberId,
+                        senderId: userId,
+                        entityId: groupId,
+                        entityType: "Group",
+                        notificationType: "group_invite",
+                        category: "groups",
+                        customMessage: "invited you to join group \"{entityName}\""
+                    });
                 });
             }
 
@@ -307,7 +316,7 @@ const groupServices = {
         }
     },
 
-    removeMember: async (groupId, removedUserId) => {
+    removeMember: async (groupId, removedUserId, userId) => {
         try {
             const group = await Group.findById(groupId);
             if(!group) {
@@ -316,6 +325,17 @@ const groupServices = {
             group.members = group.members.filter(m => !m.user.equals(removedUserId));
             group.totalMembers = group.totalMembers - 1;
             await group.save();
+
+            await NotificationServices.sendNotification({
+                receiveId: removedUserId,
+                senderId: userId,
+                entityId: groupId,
+                entityType: "Group",
+                notificationType: "group_remove",
+                category: "groups",
+                customMessage: "removed you from group \"{entityName}\""
+            });
+
             return group;
         } catch (error) {
             throw new Error(`Remove members service error: ${error}`, 500);
@@ -362,7 +382,7 @@ const groupServices = {
         }
     },
 
-    assignAdmin : async (groupId, assignAdminUserId) => {
+    assignAdmin : async (groupId, assignAdminUserId, userId) => {
         try {
             const group = await Group.findById(groupId);
             if (!group) throw new Error("Group not found");
@@ -372,13 +392,22 @@ const groupServices = {
 
             member.role = "admin";
             await group.save();
+            await NotificationServices.sendNotification({
+                receiveId: assignAdminUserId,
+                senderId: userId,
+                entityId: groupId,
+                entityType: "Group",
+                notificationType: "group_admin_add",
+                category: "groups",
+                customMessage: "added you to admin in group \"{entityName}\""
+            });
             return group;
         } catch (error) {
             throw new Error(`Assign admin group service error: ${error}`, 500);
         }
     },
 
-    removeAdmin : async (groupId, removeAdminUserId) => {
+    removeAdmin : async (groupId, removeAdminUserId, userId) => {
         try {
             const group = await Group.findById(groupId);
             if (!group) throw new Error("Group not found");
@@ -389,13 +418,22 @@ const groupServices = {
             }
             member.role = "member"
             await group.save();
+            await NotificationServices.sendNotification({
+                receiveId: removeAdminUserId,
+                senderId: userId,
+                entityId: groupId,
+                entityType: "Group",
+                notificationType: "group_admin_remove",
+                category: "groups",
+                customMessage: "removed you as an admin in group \"{entityName}\""
+            });
             return group;
         } catch (error) {
             throw new Error(`Remove admin group service error: ${error}`, 500);
         } 
     },
 
-    assignCreator : async (groupId, assignCreatorUserId) => {
+    assignCreator : async (groupId, assignCreatorUserId, userId) => {
         try {
             const group = await Group.findById(groupId);
             if (!group) throw new Error("Group not found");
@@ -405,6 +443,15 @@ const groupServices = {
 
             member.role = "creator";
             await group.save();
+            await NotificationServices.sendNotification({
+                receiveId: assignAdminUserId,
+                senderId: userId,
+                entityId: groupId,
+                entityType: "Group",
+                notificationType: "group_creator_add",
+                category: "groups",
+                customMessage: "added you to creator in group \"{entityName}\""
+            });
             return group;
         } catch (error) {
             throw new Error(`Assign creator group service error: ${error}`, 500);

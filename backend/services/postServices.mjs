@@ -239,6 +239,8 @@ const postServices = {
   confirmCreatePost: async (userId, { group, project, section }, postId, accept) => {
     try {
       const post = await Post.findById(postId);
+      let entityid;
+      let entityType;
       if (!post) {
         throw new Error("Post not found");
       }
@@ -259,14 +261,32 @@ const postServices = {
   
         // Giảm số lượng bài viết nếu bị từ chối
         if (group) {
+          entityid = group;
+          entityType = "Group";
           await updateDocument(Group, 1, [{ _id: group }], [{ $inc: { totalPosts: -1 } }]);
         } else if (project) {
+          entityid = project;
+          entityType = "Project";
           await updateDocument(Project, 1, [{ _id: project }], [{ $inc: { totalPosts: -1 } }]);
         } else if (section) {  // Sửa lỗi lặp
+          entityid = section;
+          entityType = "Section";
           await updateDocument(Section, 1, [{ _id: section }], [{ $inc: { totalPosts: -1 } }]);
         }
       }
-  
+      const postAuthor = post.author;
+      const message = accept === "approve" ? "approved" : "rejected";
+
+        await NotificationServices.sendNotification({
+            receiveId: postAuthor,
+            senderId: userId,
+            entityId: entityid,
+            entityType: entityType, 
+            notificationType: "confirm_post",
+            category: "groups", 
+            customMessage: `your post is ${message} in ${entityType.toLowerCase()} \"{entityName}\"`
+        });
+
       await post.save();
   
       return { message: accept === "approve" ? "approved" : "rejected" };

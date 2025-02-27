@@ -306,13 +306,22 @@ const projectServices = {
             });
 
             if(newInvites.length > 0) {
-                project.pendingInvites = [...(project.pendingInvites || []), ...newInvites];
-                await project.save();
+              project.pendingInvites = [...(project.pendingInvites || []), ...newInvites];
+              await project.save();
 
-                newInvites.forEach(async (memberId) => {
-                    await NotificationServices.ProjectInviteNotification(projectId, userId, memberId);
-                });
-            }
+              newInvites.forEach(async (memberId) => {
+                  //await NotificationServices.GroupInviteNotification(groupId, userId, memberId);
+                  await NotificationServices.sendNotification({
+                      receiveId: memberId,
+                      senderId: userId,
+                      entityId: projectId,
+                      entityType: "Project",
+                      notificationType: "project_invite",
+                      category: "groups",
+                      customMessage: "invited you to join project \"{entityName}\""
+                  });
+              });
+          }
 
             return { message: "Invites sent successfully", invited: newInvites };
         } catch (error) {
@@ -347,7 +356,7 @@ const projectServices = {
         }
     },
 
-    removeMember: async (projectId, removedUserId) => {
+    removeMember: async (projectId, removedUserId, userId) => {
         try {
             const project = await Project.findById(projectId);
             if(!project) {
@@ -356,6 +365,15 @@ const projectServices = {
             project.totalMembers = project.totalMembers - 1
             project.members = project.members.filter(m => !m.user.equals(removedUserId));
             await project.save();
+            await NotificationServices.sendNotification({
+              receiveId: removedUserId,
+              senderId: userId,
+              entityId: projectId,
+              entityType: "Project",
+              notificationType: "project_remove",
+              category: "groups",
+              customMessage: "removed you from project \"{entityName}\""
+          });
             return project;
         } catch (error) {
             throw new Error(`Remove members service error: ${error}`, 500);
@@ -408,7 +426,7 @@ const projectServices = {
         }
     },
 
-    assignAdmin : async (projectId, assignAdminUserId) => {
+    assignAdmin : async (projectId, assignAdminUserId, userId) => {
         try {
             const project = await Project.findById(projectId);
             if(!project) {
@@ -420,13 +438,22 @@ const projectServices = {
 
             member.role = "admin";
             await project.save();
+            await NotificationServices.sendNotification({
+              receiveId: assignAdminUserId,
+              senderId: userId,
+              entityId: projectId,
+              entityType: "Project",
+              notificationType: "project_admin_add",
+              category: "groups",
+              customMessage: "added you to admin in project \"{entityName}\""
+          });
             return project;
         } catch (error) {
             throw new Error(`Assign admin project service error: ${error}`, 500);
         }
     },
 
-    removeAdmin : async (projectId, removeAdminUserId) => {
+    removeAdmin : async (projectId, removeAdminUserId, userId) => {
         try {
             const project = await Project.findById(projectId);
             if(!project) {
@@ -439,6 +466,15 @@ const projectServices = {
             }
             member.role = "participant"
             await project.save();
+            await NotificationServices.sendNotification({
+              receiveId: removeAdminUserId,
+              senderId: userId,
+              entityId: projectId,
+              entityType: "Project",
+              notificationType: "project_admin_remove",
+              category: "groups",
+              customMessage: "removed you as an admin in project \"{entityName}\""
+          });
             return project;
         } catch (error) {
             throw new Error(`Remove admin project service error: ${error}`, 500);

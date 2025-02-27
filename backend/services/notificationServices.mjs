@@ -472,43 +472,56 @@ const NotificationServices = {
   //   }
   // },
 
-  sendNotification : async ({receiveId, senderId, entityId, entityType, notificationType, category, CusMessage}) => {
+  sendNotification : async ({receiveId, senderId, entityId, entityType, notificationType, category, customMessage}) => {
     try {
-      const senderUser = await User.findById(senderId);
-      if(!senderUser) throw new Error("SenderUser not found");
-      let entityModel;
-      if(entityType === "Group") entityModel = Group;
-      else if(entityType === "Project") entityModel = Project;
-      else if(entityType === "Section") entityModel = Section;
+        const senderUser = await User.findById(senderId);
+        if (!senderUser) throw new Error("SenderUser not found");
 
-      const entity = await entityModel?.findById(entityId);
-      if(!entity) throw new httpError(`${entityType} not found`, 404);
+        // Xác định model của entity
+        let entityModel;
+        switch (entityType) {
+            case "Group": entityModel = Group; break;
+            case "Project": entityModel = Project; break;
+            case "Section": entityModel = Section; break;
+            default: 
+                throw new Error(`Invalid entityType: ${entityType}`);
+        }
 
-      const notification = new Notification({
-        userId: receiveId,
-        senderId,
-        senderName: senderUser.displayname,
-        senderAvatar: senderUser.avatar,
-        type: notificationType,
-        message: customMessage.replace("{entityName}", entity.name),
-        relatedEntityId: entityId,
-        entityType,
-        category,
-    });
 
-    const savedNotification = await notification.save();
+        const entity = await entityModel.findById(entityId);
+        if (!entity) throw new Error(`${entityType} not found`);
 
-    // Gửi thông báo qua socket nếu người dùng đang online
-    const socketId = onlineUsers.get(receiveId);
-    if (socketId) io.to(socketId).emit("newNotification", savedNotification);
-  
-    return savedNotification;
+        const message = customMessage.replace("{entityName}", entity.name || "[Unknown]");
+        
+        const notification = new Notification({
+            userId: receiveId,
+            senderId,
+            senderName: senderUser.displayname,
+            senderAvatar: senderUser.avatar,
+            type: notificationType,
+            message: message,
+            relatedEntityId: entityId,
+            entityType,
+            category,
+        });
+
+
+
+        const savedNotification = await notification.save();
+        console.log("Saved Notification:", savedNotification);
+
+        // Gửi thông báo qua socket nếu người dùng online
+        const socketId = onlineUsers.get(receiveId);
+        if (socketId) io.to(socketId).emit("newNotification", savedNotification);
+
+        return savedNotification;
 
     } catch (error) {
-      console.error(`Error creating invite notification: ${error.message}`);
-      throw new httpError("Failed to create custom notification", 500);
+        console.error(`Error creating invite notification: ${error.message}`);
+        throw new httpError("Failed to create custom notification", 500);
     }
-  },
+},
+
 
   getNotificationsByUserId: async (
     userId,

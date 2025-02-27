@@ -253,12 +253,11 @@ const groupServices = {
             if(!group) {
                 throw new Error("Group not found");
             }
-
+            console.log(group)
             const validMembers = members.filter(m => mongoose.Types.ObjectId.isValid(m));
             if(validMembers.length === 0) {
                 throw new Error("No valid members to invite");
             }
-
             let newInvites = [];
             validMembers.forEach(memberId => {
                 const isMember = group.members.some(m => m.user.equals(memberId));
@@ -268,7 +267,6 @@ const groupServices = {
                     newInvites.push(memberId);
                 }
             });
-
             if(newInvites.length > 0) {
                 group.pendingInvites = [...(group.pendingInvites || []), ...newInvites];
                 await group.save();

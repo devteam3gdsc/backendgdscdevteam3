@@ -417,7 +417,9 @@ const groupController = {
 
   inviteMembers : async (req, res) => {
     try {
+      console.log(1)
       const group = await groupServices.inviteMembers(req.params.groupId, req.user.id, req.body.members);//{ "members": ["userId1", "userId2", "userId3"]
+      console.log(group)
       res.status(200).json({ message:"Invite new member successfully"});
     } catch (error) {
       if (error instanceof httpError)

@@ -123,11 +123,6 @@ addParticipant: async (req, res) => {
             });
         });
 
-        return res.status(200).json("Participant added!");
-      const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
-      const usersId = req.body.usersId;
-      const Ids = usersId.map((id)=>{return new mongoose.Types.ObjectId(`${id}`)})
-      await sectionServices.addParticipant(Ids,sectionId);
       return res.status(200).json("participant added!");
     } catch (error) {
         if (error instanceof httpError)

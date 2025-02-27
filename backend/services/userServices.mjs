@@ -3,7 +3,7 @@ import findDocument from "../utils/findDocument.mjs";
 import Post from "../models/Posts.mjs";
 import Comments from "../models/Comments.mjs";
 import authServices from "./authServices.mjs";
-import { v2 } from "cloudinary";
+import getRandomAvatar from "../utils/avatarHelper.mjs";
 import { httpError, httpResponse } from "../utils/httpResponse.mjs";
 import updateDocument from "../utils/updateDocument.mjs";
 import { fileDestroy } from "../utils/filesHelper.mjs";
@@ -88,6 +88,7 @@ const userServices = {
           email: email,
           password: hashed,
           displayname: username,
+          avatar:getRandomAvatar()
         });
         return new httpResponse("Sign up successfully", 200);
       }

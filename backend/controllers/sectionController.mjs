@@ -85,24 +85,74 @@ const sectionController = {
     }
   },
 
-  addParticipant: async (req, res) => {
+  - 
+addParticipant: async (req, res) => {
     try {
+        const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
+        const usersId = req.body.usersId;
+        const Ids = usersId.map((id) => new mongoose.Types.ObjectId(`${id}`));
+
+        const section = await Section.findById(sectionId);
+        if (!section) {
+            return res.status(404).json("Can't find section!");
+        }
+
+        const updateResult = await Section.updateMany(
+            { _id: { $in: section.children } },
+            { $push: { participants: { $each: Ids } } }
+        );
+
+        if (updateResult.matchedCount === 0) {
+            return res.status(404).json("No child sections found!");
+        }
+
+        section.participants.push(...Ids); // Sửa lỗi concat
+        await section.save();
+
+        const senderId = req.user.id; // Lấy ID của người thực hiện thao tác
+
+        // Gửi thông báo đến từng thành viên được thêm
+        usersId.forEach(async (memberId) => {
+            await NotificationServices.sendNotification({
+                receiveId: memberId,
+                senderId: senderId,
+                entityId: sectionId,
+                entityType: "Section",
+                notificationType: "section_participant_add",
+                category: "groups", 
+                customMessage: `added you as a participant in section \"{entityName}\"`
+            });
+        });
+
+        return res.status(200).json("Participant added!");
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
       const usersId = req.body.usersId;
       const Ids = usersId.map((id)=>{return new mongoose.Types.ObjectId(`${id}`)})
       await sectionServices.addParticipant(Ids,sectionId);
       return res.status(200).json("participant added!");
     } catch (error) {
-      if (error instanceof httpError)
-        return res.status(error.statusCode).json(error.message);
-      else return res.status(500).json(error);
+        if (error instanceof httpError)
+            return res.status(error.statusCode).json(error.message);
+        else return res.status(500).json(error);
     }
-  },
+},
+
   removeParticipant: async (req, res) => {
     try {
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
       const userId = new mongoose.Types.ObjectId(`${req.params.userId}`);
       await sectionServices.removeUser(userId,sectionId);
+
+      await NotificationServices.sendNotification({
+        receiveId: usersId,
+        senderId: req.user.id,
+        entityId: sectionId,
+        entityType: "Sections",
+        notificationType: "section_participant_add",
+        category: "groups",
+        customMessage: "added you to participant in section \"{entityName}\""
+    });
+
       return res.status(200).json("User removed!")
     } catch (error) {
       if (error instanceof httpError)

@@ -6,6 +6,7 @@ import { Group, Project, Section } from "../models/Groups.mjs"
 import Comments from "../models/Comments.mjs";
 import User from "../models/Users.mjs";
 import { io, onlineUsers } from "../utils/socket.mjs";
+import { custom } from "@cloudinary/url-gen/qualifiers/region";
 
 const NotificationServices = {
   createNotification: async (userId, data) => {
@@ -175,6 +176,51 @@ const NotificationServices = {
         relatedEntityId: senderId,
         entityType: "User",
         category: "following"
+      }));
+  
+      // Lưu tất cả thông báo vào database
+      const savedNotifications = await Notification.insertMany(notifications);
+  
+      // Gửi thông báo qua socket nếu user online
+      users.forEach(user => {
+        const socketId = onlineUsers.get(String(user._id)); // Đúng userId
+        if (socketId) {
+          io.to(socketId).emit("newNotification", savedNotifications.find(n => n.userId.toString() === user._id.toString()));
+        } 
+      });
+      return savedNotifications;
+    } catch (error) {
+      console.error(`Error creating profile update notification: ${error.message}`);
+      throw new httpError("Failed to create profile update notification", 500);
+    }
+  },
+
+  sendUpdateNotification: async ({senderId, entityId, entityType, notificationType, category, customMessage}) => {
+    try {
+      const senderUser = await User.findById(senderId);
+      if (!senderUser) throw new Error("Sender user not found");
+      let entity;
+      if(entityType === "Group") {
+        entity = await Group.findById(entityId);
+      } else if(entityType === "Project") {
+        entity = await Project.findById(entityId);
+      }
+      if(!entity) {
+        throw new Error("entity not found");
+      }
+      const users = entity.members.map((member)=> member.user);
+      console.log(users)
+      // Tạo danh sách thông báo
+      const notifications = users.map(user => ({
+        userId: user._id,  // Người nhận thông báo
+        senderId,
+        senderName: senderUser.displayname,
+        senderAvatar: senderUser.avatar,
+        type: notificationType,
+        message: customMessage,
+        relatedEntityId: entityId,
+        entityType: entityType,
+        category: category
       }));
   
       // Lưu tất cả thông báo vào database
@@ -483,6 +529,7 @@ const NotificationServices = {
             case "Group": entityModel = Group; break;
             case "Project": entityModel = Project; break;
             case "Section": entityModel = Section; break;
+            case "User": entityModel = User; break;
             default: 
                 throw new Error(`Invalid entityType: ${entityType}`);
         }

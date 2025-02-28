@@ -155,7 +155,7 @@ const projectServices = {
         }
     },
 
-    updateProject : async (projectId, updateData) => {
+    updateProject : async (projectId, updateData, userId) => {
         try { 
             const updatedProject = await Project.findByIdAndUpdate(
                 projectId, 
@@ -167,12 +167,21 @@ const projectServices = {
                 throw new Error("Project not found.");
             }
 
+            await NotificationServices.sendUpdateNotification({
+              senderId: userId,
+              entityId: projectId,
+              entityType: "Project",
+              notificationType: "project_update_profile",
+              category: "groups",
+              customMessage: "updated project \"{entityName}\""
+            });
+
             return updatedProject;
         } catch (error) {
             throw new Error(`Updating project service error: ${error}`, 500);
         }
     },
-    updateProjectFull: async (projectId, avatarFile, ...updateData) => {
+    updateProjectFull: async (userId ,projectId, avatarFile, ...updateData) => {
       try {
           const project = await Project.findById(projectId);
           if (!project) {
@@ -203,7 +212,16 @@ const projectServices = {
           // Kiểm tra lại sau khi cập nhật
           const checkProject = await Project.findById(projectId);
           console.log("Updated project:", checkProject);
-  
+
+          await NotificationServices.sendUpdateNotification({
+            senderId: userId,
+            entityId: projectId,
+            entityType: "Project",
+            notificationType: "project_update_profile",
+            category: "groups",
+            customMessage: "updated project \"{entityName}\""
+          });
+          
           return new httpResponse("updated successfully", 200);
       } catch (error) {
           console.error("Updating group service error:", error);
@@ -211,7 +229,7 @@ const projectServices = {
       }
   },
 
-    deleteProject: async (projectId) => {
+    deleteProject: async (projectId, userId) => {
         try {
             const project = await Project.findById(projectId);
             
@@ -219,6 +237,14 @@ const projectServices = {
                 throw new Error("Project not found.");
             }
     
+            await NotificationServices.sendUpdateNotification({
+              senderId: userId,
+              entityId: projectId,
+              entityType: "Project",
+              notificationType: "project_delete",
+              category: "groups",
+              customMessage: "deleted project \"{entityName}\""
+            });
             await Section.deleteMany({ project: projectId });
             await Project.findByIdAndDelete(projectId);
 

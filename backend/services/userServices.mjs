@@ -9,6 +9,7 @@ import updateDocument from "../utils/updateDocument.mjs";
 import { fileDestroy } from "../utils/filesHelper.mjs";
 import { Group, Project } from "../models/Groups.mjs";
 import mongoose from "mongoose";
+import NotificationServices from "./notificationServices.mjs";
 const userServices = {
   updateUserPassword: async (userId, oldPassword, newPassword) => {
     try {
@@ -16,6 +17,17 @@ const userServices = {
       if (await authServices.passwordCheck(oldPassword, user.password)) {
         const hashed = await authServices.createHashedPassword(newPassword);
         await user.updateOne({ $set: { password: hashed } });
+
+        await NotificationServices.sendNotification({
+          receiveId: userId,
+          senderId: userId,
+          entityId: userId,
+          entityType: "User",
+          notificationType: "user_update_password",
+          category: "system",
+          customMessage: "updated password \"{entityName}\""
+        });
+
         return new httpResponse("updated success", 200);
       } else throw new httpError("Incorrect password", 400);
     } catch (error) {
@@ -65,6 +77,16 @@ const userServices = {
         { $set: { authorname: displayname, avatar: avatarURL } },
       );
       
+      await NotificationServices.sendNotification({
+        receiveId: userId,
+        senderId: userId,
+        entityId: userId,
+        entityType: "User",
+        notificationType: "user_update_profile",
+        category: "system",
+        customMessage: "updated profile \"{entityName}\""
+      });
+
       return new httpResponse("updated successfully", 200);
     } catch (error) {
       if (error instanceof httpError) throw error;

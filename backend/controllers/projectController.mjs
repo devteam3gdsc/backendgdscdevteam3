@@ -382,7 +382,7 @@ const projectController = {
     },
     updateProject : async (req, res) => {
         try {
-            const updatedProject = await projectServices.updateProject(req.params.projectId, req.body);
+            const updatedProject = await projectServices.updateProject(req.params.projectId, req.body, req.user.id);
             console.log(updatedProject)
             res.status(200).json(updatedProject);
         } catch (error) {
@@ -395,6 +395,7 @@ const projectController = {
       try {
         const projectId = req.params.projectId;
         const result = await projectServices.updateProjectFull(
+          req.user.id,
           projectId,
           req.file,
           req.body,
@@ -409,7 +410,7 @@ const projectController = {
 
     deleteProject : async (req, res) => {
         try {
-            const result = await projectServices.deleteProject(req.params.projectId);
+            const result = await projectServices.deleteProject(req.params.projectId, req.user.id);
             res.status(200).json({message: "Deleting project successfully"});
         } catch (error) {
             if (error instanceof httpError)

@@ -51,6 +51,7 @@ const groupController = {
       await groupServices.updateGroup(
         req.params.groupId,
         req.body,
+        req.user.id,
       );
       return res.status(200).json("updated success");
 
@@ -137,6 +138,7 @@ const groupController = {
     try {
       const groupId = req.params.groupId;
       const result = await groupServices.updateGroupFull(
+        req.user.id,
         groupId,
         req.file,
         req.body,
@@ -252,7 +254,7 @@ const groupController = {
 
   deleteGroup: async (req, res) => {
     try {
-      const result = await groupServices.deleteGroup(req.params.groupId);
+      const result = await groupServices.deleteGroup(req.params.groupId, req.user.id);
       res.status(200).json(result);
     } catch (error) {
       if (error instanceof httpError)

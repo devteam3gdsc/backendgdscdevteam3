@@ -127,7 +127,7 @@ const groupServices = {
     }
   },
 
-    updateGroup: async (groupId, updateData) => {
+    updateGroup: async (groupId, updateData, userId) => {
         try {
             const Id = new mongoose.Types.ObjectId(`${groupId}`)
             const updatedGroup = await Group.updateOne({_id:Id},{$set:updateData})
@@ -135,12 +135,21 @@ const groupServices = {
             if (updatedGroup.matchedCount === 0) {
                 throw new Error("Group not found.");
             }
-    
+            
+            await NotificationServices.sendUpdateNotification({
+                senderId: userId,
+                entityId: groupId,
+                entityType: "Group",
+                notificationType: "group_update_profile",
+                category: "groups",
+                customMessage: "updated profile group \"{entityName}\""
+            });
+
         } catch (error) {
             throw new Error(`Updating group service error: ${error}`);
         }
     },
-    updateGroupFull: async (groupId, avatarFile, ...updateData) => {
+    updateGroupFull: async (userId,groupId, avatarFile, ...updateData) => {
         try {
             // Tìm nhóm trong database
             const group = await Group.findById(groupId);
@@ -169,7 +178,16 @@ const groupServices = {
             // Kiểm tra lại dữ liệu sau khi cập nhật
             const updatedGroup = await Group.findById(groupId);
             console.log("Updated group:", updatedGroup);
-    
+            
+            await NotificationServices.sendUpdateNotification({
+                senderId: userId,
+                entityId: groupId,
+                entityType: "Group",
+                notificationType: "group_update_profile",
+                category: "groups",
+                customMessage: "updated profile group \"{entityName}\""
+            });
+
             return new httpResponse("Updated successfully", 200);
         } catch (error) {
             console.error("Updating group service error:", error);
@@ -177,7 +195,7 @@ const groupServices = {
         }
     },
 
-    deleteGroup: async (groupId) => {
+    deleteGroup: async (groupId, userId) => {
         try {
             console.log(groupId)
             const group = await Group.findById(groupId);
@@ -186,6 +204,15 @@ const groupServices = {
                 throw new Error("Group not found.");
             }
     
+            await NotificationServices.sendUpdateNotification({
+                senderId: userId,
+                entityId: groupId,
+                entityType: "Group",
+                notificationType: "group_delete",
+                category: "groups",
+                customMessage: "deleted group \"{entityName}\""
+            });
+
             await Group.findByIdAndDelete(groupId);
             return { message: "Group deleted successfully" };
         } catch (error) {

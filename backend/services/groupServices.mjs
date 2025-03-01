@@ -240,7 +240,7 @@ const groupServices = {
             const members = groupData.members || [];
             const userRole = members.find(m => m.user.toString() === userId.toString())?.role || "guest";
             const isJoined = members.some(m => m.user.toString() === userId.toString());
-            const canJoin = groupData.private ? isJoined : true; 
+            const canJoin = groupData.private ? isJoined : false; 
             const numberOfProjects = await Project.countDocuments({ group: groupId });
             // const posts = await Post.find({group:groupId})
             // console.log(posts)

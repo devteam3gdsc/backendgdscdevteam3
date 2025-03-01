@@ -75,6 +75,7 @@ const NotificationServices = {
         relatedEntityId: postId,
         entityType: "Post",
         category: "following",
+        extraData: post.title,
       });
 
       const savedNotification = await notification.save();
@@ -141,6 +142,7 @@ const NotificationServices = {
         message: `commented on your post.`,
         relatedEntityId: commentId,
         entityType: "Comments",
+        extraData: comment.code,
       });
 
       const savedNotification = await notification.save();
@@ -175,7 +177,8 @@ const NotificationServices = {
         message: `updated profile.`,
         relatedEntityId: senderId,
         entityType: "User",
-        category: "following"
+        category: "following",
+        extraData: user.displayname,
       }));
   
       // Lưu tất cả thông báo vào database
@@ -208,6 +211,8 @@ const NotificationServices = {
       if(!entity) {
         throw new Error("entity not found");
       }
+
+      //const message = customMessage.replace("{entityName}", entity.name || "[Unknown]");
       const users = entity.members.map((member)=> member.user);
       console.log(users)
       // Tạo danh sách thông báo
@@ -220,7 +225,8 @@ const NotificationServices = {
         message: customMessage,
         relatedEntityId: entityId,
         entityType: entityType,
-        category: category
+        category: category,
+        extraData: entity.name,
       }));
   
       // Lưu tất cả thông báo vào database
@@ -538,7 +544,7 @@ const NotificationServices = {
         const entity = await entityModel.findById(entityId);
         if (!entity) throw new Error(`${entityType} not found`);
 
-        const message = customMessage.replace("{entityName}", entity.name || "[Unknown]");
+        //const message = customMessage.replace("{entityName}", entity.name || "[Unknown]");
         
         const notification = new Notification({
             userId: receiveId,
@@ -546,10 +552,11 @@ const NotificationServices = {
             senderName: senderUser.displayname,
             senderAvatar: senderUser.avatar,
             type: notificationType,
-            message: message,
+            message: customMessage,
             relatedEntityId: entityId,
             entityType,
             category,
+            extraData: entity.name,
         });
 
 

@@ -173,7 +173,7 @@ const projectServices = {
               entityType: "Project",
               notificationType: "project_update_profile",
               category: "groups",
-              customMessage: "updated project \"{entityName}\""
+              customMessage: "updated project "
             });
 
             return updatedProject;
@@ -219,7 +219,7 @@ const projectServices = {
             entityType: "Project",
             notificationType: "project_update_profile",
             category: "groups",
-            customMessage: "updated project \"{entityName}\""
+            customMessage: "updated project"
           });
           
           return new httpResponse("updated successfully", 200);
@@ -243,7 +243,7 @@ const projectServices = {
               entityType: "Project",
               notificationType: "project_delete",
               category: "groups",
-              customMessage: "deleted project \"{entityName}\""
+              customMessage: "deleted project "
             });
             await Section.deleteMany({ project: projectId });
             await Project.findByIdAndDelete(projectId);
@@ -344,7 +344,7 @@ const projectServices = {
                       entityType: "Project",
                       notificationType: "project_invite",
                       category: "groups",
-                      customMessage: "invited you to join project \"{entityName}\""
+                      customMessage: "invited you to join project"
                   });
               });
           }
@@ -398,7 +398,7 @@ const projectServices = {
               entityType: "Project",
               notificationType: "project_remove",
               category: "groups",
-              customMessage: "removed you from project \"{entityName}\""
+              customMessage: "removed you from project "
           });
             return project;
         } catch (error) {
@@ -471,7 +471,7 @@ const projectServices = {
               entityType: "Project",
               notificationType: "project_admin_add",
               category: "groups",
-              customMessage: "added you to admin in project \"{entityName}\""
+              customMessage: "added you to admin in project "
           });
             return project;
         } catch (error) {
@@ -499,7 +499,7 @@ const projectServices = {
               entityType: "Project",
               notificationType: "project_admin_remove",
               category: "groups",
-              customMessage: "removed you as an admin in project \"{entityName}\""
+              customMessage: "removed you as an admin in project "
           });
             return project;
         } catch (error) {

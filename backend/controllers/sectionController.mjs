@@ -120,7 +120,7 @@ addParticipant: async (req, res) => {
                 entityType: "Section",
                 notificationType: "section_participant_add",
                 category: "groups", 
-                customMessage: `added you as a participant in section \"{entityName}\"`
+                customMessage: `added you as a participant in section`
             });
         });
 
@@ -145,7 +145,7 @@ addParticipant: async (req, res) => {
         entityType: "Sections",
         notificationType: "section_participant_add",
         category: "groups",
-        customMessage: "added you to participant in section \"{entityName}\""
+        customMessage: "added you to participant in section"
     });
 
       return res.status(200).json("User removed!")

@@ -25,7 +25,7 @@ const userServices = {
           entityType: "User",
           notificationType: "user_update_password",
           category: "system",
-          customMessage: "updated password \"{entityName}\""
+          customMessage: "updated password "
         });
 
         return new httpResponse("updated success", 200);
@@ -84,9 +84,13 @@ const userServices = {
         entityType: "User",
         notificationType: "user_update_profile",
         category: "system",
-        customMessage: "updated profile \"{entityName}\""
+        customMessage: "updated profile "
       });
 
+      await NotificationServices.createUpdateUserFollowingNotification({
+        senderId: userId,
+      });
+      
       return new httpResponse("updated successfully", 200);
     } catch (error) {
       if (error instanceof httpError) throw error;

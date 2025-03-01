@@ -142,7 +142,7 @@ const groupServices = {
                 entityType: "Group",
                 notificationType: "group_update_profile",
                 category: "groups",
-                customMessage: "updated profile group \"{entityName}\""
+                customMessage: "updated profile group"
             });
 
         } catch (error) {
@@ -185,7 +185,7 @@ const groupServices = {
                 entityType: "Group",
                 notificationType: "group_update_profile",
                 category: "groups",
-                customMessage: "updated profile group \"{entityName}\""
+                customMessage: "updated profile group"
             });
 
             return new httpResponse("Updated successfully", 200);
@@ -210,7 +210,7 @@ const groupServices = {
                 entityType: "Group",
                 notificationType: "group_delete",
                 category: "groups",
-                customMessage: "deleted group \"{entityName}\""
+                customMessage: "deleted group"
             });
 
             await Group.findByIdAndDelete(groupId);
@@ -307,7 +307,7 @@ const groupServices = {
                         entityType: "Group",
                         notificationType: "group_invite",
                         category: "groups",
-                        customMessage: "invited you to join group \"{entityName}\""
+                        customMessage: "invited you to join group"
                     });
                 });
             }
@@ -358,7 +358,7 @@ const groupServices = {
                 entityType: "Group",
                 notificationType: "group_remove",
                 category: "groups",
-                customMessage: "removed you from group \"{entityName}\""
+                customMessage: "removed you from group"
             });
 
             return group;
@@ -424,7 +424,7 @@ const groupServices = {
                 entityType: "Group",
                 notificationType: "group_admin_add",
                 category: "groups",
-                customMessage: "added you to admin in group \"{entityName}\""
+                customMessage: "added you to admin in group"
             });
             return group;
         } catch (error) {
@@ -450,7 +450,7 @@ const groupServices = {
                 entityType: "Group",
                 notificationType: "group_admin_remove",
                 category: "groups",
-                customMessage: "removed you as an admin in group \"{entityName}\""
+                customMessage: "removed you as an admin in group "
             });
             return group;
         } catch (error) {
@@ -475,7 +475,7 @@ const groupServices = {
                 entityType: "Group",
                 notificationType: "group_creator_add",
                 category: "groups",
-                customMessage: "added you to creator in group \"{entityName}\""
+                customMessage: "added you to creator in group "
             });
             return group;
         } catch (error) {

@@ -123,8 +123,8 @@ addParticipant: async (req, res) => {
                 customMessage: `added you as a participant in section`
             });
         });
-
-      return res.status(200).json("participant added!");
+        const projectId = section.project
+      return res.status(200).json({message:"participant added!",projectId});
     } catch (error) {
         if (error instanceof httpError)
             return res.status(error.statusCode).json(error.message);
@@ -137,18 +137,21 @@ addParticipant: async (req, res) => {
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
       const userId = new mongoose.Types.ObjectId(`${req.params.userId}`);
       await sectionServices.removeUser(userId,sectionId);
-
+      const section = await Section.findById(sectionId);
+      if (!section) {
+          return res.status(404).json("Can't find section!");
+      }
       await NotificationServices.sendNotification({
         receiveId: usersId,
         senderId: req.user.id,
         entityId: sectionId,
-        entityType: "Sections",
+        entityType: "Section",
         notificationType: "section_participant_add",
         category: "groups",
         customMessage: "added you to participant in section"
     });
-
-      return res.status(200).json("User removed!")
+    const projectId = section.project
+    return res.status(200).json({message:"User removed!",projectId});
     } catch (error) {
       if (error instanceof httpError)
         return res.status(error.statusCode).json(error.message);

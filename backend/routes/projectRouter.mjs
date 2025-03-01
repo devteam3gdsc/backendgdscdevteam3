@@ -59,9 +59,9 @@ projectRouter.post(
   sectionController.addParticipant,
 );
 projectRouter.get(
-  "/section/:sectionId/removeParticipant/:userId",
+  "/section/:sectionId/all",
   authMiddleware.verifyToken,
-  sectionController.removeParticipant,
+  sectionController.removeUsersInAllSections,
 );
 projectRouter.get(
   "/section/:sectionId/getUsers",
@@ -144,5 +144,9 @@ projectRouter.post(
     roleMiddleware("project",["admin", "leader"]),
     projectController.removeAdmin,
   );
+projectRouter.get("/publicData/:projectId",authMiddleware.verifyToken,projectController.getPublicProjectData);
+projectRouter.get("/section/findAncestor/:sectionId",authMiddleware.verifyToken,sectionController.findAncestor);
+projectRouter.get("/section/removeUsersInOneSection/:sectionId",authMiddleware.verifyToken,sectionController.removeUsersInOneSection);
+projectRouter.get("/section/removeUsersInAllSection/:sectionId",authMiddleware.verifyToken,sectionController.removeUsersInOneSection);
 export default projectRouter;
 

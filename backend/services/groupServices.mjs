@@ -7,13 +7,14 @@ import mongoose from "mongoose"
 import NotificationServices from "./notificationServices.mjs";
 import { httpResponse } from "../utils/httpResponse.mjs";
 import sectionServices from "./sectionServices.mjs";
+import getRandomAvatar from "../utils/avatarHelper.mjs";
 const groupServices = {
     //-----------GROUP-----------------
     createGroup: async (data, creatorId, avatarFile) => {
         try {
             const avatarURL = avatarFile 
                 ? avatarFile.path 
-                : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541";
+                : getRandomAvatar("group");
             const userAvatar = (await User.findById(creatorId,{avatar:1})).avatar
             const newGroup = new Group({
                 ...data,

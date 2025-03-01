@@ -86,6 +86,7 @@ const sectionController = {
   },
 
   addParticipant: async (req, res) => {
+    //con bug 
     try {
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
       const usersId = req.body.usersId;
@@ -98,11 +99,23 @@ const sectionController = {
       else return res.status(500).json(error);
     }
   },
-  removeParticipant: async (req, res) => {
+  removeUsersInAllSections: async (req, res) => {
+    try {
+      const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
+      const usersId = req.body.userIds.map((id)=> new mongoose.Types.ObjectId(`${id}`));
+      await sectionServices.removeUserInAllSections(usersId,sectionId);
+      return res.status(200).json("User removed!")
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  },
+  removeUsersInOneSection: async (req, res) => {
     try {
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
       const userId = new mongoose.Types.ObjectId(`${req.params.userId}`);
-      await sectionServices.removeUser(userId,sectionId);
+      await sectionServices.removeUsersInOneSection(userId,sectionId);
       return res.status(200).json("User removed!")
     } catch (error) {
       if (error instanceof httpError)
@@ -115,7 +128,6 @@ const sectionController = {
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
       const section = await Section.findById(sectionId);
-   
       const sectionParticipants = section.participants || []
       if (!section) {
         return res.status(404).json("Invalid section Id!");
@@ -363,6 +375,17 @@ const sectionController = {
         totalPosts: result.totalPosts,
         hasMore,
       });
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  },
+  findAncestor: async (req,res)=>{
+    try {
+      const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`)
+      const result = await sectionServices.findAncestor([],sectionId);
+      return res.status(200).json(result);
     } catch (error) {
       if (error instanceof httpError)
         return res.status(error.statusCode).json(error.message);

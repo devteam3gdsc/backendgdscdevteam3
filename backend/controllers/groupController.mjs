@@ -504,6 +504,20 @@ const groupController = {
       else return res.status(500).json(error);
     }
   },
+  getPublicGroupData: async (req,res) => {
+    try {
+      const groupId = new mongoose.Types.ObjectId(`${req.params.groupId}`);
+      const Data = await Group.findOne({_id:groupId},{name:1,avatar:1});
+      if (!Data){
+        return res.status(404).json("cant find group")
+      }
+      return res.status(200).json(Data)
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  }
 
 
 };

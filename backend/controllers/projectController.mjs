@@ -511,6 +511,20 @@ const projectController = {
           else return res.status(500).json(error);
         }
       },
+      getPublicProjectData: async (req,res) => {
+          try {
+            const projectId = new mongoose.Types.ObjectId(`${req.params.projectId}`);
+            const Data = await Project.findOne({_id:projectId},{name:1,avatar:1});
+            if (!Data){
+              return res.status(404).json("cant find project")
+            }
+            return res.status(200).json(Data)
+          } catch (error) {
+            if (error instanceof httpError)
+              return res.status(error.statusCode).json(error.message);
+            else return res.status(500).json(error);
+          }
+      }
 
 };
 

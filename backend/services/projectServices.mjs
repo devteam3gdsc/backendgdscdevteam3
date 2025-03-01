@@ -3,6 +3,7 @@ import User from "../models/Users.mjs";
 import mongoose from "mongoose"
 import NotificationServices from "./notificationServices.mjs";
 import { httpError, httpResponse } from "../utils/httpResponse.mjs";
+import getRandomAvatar from "../utils/avatarHelper.mjs";
 
 
 const projectServices = {
@@ -140,7 +141,7 @@ const projectServices = {
             if(!group) {
                 throw new httpError("Group not found",404);
             }
-            const avatarURL = avatarFile?avatarFile.path:"https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541";
+            const avatarURL = avatarFile?avatarFile.path:getRandomAvatar("project");
             const userAvatar = (await User.findById(userId,{avatar:1})).avatar
             const newProject = await Project.create({
                 ...data,

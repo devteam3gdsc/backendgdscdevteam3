@@ -18,15 +18,15 @@ const userServices = {
         const hashed = await authServices.createHashedPassword(newPassword);
         await user.updateOne({ $set: { password: hashed } });
 
-        await NotificationServices.sendNotification({
-          receiveId: userId,
-          senderId: userId,
-          entityId: userId,
-          entityType: "User",
-          notificationType: "user_update_password",
-          category: "system",
-          customMessage: "updated password "
-        });
+        // await NotificationServices.sendNotification({
+        //   receiveId: userId,
+        //   senderId: userId,
+        //   entityId: userId,
+        //   entityType: "User",
+        //   notificationType: "user_update_password",
+        //   category: "system",
+        //   customMessage: "updated password "
+        // });
 
         return new httpResponse("updated success", 200);
       } else throw new httpError("Incorrect password", 400);
@@ -77,15 +77,15 @@ const userServices = {
         { $set: { authorname: displayname, avatar: avatarURL } },
       );
       
-      await NotificationServices.sendNotification({
-        receiveId: userId,
-        senderId: userId,
-        entityId: userId,
-        entityType: "User",
-        notificationType: "user_update_profile",
-        category: "system",
-        customMessage: "updated profile "
-      });
+      // await NotificationServices.sendNotification({
+      //   receiveId: userId,
+      //   senderId: userId,
+      //   entityId: userId,
+      //   entityType: "User",
+      //   notificationType: "user_update_profile",
+      //   category: "system",
+      //   customMessage: "updated profile "
+      // });
 
       await NotificationServices.createUpdateUserFollowingNotification({
         senderId: userId,

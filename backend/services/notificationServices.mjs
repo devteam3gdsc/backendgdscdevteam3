@@ -577,11 +577,64 @@ const NotificationServices = {
 },
 
 
+  // getNotificationsByUserId: async (
+  //   userId,
+  //   skip = 0,
+  //   limit = 10,
+  //   filter = "all",
+  // ) => {
+  //   try {
+  //     if (!mongoose.Types.ObjectId.isValid(userId)) {
+  //       throw new Error("Invalid userId");
+  //     }
+
+  //     const matchStage = { userId: new mongoose.Types.ObjectId(userId) };
+  //     if (filter === "read") {
+  //       matchStage.isRead = true;
+  //     } else if (filter === "unread") {
+  //       matchStage.isRead = false;
+  //     }
+
+  //     const Data = await Notification.aggregate([
+  //       { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+  //       { $sort: { createdAt: -1 } },
+  //       {
+  //         $facet: {
+  //           notifications: [
+  //             { $match: matchStage },
+  //             { $skip: skip },
+  //             { $limit: limit },
+  //           ],
+  //           totalNotifications: [{ $count: "count" }],
+  //           totalUnreadNotifications: [
+  //             { $match: { isRead: false } },
+  //             { $count: "count" },
+  //           ],
+  //           totalReadNotifications: [
+  //             { $match: { isRead: true } },
+  //             { $count: "count" },
+  //           ],
+  //         },
+  //       },
+  //     ]);
+
+  //     return {
+  //       notifications: Data[0].notifications,
+  //       totalNotifications: Data[0].totalNotifications[0]?.count || 0,
+  //       totalUnreadNotifications:
+  //         Data[0].totalUnreadNotifications[0]?.count || 0,
+  //       totalReadNotifications: Data[0].totalReadNotifications[0]?.count || 0,
+  //     };
+  //   } catch (error) {
+  //     throw new Error(`getNotifications service error: ${error.message}`);
+  //   }
+  // },
   getNotificationsByUserId: async (
     userId,
     skip = 0,
     limit = 10,
-    filter = "all",
+    filter = "all", // all | unread
+    category = "all" // all | groups | system | following
   ) => {
     try {
       if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -589,6 +642,13 @@ const NotificationServices = {
       }
 
       const matchStage = { userId: new mongoose.Types.ObjectId(userId) };
+
+      // Thêm bộ lọc category
+      if (category !== "all") {
+        matchStage.category = category;
+      }
+
+      // Thêm bộ lọc đọc/chưa đọc
       if (filter === "read") {
         matchStage.isRead = true;
       } else if (filter === "unread") {
@@ -605,13 +665,13 @@ const NotificationServices = {
               { $skip: skip },
               { $limit: limit },
             ],
-            totalNotifications: [{ $count: "count" }],
+            totalNotifications: [{ $match: { category: category !== "all" ? category : { $exists: true } } }, { $count: "count" }],
             totalUnreadNotifications: [
-              { $match: { isRead: false } },
+              { $match: { isRead: false, category: category !== "all" ? category : { $exists: true } } },
               { $count: "count" },
             ],
             totalReadNotifications: [
-              { $match: { isRead: true } },
+              { $match: { isRead: true, category: category !== "all" ? category : { $exists: true } } },
               { $count: "count" },
             ],
           },
@@ -629,6 +689,7 @@ const NotificationServices = {
       throw new Error(`getNotifications service error: ${error.message}`);
     }
   },
+
 
   getNotificationById: async (notificationId) => {
     try {

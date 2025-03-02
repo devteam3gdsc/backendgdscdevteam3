@@ -252,7 +252,7 @@ const projectServices = {
           const members = projectData.members || [];
   
           const isJoined = members.some(m => m.user.toString() === userId.toString());
-          const canJoin = projectData.private ? isJoined : true;
+          const canJoin = projectData.private;
           
           const sortedMembers = members.sort((a, b) => {
               return b.following?.includes(userId) - a.following?.includes(userId);

@@ -264,7 +264,7 @@ const projectServices = {
               .select("_id name parent participants")
               .lean();
   
-          const sectionTree = buildSectionTree(sections, null);
+          const sectionTree = buildSectionTree(sections, null,userId);
           const userRole = members.find(m => m.user.toString() === userId.toString())?.role || "guest";
           return {
               name: projectData.name,
@@ -448,13 +448,14 @@ const projectServices = {
 };
 
 
-const buildSectionTree = (sections, parentId) => {
+const buildSectionTree = (sections, parentId,userId) => {
     return sections
         .filter((section) => (parentId ? section.parent?.toString() === parentId.toString() : !section.parent))
         .map((section) => ({
             _id: section._id,
             name: section.name,
             participants: section.participants,
+            isJoined: section.participants.some((par)=>par === userId),
             children: buildSectionTree(sections, section._id),
         }));
 };

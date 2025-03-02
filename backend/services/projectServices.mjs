@@ -455,7 +455,7 @@ const buildSectionTree = (sections, parentId,userId) => {
             _id: section._id,
             name: section.name,
             participants: section.participants,
-            isJoined: section.participants.some((par)=>par === userId),
+            isJoined: section.participants.some((par)=>par.equals(userId)),
             children: buildSectionTree(sections, section._id),
         }));
 };

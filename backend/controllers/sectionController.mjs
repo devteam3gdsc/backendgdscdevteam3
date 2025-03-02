@@ -102,8 +102,8 @@ const sectionController = {
   removeUsersInAllSections: async (req, res) => {
     try {
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
-      const usersId = req.body.userIds.map((id)=> new mongoose.Types.ObjectId(`${id}`));
-      await sectionServices.removeUserInAllSections(usersId,sectionId);
+      const userId = new mongoose.Types.ObjectId(`${req.params.userId}`)
+      await sectionServices.removeUsersInAllSections(usersId,sectionId);
       return res.status(200).json("User removed!")
     } catch (error) {
       if (error instanceof httpError)

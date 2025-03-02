@@ -77,7 +77,7 @@ const sectionServices = {
     }
   },
 
-  removeUsersInAllSections: async (usersId,sectionId)=>{
+  removeUsersInAllSections: async (userId,sectionId)=>{
     try {
       const sections = await Section.aggregate([
         {$match:{_id:sectionId}},
@@ -96,7 +96,7 @@ const sectionServices = {
       sectionIds = sectionIds.concat(ancestorIds);
       const updateResult = await Section.updateMany(
       { _id: { $in: sectionIds } },
-      { $pull: { participants: {$in:usersId} } },
+      { $pull: { participants: userId } },
     );
     if (updateResult.matchedCount === 0) {
       throw new httpError("cant find section", 404);}

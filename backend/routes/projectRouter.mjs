@@ -146,7 +146,7 @@ projectRouter.post(
   );
 projectRouter.get("/publicData/:projectId",authMiddleware.verifyToken,projectController.getPublicProjectData);
 projectRouter.get("/section/findAncestor/:sectionId",authMiddleware.verifyToken,sectionController.findAncestor);
-projectRouter.get("/section/removeUsersInOneSection/:sectionId",authMiddleware.verifyToken,sectionController.removeUsersInOneSection);
-projectRouter.get("/section/removeUsersInAllSection/:sectionId",authMiddleware.verifyToken,sectionController.removeUsersInOneSection);
+projectRouter.get("/section/:sectionId/removeUsersInOneSection/:userId",authMiddleware.verifyToken,sectionController.removeUsersInOneSection);
+projectRouter.get("/section/:sectionId/removeUsersInAllSection/:userId",authMiddleware.verifyToken,sectionController.removeUsersInOneSection);
 export default projectRouter;
 

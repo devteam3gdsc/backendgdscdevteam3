@@ -103,7 +103,7 @@ const sectionController = {
     try {
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
       const userId = new mongoose.Types.ObjectId(`${req.params.userId}`)
-      await sectionServices.removeUsersInAllSections(usersId,sectionId);
+      await sectionServices.removeUsersInAllSections(userId,sectionId);
       return res.status(200).json("User removed!")
     } catch (error) {
       if (error instanceof httpError)

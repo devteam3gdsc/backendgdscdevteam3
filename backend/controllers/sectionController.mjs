@@ -391,6 +391,17 @@ const sectionController = {
         return res.status(error.statusCode).json(error.message);
       else return res.status(500).json(error);
     }
+  },
+  getSectionDescription: async (req,res)=>{
+    try {
+      const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`)
+      const result = await sectionServices.getSectionDescription(sectionId);
+      return res.status(200).json(result);
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
   }
 };
 

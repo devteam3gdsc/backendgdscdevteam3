@@ -177,6 +177,18 @@ removeUsersInOneSection: async (usersId,sectionId)=>{
       if (error instanceof httpError) throw error;
       else throw new httpError("findAncestor service error", 500);
     }
+  },
+  getSectionDescription: async (sectionId)=>{
+    try {
+      const section = await Section.findById(sectionId,{description:1})
+      if (!section){
+        throw new httpError(400,"cant find section")
+      }
+      return section.description;
+    } catch (error) {
+      if (error instanceof httpError) throw error;
+      else throw new httpError("getDescription service error", 500);
+    }
   }
 };
 

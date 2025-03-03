@@ -57,6 +57,7 @@ const projectSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     description: { type: String, default: "" },
+    note:{type: String,default:""},
     private: { type: Boolean, default: false },
     avatar: {
       type: String,

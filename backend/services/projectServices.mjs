@@ -239,6 +239,7 @@ const projectServices = {
          const projectData = await Project.findById(projectId,{
             name:1,
             description:1,
+            note:1,
             totalPosts:1,
             totalMembers:1,
             avatar:1,
@@ -269,6 +270,7 @@ const projectServices = {
           return {
               name: projectData.name,
               bio: projectData.description,
+              note:projectData.note,
               avatar: projectData.avatar,
               members: memberAvatars,
               numberOfMembers: members.length,

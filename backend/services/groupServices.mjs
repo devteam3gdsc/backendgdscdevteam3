@@ -355,11 +355,12 @@ const groupServices = {
             const groupId = new mongoose.Types.ObjectId(`${Id}`)
             const group = await Group.updateOne({_id:groupId},{$pull:{members:{user:userId}},$inc:{totalMembers:-1}})
             if (group.matchedCount === 0) throw new Error("Group not found");
-            if (group.creator.equals(userId)) return { success: false, message:"You are creator, please choose another creator before leave"};
             const projectsId = (await Project.find({group:groupId,"members.user":userId},{_id:1}))._id;
-            const updateResult = await Project.updateMany({_id:{$in:projectsId}},{$pull:{members:{user:userId}},$inc:{totalMembers:-1}})
-            if (updateResult.matchedCount === 0) throw new Error("Projects not found");
-            await Section.updateMany({project:projectsId},{$pull:{participants:userId},$inc:{totalMembers:-1}})
+            if (projectsId){
+                const updateResult = await Project.updateMany({_id:{$in:projectsId}},{$pull:{members:{user:userId}},$inc:{totalMembers:-1}})
+                if (updateResult.matchedCount === 0) throw new Error("Projects not found");
+                await Section.updateMany({project:{$in:projectsId}},{$pull:{participants:userId},$inc:{totalMembers:-1}})
+            }
         } catch (error) {
             throw new Error(`Leave group service error: ${error}`, 500);
         }

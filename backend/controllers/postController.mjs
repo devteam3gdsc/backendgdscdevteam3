@@ -457,6 +457,7 @@ const postController = {
         { author: { $ne: userId}},
         { author: { $in: following } },
         { visibility: "public" },
+        { status: "approved"}
       ];
 
       let groupFilter = {};

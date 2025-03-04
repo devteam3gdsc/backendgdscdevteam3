@@ -77,6 +77,7 @@ const groupController = {
       if (req.query.status) {
         matchData.push({ status: req.query.status });
       } else matchData.push({ status: "approved" });
+      
       if (search) {
         matchData.push({ title: { $regex: search, $options: "i" } });
       }
@@ -88,12 +89,14 @@ const groupController = {
         skip,
         limit,
       );
+      
       const group = await findDocument(
         Group,
         { _id: groupId },
         { avatar: 1, name: 1, _id: 0 },
       );
       const me = await User.findById(userId);
+      console.log(1);
       const newRecent = me.recent.filter((pin) => {
         return pin.name !== group.name;
       });

@@ -304,9 +304,11 @@ const projectController = {
       const projectMembersId = project.members.map((member) => {
         return member.user;
       });
+      console.log(projectMembersId)
       const groupMembersId = groupMembers.map((member) => {
-        return member.users;
+        return member.user;
       });
+      console.log(groupMembersId)
       const page = req.query.page || 1;
       const limit = req.query.limit || 5;
       const skip = (page - 1) * limit;

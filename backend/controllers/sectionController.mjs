@@ -174,7 +174,6 @@ const sectionController = {
         skip,
         limit,
       );
-      console.log(result)
       if (result.totalUsers === 0){
         return res.status(200).json({
           users: [],
@@ -184,15 +183,19 @@ const sectionController = {
           hasMore:false,
         })
       }
+      const projectId = (await Section.findById(sectionId,{project:1})).project
+      const project = await Project.findById(projectId,{members:1})
+      const projectUsers = project.members;
       const usersMap = new Map(
         result.users.map((user) => [`${user._id}`, user]),
       );
-      // const usersWithRole = projectUsers.map((member) => {
-      //   return {
-      //     ...member,
-      //     ...(usersMap.get(member._id) || {}),
-      //   };
-      // });
+      // console.log(projectUsers)
+      const usersWithRole = projectUsers.map((member) => {
+        return {
+          ...(usersMap.get(`${member.user}`) || {}),
+          role:member.role
+        };
+      });
       const totalPages = Math.ceil(result.totalUsers / limit);
       if (page > totalPages) {
         return res.status(200).json({
@@ -205,7 +208,7 @@ const sectionController = {
       }
       const hasMore = totalPages - page > 0 ? true : false;
       return res.status(200).json({
-        users: result.users,
+        users: usersWithRole,
         totalPages,
         currentPage: page,
         totalUsers: result.totalUsers,

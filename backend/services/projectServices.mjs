@@ -242,6 +242,7 @@ const projectServices = {
             note:1,
             totalPosts:1,
             totalMembers:1,
+            group:1,
             avatar:1,
             members:1,
             private:1
@@ -251,10 +252,10 @@ const projectServices = {
               return { message: "Project not found" };
           }
           const members = projectData.members || [];
-  
+          const groupMembers = (await Group.findById(projectData.group,{members:1})).members
           const isJoined = members.some(m => m.user.toString() === userId.toString());
-          const canJoin = projectData.private?false:true;
-          
+          const idValidation = groupMembers.some((mem)=>mem.user.equals(userId));
+          const canJoin = ((!projectData.private)&&(idValidation))?true:false
           const sortedMembers = members.sort((a, b) => {
               return b.following?.includes(userId) - a.following?.includes(userId);
           });

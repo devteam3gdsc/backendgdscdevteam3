@@ -212,7 +212,7 @@ const groupServices = {
             if (!groupData) {
                 return { message: "Group not found" };
             }
-            const members = groupData.members || [];
+            const members = groupData.members.slice(0,4).map(m => ({ avatar: m.avatar, role: m.role })) || [];
             const userRole = members.find(m => m.user.toString() === userId.toString())?.role || "guest";
             const isJoined = members.some(m => m.user.toString() === userId.toString());
             console.log(groupData.private)

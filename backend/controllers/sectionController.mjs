@@ -233,7 +233,7 @@ const sectionController = {
         )
       ).members;
       const projectMembersId = projectMembers.map((member) => {
-        return member.users;
+        return member.user;
       });
       const page = req.query.page || 1;
       const limit = req.query.limit || 5;

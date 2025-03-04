@@ -218,12 +218,16 @@ const projectController = {
       const limit = req.query.limit || 5;
       const search = req.query.search || "";
       const skip = (page - 1) * limit;
+      const mode = req.query.mode || "only"
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
       const projectId = new mongoose.Types.ObjectId(`${req.params.projectId}`);
       const matchData = [{ project: projectId, visibility: "public" }];
       if (req.query.tags) {
         const tags = req.query.tags.split(",");
         matchData.push({ tags: { $all: tags } });
+      }
+      if (mode === 'only'){
+        matchData.push({section:null})
       }
       if (req.query.status) {
         matchData.push({ status: req.query.status });

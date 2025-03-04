@@ -107,6 +107,9 @@ const projectServices = {
                   },
                 },
               },
+              {$project:{
+                groupData:0
+              }}
             ],
             countingProjects: [{ $count: "totalProjects" }],
           },
@@ -328,6 +331,7 @@ const projectServices = {
         try {
            
             const project = await Project.findById(projectId);
+            const user = await User.findById(userId)
             if(!project) {
                 throw new Error("Project not found");
             }
@@ -337,7 +341,7 @@ const projectServices = {
             }
 
             if (accept) {
-                project.members.push({ user: userId, role: "participant"});
+                project.members.push({ user: userId, avatar:user.avatar, role: "participant"});
             }
 
             project.pendingInvites = project.pendingInvites.filter(id => !id.equals(userId));
@@ -379,7 +383,8 @@ const projectServices = {
 
             if(!project.members.some(m => m.user.equals(userId))) {
                 project.totalMembers = project.totalMembers + 1
-                project.members.push({ user: userId, role: "participant" });
+                const user = await User.findById(userId)
+                project.members.push({ user: userId,avatar:user.avatar, role: "participant" });
                 await project.save();
             }
             return project;

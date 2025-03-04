@@ -289,6 +289,7 @@ const groupServices = {
 
     confirmInvite : async (groupId, userId, accept) => {
         try {
+            const user = await User.findById(userId);
             const group = await Group.findById(groupId);
             if(!group) {
                 throw new Error("Group not found");
@@ -299,7 +300,7 @@ const groupServices = {
             }
 
             if (accept) {
-                group.members.push({ user: userId, role: "member"});
+                group.members.push({ user: userId,avatar:user.avatar, role: "member"});
             }
             group.totalMembers = group.totalMembers + 1;
             group.pendingInvites = group.pendingInvites.filter(id => !id.equals(userId));

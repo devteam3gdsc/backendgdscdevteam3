@@ -388,7 +388,7 @@ const projectController = {
     },
     updateProject : async (req, res) => {
         try {
-            const updatedProject = await projectServices.updateProject(req.params.projectId, req.body);
+            const updatedProject = await projectServices.updateProject(req.params.projectId, req.body, req.user.id);
             console.log(updatedProject)
             res.status(200).json(updatedProject);
         } catch (error) {
@@ -401,6 +401,7 @@ const projectController = {
       try {
         const projectId = req.params.projectId;
         const result = await projectServices.updateProjectFull(
+          req.user.id,
           projectId,
           req.file,
           req.body,
@@ -415,7 +416,7 @@ const projectController = {
 
     deleteProject : async (req, res) => {
         try {
-            const result = await projectServices.deleteProject(req.params.projectId);
+            const result = await projectServices.deleteProject(req.params.projectId, req.user.id);
             res.status(200).json({message: "Deleting project successfully"});
         } catch (error) {
             if (error instanceof httpError)
@@ -465,7 +466,7 @@ const projectController = {
     
       removeMember : async (req, res) => {
         try {
-          const project = await projectServices.removeMember(req.params.projectId, req.params.removedUserId);
+          const project = await projectServices.removeMember(req.params.projectId, req.params.removedUserId, req.user.id);
           res.status(200).json({ message:"Delete member successfully"});
         } catch (error) {
           if (error instanceof httpError)
@@ -498,7 +499,7 @@ const projectController = {
     
       assignAdmin : async (req, res) => {
         try {
-          const project = await projectServices.assignAdmin(req.params.projectId, req.params.assignAdminUserId);
+          const project = await projectServices.assignAdmin(req.params.projectId, req.params.assignAdminUserId, req.user.id);
           res.status(200).json({ message:"assign admin project successfully"});
         } catch (error) {
           if (error instanceof httpError)
@@ -509,7 +510,7 @@ const projectController = {
     
       removeAdmin : async (req, res) => {
         try {
-          const project = await projectServices.removeAdmin(req.params.projectId, req.params.removeAdminUserId);
+          const project = await projectServices.removeAdmin(req.params.projectId, req.params.removeAdminUserId, req.user.id);
           res.status(200).json({ message:"Remove admin project successfully"});
         } catch (error) {
           if (error instanceof httpError)

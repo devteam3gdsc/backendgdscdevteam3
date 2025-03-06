@@ -128,7 +128,7 @@ const groupServices = {
     }
   },
 
-    updateGroup: async (groupId, updateData) => {
+    updateGroup: async (groupId, updateData, userId) => {
         try {
             const Id = new mongoose.Types.ObjectId(`${groupId}`)
             const updatedGroup = await Group.updateOne({_id:Id},{$set:updateData})
@@ -136,12 +136,21 @@ const groupServices = {
             if (updatedGroup.matchedCount === 0) {
                 throw new Error("Group not found.");
             }
-    
+            
+            await NotificationServices.sendUpdateNotification({
+                senderId: userId,
+                entityId: groupId,
+                entityType: "Group",
+                notificationType: "group_update_profile",
+                category: "groups",
+                customMessage: "updated profile group"
+            });
+
         } catch (error) {
             throw new Error(`Updating group service error: ${error}`);
         }
     },
-    updateGroupFull: async (groupId, avatarFile, ...updateData) => {
+    updateGroupFull: async (userId,groupId, avatarFile, ...updateData) => {
         try {
             // Tìm nhóm trong database
             const group = await Group.findById(groupId);
@@ -170,7 +179,16 @@ const groupServices = {
             // Kiểm tra lại dữ liệu sau khi cập nhật
             const updatedGroup = await Group.findById(groupId);
             console.log("Updated group:", updatedGroup);
-    
+            
+            await NotificationServices.sendUpdateNotification({
+                senderId: userId,
+                entityId: groupId,
+                entityType: "Group",
+                notificationType: "group_update_profile",
+                category: "groups",
+                customMessage: "updated profile group"
+            });
+
             return new httpResponse("Updated successfully", 200);
         } catch (error) {
             console.error("Updating group service error:", error);
@@ -178,7 +196,7 @@ const groupServices = {
         }
     },
 
-    deleteGroup: async (groupId) => {
+    deleteGroup: async (groupId, userId) => {
         try {
             console.log(groupId)
             const group = await Group.findById(groupId);
@@ -187,6 +205,15 @@ const groupServices = {
                 throw new Error("Group not found.");
             }
     
+            await NotificationServices.sendUpdateNotification({
+                senderId: userId,
+                entityId: groupId,
+                entityType: "Group",
+                notificationType: "group_delete",
+                category: "groups",
+                customMessage: "deleted group"
+            });
+
             await Group.findByIdAndDelete(groupId);
             return { message: "Group deleted successfully" };
         } catch (error) {
@@ -256,12 +283,11 @@ const groupServices = {
             if(!group) {
                 throw new Error("Group not found");
             }
-
+            console.log(group)
             const validMembers = members.filter(m => mongoose.Types.ObjectId.isValid(m));
             if(validMembers.length === 0) {
                 throw new Error("No valid members to invite");
             }
-
             let newInvites = [];
             validMembers.forEach(memberId => {
                 const isMember = group.members.some(m => m.user.equals(memberId));
@@ -271,13 +297,21 @@ const groupServices = {
                     newInvites.push(memberId);
                 }
             });
-
             if(newInvites.length > 0) {
                 group.pendingInvites = [...(group.pendingInvites || []), ...newInvites];
                 await group.save();
 
                 newInvites.forEach(async (memberId) => {
-                    await NotificationServices.GroupInviteNotification(groupId, userId, memberId);
+                    //await NotificationServices.GroupInviteNotification(groupId, userId, memberId);
+                    await NotificationServices.sendNotification({
+                        receiveId: memberId,
+                        senderId: userId,
+                        entityId: groupId,
+                        entityType: "Group",
+                        notificationType: "group_invite",
+                        category: "groups",
+                        customMessage: "invited you to join group"
+                    });
                 });
             }
 
@@ -311,7 +345,7 @@ const groupServices = {
         }
     },
 
-    removeMember: async (groupId, removedUserId) => {
+    removeMember: async (groupId, removedUserId, userId) => {
         try {
             const group = await Group.findById(groupId);
             if(!group) {
@@ -320,6 +354,17 @@ const groupServices = {
             group.members = group.members.filter(m => !m.user.equals(removedUserId));
             group.totalMembers = group.totalMembers - 1;
             await group.save();
+
+            await NotificationServices.sendNotification({
+                receiveId: removedUserId,
+                senderId: userId,
+                entityId: groupId,
+                entityType: "Group",
+                notificationType: "group_remove",
+                category: "groups",
+                customMessage: "removed you from group"
+            });
+
             return group;
         } catch (error) {
             throw new Error(`Remove members service error: ${error}`, 500);
@@ -367,7 +412,7 @@ const groupServices = {
         }
     },
 
-    assignAdmin : async (groupId, assignAdminUserId) => {
+    assignAdmin : async (groupId, assignAdminUserId, userId) => {
         try {
             const group = await Group.findById(groupId);
             if (!group) throw new Error("Group not found");
@@ -377,13 +422,22 @@ const groupServices = {
 
             member.role = "admin";
             await group.save();
+            await NotificationServices.sendNotification({
+                receiveId: assignAdminUserId,
+                senderId: userId,
+                entityId: groupId,
+                entityType: "Group",
+                notificationType: "group_admin_add",
+                category: "groups",
+                customMessage: "added you to admin in group"
+            });
             return group;
         } catch (error) {
             throw new Error(`Assign admin group service error: ${error}`, 500);
         }
     },
 
-    removeAdmin : async (groupId, removeAdminUserId) => {
+    removeAdmin : async (groupId, removeAdminUserId, userId) => {
         try {
             const group = await Group.findById(groupId);
             if (!group) throw new Error("Group not found");
@@ -394,13 +448,22 @@ const groupServices = {
             }
             member.role = "member"
             await group.save();
+            await NotificationServices.sendNotification({
+                receiveId: removeAdminUserId,
+                senderId: userId,
+                entityId: groupId,
+                entityType: "Group",
+                notificationType: "group_admin_remove",
+                category: "groups",
+                customMessage: "removed you as an admin in group "
+            });
             return group;
         } catch (error) {
             throw new Error(`Remove admin group service error: ${error}`, 500);
         } 
     },
 
-    assignCreator : async (groupId, assignCreatorUserId) => {
+    assignCreator : async (groupId, assignCreatorUserId, userId) => {
         try {
             const group = await Group.findById(groupId);
             if (!group) throw new Error("Group not found");
@@ -410,6 +473,15 @@ const groupServices = {
 
             member.role = "creator";
             await group.save();
+            await NotificationServices.sendNotification({
+                receiveId: assignAdminUserId,
+                senderId: userId,
+                entityId: groupId,
+                entityType: "Group",
+                notificationType: "group_creator_add",
+                category: "groups",
+                customMessage: "added you to creator in group "
+            });
             return group;
         } catch (error) {
             throw new Error(`Assign creator group service error: ${error}`, 500);

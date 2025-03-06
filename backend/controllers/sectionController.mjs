@@ -7,6 +7,7 @@ import User from "../models/Users.mjs";
 import { httpError } from "../utils/httpResponse.mjs";
 import postServices from "../services/postServices.mjs";
 import Post from "../models/Posts.mjs";
+import NotificationServices from "../services/notificationServices.mjs";
 const sectionController = {
   createSection: async (req, res) => {
     try {
@@ -85,19 +86,51 @@ const sectionController = {
     }
   },
 
-  addParticipant: async (req, res) => {
-    //con bug 
+addParticipant: async (req, res) => {
     try {
-      const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
-      const usersId = req.body.usersId;
-      const Ids = usersId.map((id)=>{return new mongoose.Types.ObjectId(`${id}`)})
-      await sectionServices.addParticipant(Ids,sectionId);
-      return res.status(200).json("participant added!");
+        const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
+        const usersId = req.body.usersId;
+        const Ids = usersId.map((id) => new mongoose.Types.ObjectId(`${id}`));
+
+        const section = await Section.findById(sectionId);
+        if (!section) {
+            return res.status(404).json("Can't find section!");
+        }
+
+        const updateResult = await Section.updateMany(
+            { _id: { $in: section.children } },
+            { $push: { participants: { $each: Ids } } }
+        );
+
+        if (updateResult.matchedCount === 0) {
+            return res.status(404).json("No child sections found!");
+        }
+
+        section.participants.push(...Ids); // Sửa lỗi concat
+        await section.save();
+
+        const senderId = req.user.id; // Lấy ID của người thực hiện thao tác
+
+        // Gửi thông báo đến từng thành viên được thêm
+        usersId.forEach(async (memberId) => {
+            await NotificationServices.sendNotification({
+                receiveId: memberId,
+                senderId: senderId,
+                entityId: sectionId,
+                entityType: "Section",
+                notificationType: "section_participant_add",
+                category: "groups", 
+                customMessage: `added you as a participant in section`
+            });
+        });
+        const projectId = section.project
+      return res.status(200).json({message:"participant added!",projectId});
     } catch (error) {
-      if (error instanceof httpError)
-        return res.status(error.statusCode).json(error.message);
-      else return res.status(500).json(error);
+        if (error instanceof httpError)
+            return res.status(error.statusCode).json(error.message);
+        else return res.status(500).json(error);
     }
+
   },
   removeUsersInAllSections: async (req, res) => {
     try {

@@ -68,6 +68,7 @@ const notificationController = {
       }
 
       const filter = req.query.filter || "all"; // Default filter is "all"
+      const category = req.query.category || "all"; // Default filter is "all"
 
       // Call the service function
       const result = await notificationServices.getNotificationsByUserId(
@@ -75,6 +76,7 @@ const notificationController = {
         skip,
         limit,
         filter,
+        category,
       );
 
       // Calculate pagination details

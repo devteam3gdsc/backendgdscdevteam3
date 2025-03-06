@@ -500,7 +500,7 @@ const postController = {
       const search = req.query.search || "";
       const authorId = new mongoose.Types.ObjectId(`${req.params.userId}`);
       const myId = new mongoose.Types.ObjectId(`${req.user.id}`);
-      const matchData = [{ author: authorId }, { visibility: "public" }];
+      const matchData = [{ author: authorId }, { visibility: "public" }, {status: "approved"}];
       if (search) {
         matchData.push({ title: { $regex: search, $options: "i" } });
       }

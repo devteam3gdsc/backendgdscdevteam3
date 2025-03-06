@@ -436,7 +436,8 @@ const groupController = {
 
   confirmInvite : async (req, res) => { // accept // ?accept=true/false
     try {
-      const confirm = await groupServices.confirmInvite(req.params.groupId, req.user.id, req.query.accept);
+      const groupId = new mongoose.Types.ObjectId(`${req.params.groupId}`)
+      const confirm = await groupServices.confirmInvite(groupId,req.user.id , req.query.accept);
       res.status(200).json(confirm)
     } catch (error) {
       if (error instanceof httpError)

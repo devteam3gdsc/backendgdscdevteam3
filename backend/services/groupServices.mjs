@@ -239,7 +239,8 @@ const groupServices = {
             if (!groupData) {
                 return { message: "Group not found" };
             }
-            const members = groupData.members.slice(0,4).map(m => ({ avatar: m.avatar, role: m.role })) || [];
+            const members = groupData.members.slice(0,4).map(m => ({ user:m.user,avatar: m.avatar, role: m.role })) || [];
+            console.log(members)
             const userRole = members.find(m => m.user.toString() === userId.toString())?.role || "guest";
             const isJoined = members.some(m => m.user.toString() === userId.toString());
             console.log(groupData.private)
@@ -323,16 +324,18 @@ const groupServices = {
 
     confirmInvite : async (groupId, userId, accept) => {
         try {
+           
             const user = await User.findById(userId);
+            
             const group = await Group.findById(groupId);
             if(!group) {
                 throw new Error("Group not found");
             }
-
-            if (!group.pendingInvites?.includes(userId)) {
-                throw new Error("User was not invited");
-            }
-
+            // console.log(group)
+            // if (!group.pendingInvites.includes(userId)) {
+            //     throw new Error("User was not invited");
+            // }
+           
             if (accept) {
                 group.members.push({ user: userId,avatar:user.avatar, role: "member"});
             }

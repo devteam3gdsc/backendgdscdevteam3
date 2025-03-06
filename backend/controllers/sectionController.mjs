@@ -223,11 +223,13 @@ addParticipant: async (req, res) => {
         result.users.map((user) => [`${user._id}`, user]),
       );
       // console.log(projectUsers)
-      const usersWithRole = projectUsers.map((member) => {
-        return {
-          ...(usersMap.get(`${member.user}`) || {}),
-          role:member.role
-        };
+      const usersWithRole = projectUsers.filter((member) => {
+        if (usersMap.get(`${member.user}`)){
+          return {
+            ...usersMap.get(`${member.user}`),
+            role:member.role,
+          }
+        }
       });
       const totalPages = Math.ceil(result.totalUsers / limit);
       if (page > totalPages) {

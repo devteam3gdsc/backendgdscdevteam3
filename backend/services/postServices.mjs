@@ -237,9 +237,13 @@ const postServices = {
       throw new httpError(`editing post service error: ${error}`, 500);
     }
   },
-  confirmCreatePost: async (userId, { group, project, section }, postId, accept) => {
+  confirmCreatePost: async (postId, accept) => {
     try {
       const post = await Post.findById(postId);
+      // console.log(post.group?post.group:null)
+      const group = (post.group)?post.group:null;
+      const project = post.project?post.project:null;
+      const section = post.section?post.section:null;
       let entityid;
       let entityType;
       if (!post) {
@@ -257,6 +261,19 @@ const postServices = {
       // Xử lý trạng thái
       if (accept === "approve") {
         post.status = "approved";  // Sửa lỗi push
+        if (group) {
+          entityid = group;
+          entityType = "Group";
+          await updateDocument(Group, 1, [{ _id: group }], [{ $inc: { totalPosts: -1 } }]);
+        } else if (project) {
+          entityid = project;
+          entityType = "Project";
+          await updateDocument(Project, 1, [{ _id: project }], [{ $inc: { totalPosts: -1 } }]);
+        } else if (section) {  // Sửa lỗi lặp
+          entityid = section;
+          entityType = "Section";
+          await updateDocument(Section, 1, [{ _id: section }], [{ $inc: { totalPosts: -1 } }]);
+        }
       } else if (accept === "reject") {
         post.status = "rejected";
   
@@ -277,10 +294,10 @@ const postServices = {
       }
       const postAuthor = post.author;
       const message = accept === "approve" ? "approved" : "rejected";
-
+      console.log(1)
         await NotificationServices.sendNotification({
             receiveId: postAuthor,
-            senderId: userId,
+            senderId: postAuthor,
             entityId: entityid,
             entityType: entityType, 
             notificationType: "confirm_post",

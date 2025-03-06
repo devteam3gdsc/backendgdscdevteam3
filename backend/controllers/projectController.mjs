@@ -521,7 +521,7 @@ const projectController = {
       getPublicProjectData: async (req,res) => {
           try {
             const projectId = new mongoose.Types.ObjectId(`${req.params.projectId}`);
-            const Data = await Project.findOne({_id:projectId},{name:1,avatar:1});
+            const Data = await Project.findOne({_id:projectId},{name:1,avatar:1,totalPosts:1,totalMembers:1});
             if (!Data){
               return res.status(404).json("cant find project")
             }

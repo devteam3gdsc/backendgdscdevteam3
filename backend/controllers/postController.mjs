@@ -189,26 +189,8 @@ const postController = {
   confirmPost: async (req, res) => {
     try {
       const postId = new mongoose.Types.ObjectId(`${req.params.postId}`)
-      const post = await Post.findById(postId);
-      console.log(post)
-      
-      if (!post) {
-        console.log("Post not found");
-        return res.status(404).json({ message: "Post not found" });
-      }
-  
-      console.log(post);
-      
-      // Lấy ID của group/project/section theo đúng thứ tự ưu tiên
-      const typeObj = {
-        group: post.group || null,
-        project: post.project || null,
-        section: post.section || null,
-      };
-  
-      console.log(typeObj);
-  
-      const result = await postServices.confirmCreatePost(post.author, typeObj, postId, req.query.accept);
+      console.log(postId)
+      const result = await postServices.confirmCreatePost(postId, req.query.accept);
       return res.status(200).json(result);
       
     } catch (error) {

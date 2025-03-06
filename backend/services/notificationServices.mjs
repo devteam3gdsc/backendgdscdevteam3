@@ -24,7 +24,7 @@ const NotificationServices = {
         senderName: senderUser.displayname,
         senderAvatar: senderUser.avatar,
         type: "post_create",
-        message: `has just created.`,
+        message: `has just created`,
         relatedEntityId: postId,
         entityType: "Post",
         category: "following",

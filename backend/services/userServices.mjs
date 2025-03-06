@@ -114,7 +114,7 @@ const userServices = {
           email: email,
           password: hashed,
           displayname: username,
-          avatar:getRandomAvatar()
+          avatar:getRandomAvatar("user")
         });
         return new httpResponse("Sign up successfully", 200);
       }
@@ -163,7 +163,6 @@ const userServices = {
         },
       ]);
       if (!Data[0].countingUsers[0]) {
-        
         return {
           users: [],
           totalUsers: 0,

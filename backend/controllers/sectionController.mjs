@@ -130,28 +130,26 @@ addParticipant: async (req, res) => {
             return res.status(error.statusCode).json(error.message);
         else return res.status(500).json(error);
     }
-},
 
-  removeParticipant: async (req, res) => {
+  },
+  removeUsersInAllSections: async (req, res) => {
+    try {
+      const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
+      const userId = new mongoose.Types.ObjectId(`${req.params.userId}`)
+      await sectionServices.removeUsersInAllSections(userId,sectionId);
+      return res.status(200).json("User removed!")
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  },
+  removeUsersInOneSection: async (req, res) => {
     try {
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
       const userId = new mongoose.Types.ObjectId(`${req.params.userId}`);
-      await sectionServices.removeUser(userId,sectionId);
-      const section = await Section.findById(sectionId);
-      if (!section) {
-          return res.status(404).json("Can't find section!");
-      }
-      await NotificationServices.sendNotification({
-        receiveId: usersId,
-        senderId: req.user.id,
-        entityId: sectionId,
-        entityType: "Section",
-        notificationType: "section_participant_add",
-        category: "groups",
-        customMessage: "added you to participant in section"
-    });
-    const projectId = section.project
-    return res.status(200).json({message:"User removed!",projectId});
+      await sectionServices.removeUsersInOneSection(userId,sectionId);
+      return res.status(200).json("User removed!")
     } catch (error) {
       if (error instanceof httpError)
         return res.status(error.statusCode).json(error.message);
@@ -163,7 +161,6 @@ addParticipant: async (req, res) => {
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
       const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`);
       const section = await Section.findById(sectionId);
-   
       const sectionParticipants = section.participants || []
       if (!section) {
         return res.status(404).json("Invalid section Id!");
@@ -210,7 +207,6 @@ addParticipant: async (req, res) => {
         skip,
         limit,
       );
-      console.log(result)
       if (result.totalUsers === 0){
         return res.status(200).json({
           users: [],
@@ -220,15 +216,19 @@ addParticipant: async (req, res) => {
           hasMore:false,
         })
       }
+      const projectId = (await Section.findById(sectionId,{project:1})).project
+      const project = await Project.findById(projectId,{members:1})
+      const projectUsers = project.members;
       const usersMap = new Map(
         result.users.map((user) => [`${user._id}`, user]),
       );
-      // const usersWithRole = projectUsers.map((member) => {
-      //   return {
-      //     ...member,
-      //     ...(usersMap.get(member._id) || {}),
-      //   };
-      // });
+      // console.log(projectUsers)
+      const usersWithRole = projectUsers.map((member) => {
+        return {
+          ...(usersMap.get(`${member.user}`) || {}),
+          role:member.role
+        };
+      });
       const totalPages = Math.ceil(result.totalUsers / limit);
       if (page > totalPages) {
         return res.status(200).json({
@@ -241,7 +241,7 @@ addParticipant: async (req, res) => {
       }
       const hasMore = totalPages - page > 0 ? true : false;
       return res.status(200).json({
-        users: result.users,
+        users: usersWithRole,
         totalPages,
         currentPage: page,
         totalUsers: result.totalUsers,
@@ -269,7 +269,7 @@ addParticipant: async (req, res) => {
         )
       ).members;
       const projectMembersId = projectMembers.map((member) => {
-        return member.users;
+        return member.user;
       });
       const page = req.query.page || 1;
       const limit = req.query.limit || 5;
@@ -411,6 +411,28 @@ addParticipant: async (req, res) => {
         totalPosts: result.totalPosts,
         hasMore,
       });
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  },
+  findAncestor: async (req,res)=>{
+    try {
+      const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`)
+      const result = await sectionServices.findAncestor([],sectionId);
+      return res.status(200).json(result);
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  },
+  getSectionDescription: async (req,res)=>{
+    try {
+      const sectionId = new mongoose.Types.ObjectId(`${req.params.sectionId}`)
+      const result = await sectionServices.getSectionDescription(sectionId);
+      return res.status(200).json(result);
     } catch (error) {
       if (error instanceof httpError)
         return res.status(error.statusCode).json(error.message);

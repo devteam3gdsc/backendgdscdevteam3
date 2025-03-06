@@ -133,6 +133,6 @@ groupRouter.get(
   authMiddleware.verifyToken,
   // roleMiddleware("group",["creator"]),
   postController.getPostsInGroupProjectSection,
-
 );
+groupRouter.get("/publicData/:groupId",authMiddleware.verifyToken,groupController.getPublicGroupData);
 export default groupRouter;

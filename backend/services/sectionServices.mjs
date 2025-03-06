@@ -77,7 +77,7 @@ const sectionServices = {
     }
   },
 
-  removeUser: async (userId,sectionId)=>{
+  removeUsersInAllSections: async (userId,sectionId)=>{
     try {
       const sections = await Section.aggregate([
         {$match:{_id:sectionId}},
@@ -90,8 +90,10 @@ const sectionServices = {
             as:"allSections"
           }
       }
-      ])
+      ]);
       const sectionIds = sections[0].allSections.map(s => s._id).concat(sectionId);
+      const ancestorIds = await sectionServices.findAncestor([],sectionId);
+      sectionIds = sectionIds.concat(ancestorIds);
       const updateResult = await Section.updateMany(
       { _id: { $in: sectionIds } },
       { $pull: { participants: userId } },
@@ -99,6 +101,20 @@ const sectionServices = {
     if (updateResult.matchedCount === 0) {
       throw new httpError("cant find section", 404);}
   } catch (error){
+    if (error instanceof httpError) throw error;
+    else throw new httpError("removeUser service error", 500);
+  }
+},
+removeUsersInOneSection: async (usersId,sectionId)=>{
+  try {
+    const ancestorIds = await sectionServices.findAncestor([],sectionId);
+    const updateResult = await Section.updateMany(
+      { _id: { $in: ancestorIds } },
+      { $pull: { participants: {$in:usersId} } },
+    );
+    if (updateResult.matchedCount === 0) {
+      throw new httpError("cant find section", 404);}
+  } catch (error) {
     if (error instanceof httpError) throw error;
     else throw new httpError("removeUser service error", 500);
   }
@@ -143,6 +159,35 @@ const sectionServices = {
     } catch (error) {
       if (error instanceof httpError) throw error;
       else throw new httpError("deleteSection service error", 500);
+    }
+  },
+  findAncestor: async (ancestor,sectionId)=>{
+    try {
+      const id = new mongoose.Types.ObjectId(`${sectionId}`);
+      const section = await Section.findById(id);
+      if (!section.parent){
+        return ancestor;
+      }
+      else {
+        ancestor.push(section.parent);
+        await sectionServices.findAncestor(ancestor,section.parent);
+      }
+      return ancestor;
+    } catch (error) {
+      if (error instanceof httpError) throw error;
+      else throw new httpError("findAncestor service error", 500);
+    }
+  },
+  getSectionDescription: async (sectionId)=>{
+    try {
+      const section = await Section.findById(sectionId,{description:1})
+      if (!section){
+        throw new httpError(400,"cant find section")
+      }
+      return section.description;
+    } catch (error) {
+      if (error instanceof httpError) throw error;
+      else throw new httpError("getDescription service error", 500);
     }
   }
 };

@@ -7,13 +7,14 @@ import mongoose from "mongoose"
 import NotificationServices from "./notificationServices.mjs";
 import { httpResponse } from "../utils/httpResponse.mjs";
 import sectionServices from "./sectionServices.mjs";
+import getRandomAvatar from "../utils/avatarHelper.mjs";
 const groupServices = {
     //-----------GROUP-----------------
     createGroup: async (data, creatorId, avatarFile) => {
         try {
             const avatarURL = avatarFile 
                 ? avatarFile.path 
-                : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541";
+                : getRandomAvatar("group");
             const userAvatar = (await User.findById(creatorId,{avatar:1})).avatar
             const newGroup = new Group({
                 ...data,
@@ -231,16 +232,18 @@ const groupServices = {
                 totalPosts:1,
                 totalMembers:1,
                 avatar:1,
+                private:1,
                 members:1}
             )
             console.log(groupData);
             if (!groupData) {
                 return { message: "Group not found" };
             }
-            const members = groupData.members || [];
+            const members = groupData.members.slice(0,4).map(m => ({ avatar: m.avatar, role: m.role })) || [];
             const userRole = members.find(m => m.user.toString() === userId.toString())?.role || "guest";
             const isJoined = members.some(m => m.user.toString() === userId.toString());
-            const canJoin = groupData.private ? isJoined : false; 
+            console.log(groupData.private)
+            const canJoin = !groupData.private
             const numberOfProjects = await Project.countDocuments({ group: groupId });
             // const posts = await Post.find({group:groupId})
             // console.log(posts)
@@ -320,6 +323,7 @@ const groupServices = {
 
     confirmInvite : async (groupId, userId, accept) => {
         try {
+            const user = await User.findById(userId);
             const group = await Group.findById(groupId);
             if(!group) {
                 throw new Error("Group not found");
@@ -330,7 +334,7 @@ const groupServices = {
             }
 
             if (accept) {
-                group.members.push({ user: userId, role: "member"});
+                group.members.push({ user: userId,avatar:user.avatar, role: "member"});
             }
             group.totalMembers = group.totalMembers + 1;
             group.pendingInvites = group.pendingInvites.filter(id => !id.equals(userId));
@@ -397,11 +401,12 @@ const groupServices = {
             const groupId = new mongoose.Types.ObjectId(`${Id}`)
             const group = await Group.updateOne({_id:groupId},{$pull:{members:{user:userId}},$inc:{totalMembers:-1}})
             if (group.matchedCount === 0) throw new Error("Group not found");
-            if (group.creator.equals(userId)) return { success: false, message:"You are creator, please choose another creator before leave"};
             const projectsId = (await Project.find({group:groupId,"members.user":userId},{_id:1}))._id;
-            const updateResult = await Project.updateMany({_id:{$in:projectsId}},{$pull:{members:{user:userId}},$inc:{totalMembers:-1}})
-            if (updateResult.matchedCount === 0) throw new Error("Projects not found");
-            await Section.updateMany({project:projectsId},{$pull:{participants:userId},$inc:{totalMembers:-1}})
+            if (projectsId){
+                const updateResult = await Project.updateMany({_id:{$in:projectsId}},{$pull:{members:{user:userId}},$inc:{totalMembers:-1}})
+                if (updateResult.matchedCount === 0) throw new Error("Projects not found");
+                await Section.updateMany({project:{$in:projectsId}},{$pull:{participants:userId},$inc:{totalMembers:-1}})
+            }
         } catch (error) {
             throw new Error(`Leave group service error: ${error}`, 500);
         }

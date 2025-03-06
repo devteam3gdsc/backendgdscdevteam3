@@ -453,22 +453,25 @@ const postController = {
       const following = (
         await findDocument(User, { _id: userId }, { following: 1, _id: 0 })
       ).following;
+      console.log(following)
       const matchData = [
+        { group:null},
         { author: { $ne: userId}},
         { author: { $in: following } },
         { visibility: "public" },
+        { status: "approved"}
       ];
 
       let groupFilter = {};
       if (groupsId) {
-        groupFilter = { group: { $in: groupsId } };
+        groupFilter = { group: { $in: groupsId },status:"approved" };
       }
       if (search) {
         matchData.push({ title: { $regex: search, $options: "i" } });
       }
       const result = await postServices.getPosts(
         userId,
-        { $or: [groupFilter, { $and: [...matchData] }] },
+        { $or: [{ $and:matchData },groupFilter ] },
         req.query.criteria,
         req.query.order,
         skip,

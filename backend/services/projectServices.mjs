@@ -3,6 +3,7 @@ import User from "../models/Users.mjs";
 import mongoose from "mongoose"
 import NotificationServices from "./notificationServices.mjs";
 import { httpError, httpResponse } from "../utils/httpResponse.mjs";
+import getRandomAvatar from "../utils/avatarHelper.mjs";
 
 
 const projectServices = {
@@ -106,6 +107,9 @@ const projectServices = {
                   },
                 },
               },
+              {$project:{
+                groupData:0
+              }}
             ],
             countingProjects: [{ $count: "totalProjects" }],
           },
@@ -140,7 +144,7 @@ const projectServices = {
             if(!group) {
                 throw new httpError("Group not found",404);
             }
-            const avatarURL = avatarFile?avatarFile.path:"https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541";
+            const avatarURL = avatarFile?avatarFile.path:getRandomAvatar("project");
             const userAvatar = (await User.findById(userId,{avatar:1})).avatar
             const newProject = await Project.create({
                 ...data,
@@ -264,8 +268,10 @@ const projectServices = {
          const projectData = await Project.findById(projectId,{
             name:1,
             description:1,
+            note:1,
             totalPosts:1,
             totalMembers:1,
+            group:1,
             avatar:1,
             members:1,
             private:1
@@ -275,10 +281,11 @@ const projectServices = {
               return { message: "Project not found" };
           }
           const members = projectData.members || [];
-  
+          const groupMembers = (await Group.findById(projectData.group,{members:1})).members
           const isJoined = members.some(m => m.user.toString() === userId.toString());
-          const canJoin = projectData.private ? isJoined : false;
-          
+
+          const idValidation = groupMembers.some((mem)=>mem.user.equals(userId));
+          const canJoin = ((!projectData.private)&&(idValidation))?true:false
           const sortedMembers = members.sort((a, b) => {
               return b.following?.includes(userId) - a.following?.includes(userId);
           });
@@ -289,11 +296,12 @@ const projectServices = {
               .select("_id name parent participants")
               .lean();
   
-          const sectionTree = buildSectionTree(sections, null);
+          const sectionTree = buildSectionTree(sections, null,userId);
           const userRole = members.find(m => m.user.toString() === userId.toString())?.role || "guest";
           return {
               name: projectData.name,
               bio: projectData.description,
+              note:projectData.note,
               avatar: projectData.avatar,
               members: memberAvatars,
               numberOfMembers: members.length,
@@ -359,6 +367,7 @@ const projectServices = {
         try {
            
             const project = await Project.findById(projectId);
+            const user = await User.findById(userId)
             if(!project) {
                 throw new Error("Project not found");
             }
@@ -368,7 +377,7 @@ const projectServices = {
             }
 
             if (accept) {
-                project.members.push({ user: userId, role: "participant"});
+                project.members.push({ user: userId, avatar:user.avatar, role: "participant"});
             }
 
             project.pendingInvites = project.pendingInvites.filter(id => !id.equals(userId));
@@ -419,7 +428,8 @@ const projectServices = {
 
             if(!project.members.some(m => m.user.equals(userId))) {
                 project.totalMembers = project.totalMembers + 1
-                project.members.push({ user: userId, role: "participant" });
+                const user = await User.findById(userId)
+                project.members.push({ user: userId,avatar:user.avatar, role: "participant" });
                 await project.save();
             }
             return project;
@@ -509,13 +519,14 @@ const projectServices = {
 };
 
 
-const buildSectionTree = (sections, parentId) => {
+const buildSectionTree = (sections, parentId,userId) => {
     return sections
         .filter((section) => (parentId ? section.parent?.toString() === parentId.toString() : !section.parent))
         .map((section) => ({
             _id: section._id,
             name: section.name,
             participants: section.participants,
+            isJoined: section.participants.some((par)=>par.equals(userId)),
             children: buildSectionTree(sections, section._id),
         }));
 };

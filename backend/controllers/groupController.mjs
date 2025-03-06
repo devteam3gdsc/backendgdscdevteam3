@@ -78,6 +78,7 @@ const groupController = {
       if (req.query.status) {
         matchData.push({ status: req.query.status });
       } else matchData.push({ status: "approved" });
+      
       if (search) {
         matchData.push({ title: { $regex: search, $options: "i" } });
       }
@@ -89,12 +90,14 @@ const groupController = {
         skip,
         limit,
       );
+      
       const group = await findDocument(
         Group,
         { _id: groupId },
         { avatar: 1, name: 1, _id: 0 },
       );
       const me = await User.findById(userId);
+      console.log(1);
       const newRecent = me.recent.filter((pin) => {
         return pin.name !== group.name;
       });
@@ -435,7 +438,6 @@ const groupController = {
     try {
       const confirm = await groupServices.confirmInvite(req.params.groupId, req.user.id, req.query.accept);
       res.status(200).json(confirm)
-      
     } catch (error) {
       if (error instanceof httpError)
         return res.status(error.statusCode).json(error.message);
@@ -508,6 +510,20 @@ const groupController = {
       else return res.status(500).json(error);
     }
   },
+  getPublicGroupData: async (req,res) => {
+    try {
+      const groupId = new mongoose.Types.ObjectId(`${req.params.groupId}`);
+      const Data = await Group.findOne({_id:groupId},{name:1,avatar:1});
+      if (!Data){
+        return res.status(404).json("cant find group")
+      }
+      return res.status(200).json(Data)
+    } catch (error) {
+      if (error instanceof httpError)
+        return res.status(error.statusCode).json(error.message);
+      else return res.status(500).json(error);
+    }
+  }
 
 
 };

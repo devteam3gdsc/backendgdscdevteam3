@@ -30,7 +30,6 @@ const userController = {
   //[GET] /user/publicInfo
   getUserPublicInfo: async (req, res) => {
     try {
-
       const user = await findDocument(
         User,
         { _id: req.params.userId },

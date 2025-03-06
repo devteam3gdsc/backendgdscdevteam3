@@ -324,16 +324,18 @@ const groupServices = {
 
     confirmInvite : async (groupId, userId, accept) => {
         try {
+           
             const user = await User.findById(userId);
+            
             const group = await Group.findById(groupId);
             if(!group) {
                 throw new Error("Group not found");
             }
-
-            if (!group.pendingInvites?.includes(userId)) {
-                throw new Error("User was not invited");
-            }
-
+            // console.log(group)
+            // if (!group.pendingInvites.includes(userId)) {
+            //     throw new Error("User was not invited");
+            // }
+           
             if (accept) {
                 group.members.push({ user: userId,avatar:user.avatar, role: "member"});
             }

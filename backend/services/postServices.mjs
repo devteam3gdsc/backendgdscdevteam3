@@ -286,7 +286,6 @@ const postServices = {
             notificationType: "confirm_post",
             category: "groups", 
             customMessage: `your post is ${message} in ${entityType.toLowerCase()}`,
-            extraData: entity.name,
         });
 
       await post.save();

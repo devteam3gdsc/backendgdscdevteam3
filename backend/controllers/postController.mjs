@@ -9,6 +9,8 @@ import updateDocument from "../utils/updateDocument.mjs";
 import { fileDestroy, getFiles } from "../utils/filesHelper.mjs";
 import { Group } from "../models/Groups.mjs";
 import userServices from "../services/userServices.mjs";
+import notificationController from "./notificationController.mjs";
+import NotificationServices from "../services/notificationServices.mjs";
 const postController = {
   //[GET] /me?page=...&limit=...&search=...&type=...
   getUserPost: async (req, res) => {
@@ -80,6 +82,8 @@ const postController = {
         [{ _id: req.user.id }],
         [{ $inc: { totalPosts: 1 } }],
       );
+      const notif = await NotificationServices.createPostFollowingNotification({senderId: req.user.id, postId: newPostId})
+      console.log(notif)
       return res.status(200).json({
         message: "Post created successfully!",
         postId: newPostId,

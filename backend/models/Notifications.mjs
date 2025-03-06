@@ -29,6 +29,7 @@ const notificationSchema = new mongoose.Schema({
       "friend_accept",
       "tag_post",
       "tag_comment",
+      "post_create",
       "group_invite",
       "group_post",
       "project_invite",

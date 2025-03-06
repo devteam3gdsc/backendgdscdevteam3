@@ -9,25 +9,44 @@ import { io, onlineUsers } from "../utils/socket.mjs";
 import { custom } from "@cloudinary/url-gen/qualifiers/region";
 
 const NotificationServices = {
-  createNotification: async (userId, data) => {
-    try {
-      const notification = new Notification({ userId, ...data });
-      const savedNotification = await notification.save();
-
-      // Emit the notification to the user if they are online
-      const socketId = onlineUsers.get(userId);
-      if (socketId) {
-        io.to(socketId).emit("newNotification", savedNotification);
-      }
-
-      return savedNotification;
+  createPostFollowingNotification: async ({ senderId, postId }) => { 
+    try {    
+      const senderUser = await User.findById(senderId);
+      if (!senderUser) throw new Error("Sender user not found");
+  
+      // Tìm danh sách những người đang theo dõi `senderId`
+      const users = await User.find({ following: senderId });
+  
+      // Tạo danh sách thông báo
+      const notifications = users.map(user => ({
+        userId: user._id,  // Người nhận thông báo
+        senderId,
+        senderName: senderUser.displayname,
+        senderAvatar: senderUser.avatar,
+        type: "post_create",
+        message: `has just created.`,
+        relatedEntityId: postId,
+        entityType: "Post",
+        category: "following",
+        extraData: "a new post !",
+      }));
+  
+      // Lưu tất cả thông báo vào database
+      const savedNotifications = await Notification.insertMany(notifications);
+  
+      // Gửi thông báo qua socket nếu user online
+      users.forEach(user => {
+        const socketId = onlineUsers.get(String(user._id)); // Đúng userId
+        if (socketId) {
+          io.to(socketId).emit("newNotification", savedNotifications.find(n => n.userId.toString() === user._id.toString()));
+        } 
+      });
+      return savedNotifications;
     } catch (error) {
-      console.error(`Error creating notification: ${error.message}`);
-      throw new httpError("Failed to create notification", 500);
+      console.error(`Error creating post notification: ${error.message}`);
+      throw new httpError("Failed to create profile update notification", 500);
     }
   },
-  // display name
-  // avatar
 
   createLikeNotification: async ({ postId, senderId }) => { // phải gừi thông báo đến người chủ post following 
     try {

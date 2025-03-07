@@ -225,12 +225,13 @@ addParticipant: async (req, res) => {
       // console.log(projectUsers)
       const usersWithRole = projectUsers.filter((member) => {
         if (usersMap.get(`${member.user}`)){
-          return {
-            ...usersMap.get(`${member.user}`),
-            role:member.role,
-          }
+          let mem = usersMap.get(`${member.user}`);
+          return mem;
         }
       });
+      const usersWithRol = usersWithRole.map((user)=>{
+        return {role:user.role,...usersMap.get(`${user.user}`)}
+      })
       const totalPages = Math.ceil(result.totalUsers / limit);
       if (page > totalPages) {
         return res.status(200).json({
@@ -243,7 +244,7 @@ addParticipant: async (req, res) => {
       }
       const hasMore = totalPages - page > 0 ? true : false;
       return res.status(200).json({
-        users: usersWithRole,
+        users: usersWithRol,
         totalPages,
         currentPage: page,
         totalUsers: result.totalUsers,

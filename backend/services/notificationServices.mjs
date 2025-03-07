@@ -659,44 +659,44 @@ const NotificationServices = {
       if (!mongoose.Types.ObjectId.isValid(userId)) {
         throw new Error("Invalid userId");
       }
-
+  
       const matchStage = { userId: new mongoose.Types.ObjectId(userId) };
-
+  
       // Thêm bộ lọc category
       if (category !== "all") {
         matchStage.category = category;
       }
-
+  
       // Thêm bộ lọc đọc/chưa đọc
       if (filter === "read") {
         matchStage.isRead = true;
       } else if (filter === "unread") {
         matchStage.isRead = false;
       }
-
+  
       const Data = await Notification.aggregate([
         { $match: { userId: new mongoose.Types.ObjectId(userId) } },
-        { $sort: { createdAt: -1 } },
         {
           $facet: {
             notifications: [
               { $match: matchStage },
+              { $sort: { createdAt: -1 } },
               { $skip: skip },
               { $limit: limit },
             ],
-            totalNotifications: [{ $match: { category: category !== "all" ? category : { $exists: true } } }, { $count: "count" }],
+            totalNotifications: [{ $count: "count" }], // Tổng tất cả thông báo của userId
             totalUnreadNotifications: [
-              { $match: { isRead: false, category: category !== "all" ? category : { $exists: true } } },
+              { $match: { isRead: false } }, // Chỉ đếm thông báo chưa đọc của userId
               { $count: "count" },
             ],
             totalReadNotifications: [
-              { $match: { isRead: true, category: category !== "all" ? category : { $exists: true } } },
+              { $match: { isRead: true } }, // Chỉ đếm thông báo đã đọc của userId
               { $count: "count" },
             ],
           },
         },
       ]);
-
+  
       return {
         notifications: Data[0].notifications,
         totalNotifications: Data[0].totalNotifications[0]?.count || 0,
@@ -707,7 +707,7 @@ const NotificationServices = {
     } catch (error) {
       throw new Error(`getNotifications service error: ${error.message}`);
     }
-  },
+  },  
 
 
   getNotificationById: async (notificationId) => {

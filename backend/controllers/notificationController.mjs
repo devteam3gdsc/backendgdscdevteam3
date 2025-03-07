@@ -89,6 +89,7 @@ const notificationController = {
         currentPage: page,
         totalPages,
         totalNotifications: result.totalNotifications,
+        totalUnreadNotifications: result.totalUnreadNotifications,
         hasMore,
       });
     } catch (error) {

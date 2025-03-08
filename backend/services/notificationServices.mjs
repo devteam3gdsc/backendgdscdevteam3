@@ -81,7 +81,6 @@ const NotificationServices = {
       // if (hasLiked) {
       //   return null;
       // }
-      console.log(12)
       const notification = new Notification({
         userId: postOwnerId,
         senderId,

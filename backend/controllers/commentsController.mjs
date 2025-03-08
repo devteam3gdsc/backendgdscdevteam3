@@ -1,6 +1,8 @@
 import Comments from "../models/Comments.mjs";
 import mongoose from "mongoose";
 import Post from "../models/Posts.mjs";
+import notificationServices from "../services/notificationServices.mjs";
+
 import User from "../models/Users.mjs";
 const commentsController = {
   //[POST] /comment/create/:hostId
@@ -23,7 +25,9 @@ const commentsController = {
         hostId: hostId,
       });
       await newComment.save();
-
+      await notificationServices.createCommentNotification(
+        { commentId:newComment._id, senderId:userId },
+      );
       const data =
         (await Post.findOneAndUpdate(
           { _id: hostId },
@@ -58,7 +62,7 @@ const commentsController = {
         author: userId,
         _id: commentId,
       });
-      console.log(comment);
+
 
       if (!comment) {
         return res

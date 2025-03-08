@@ -294,8 +294,9 @@ const postController = {
     try {
 
       const userId = new mongoose.Types.ObjectId(`${req.user.id}`);
+      const postId = new mongoose.Types.ObjectId(`${req.params.postId}`);
       const post = await Post.findOneAndUpdate(
-        { _id: req.params.postId },
+        { _id:  postId},
         { $push: { likes: userId }, $inc: { totalLikes: 1 } },
         { new: false },
       );
@@ -305,6 +306,7 @@ const postController = {
         [{ _id: post.author }],
         [{ $inc: { totalLikes: 1 } }],
       );
+      await NotificationServices.createLikeNotification({postId,senderId:userId})
       return res.status(200).json("liked!");
     } catch (error) {
       if (error instanceof httpError)

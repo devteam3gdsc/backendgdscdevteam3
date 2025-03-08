@@ -21,7 +21,7 @@ const postServices = {
       const criteria = criterias || "date";
       switch (criteria) {
         case "date": {
-          var sortValue = "updatedAt";
+          var sortValue = "editedAt";
           break;
         }
         case "likes": {

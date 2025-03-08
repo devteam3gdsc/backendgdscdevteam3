@@ -5,18 +5,18 @@ import authMiddleware from "../middlewares/authMidleware.mjs";
 const notificationRouter = Router();
 
 // [POST] /notification/comment/:commentId - Create a notification for a comment
-notificationRouter.post(
-  "/comment/:commentId",
-  authMiddleware.verifyToken,
-  notificationController.createCommentNotification,
-);
+// notificationRouter.post(
+//   "/comment/:commentId",
+//   authMiddleware.verifyToken,
+//   notificationController.createCommentNotification,
+// );
 
-// [POST] /notification/like/:postId - Create a notification for a like
-notificationRouter.post(
-  "/like/:postId",
-  authMiddleware.verifyToken,
-  notificationController.createLikeNotification,
-);
+// // [POST] /notification/like/:postId - Create a notification for a like
+// notificationRouter.post(
+//   "/like/:postId",
+//   authMiddleware.verifyToken,
+//   notificationController.createLikeNotification,
+// );
 
 // [GET] /notification/:notificationId/detail - Get details of a single notification by ID
 notificationRouter.get(

@@ -52,9 +52,8 @@ const NotificationServices = {
     try {
       const post = await Post.findById(postId);
       if (!post) throw new httpError("Post not found", 404);
-
       const postOwnerId = post.author;
-
+      
       const senderUser = await User.findById(senderId);
 
       // check over 24h from create post
@@ -72,20 +71,19 @@ const NotificationServices = {
       }
 
       // check senderUser isFollowing postOwnerId
-      const isPostOwnerFollowingSenderUser = await User.exists({
-        _id: postOwnerId,
-        following: senderId,
-      });
-      if (!isPostOwnerFollowingSenderUser) return null;
-
-      // check first like
-      const hasLiked = post.likes.includes(senderId);
-      if (hasLiked) {
+      const author = await User.findById(post.author,{following:1})
+      let following = author.following.filter((user)=>user._id.equals(senderId))
+      if (!(following)){
         return null;
       }
-
+      // check first like
+      // const hasLiked = post.likes.includes(senderId);
+      // if (hasLiked) {
+      //   return null;
+      // }
+      console.log(12)
       const notification = new Notification({
-        userId: String(postOwnerId),
+        userId: postOwnerId,
         senderId,
         senderName: senderUser.displayname,
         senderAvatar: senderUser.avatar,
@@ -96,7 +94,7 @@ const NotificationServices = {
         category: "following",
         extraData: post.title,
       });
-
+      
       const savedNotification = await notification.save();
 
       // Emit the notification to the user if they are online
@@ -104,7 +102,6 @@ const NotificationServices = {
       if (socketId) {
         io.to(socketId).emit("newNotification", savedNotification);
       }
-
       return savedNotification;
     } catch (error) {
       console.error(`Error creating like notification: ${error.message}`);
@@ -117,7 +114,7 @@ const NotificationServices = {
       const comment = await Comments.findById(commentId);
       if (!comment) throw new httpError("Comment not found", 404);
 
-      const postId = comment.postId;
+      const postId = comment.hostId;
       const post = await Post.findById(postId);
       if (!post) throw new httpError("Post not found", 404);
 
@@ -130,7 +127,7 @@ const NotificationServices = {
       if (postAgeInHours > 24) {
         return null;
       }
-
+     
       // stop, check if more than 20 notif
       const notificationCount = await Notification.countDocuments({
         relatedEntityId: postId,
@@ -141,31 +138,34 @@ const NotificationServices = {
 
       // check senderUser isFollowing postOwnerId
       // check senderUser isFollowing postOwnerId
-      const isPostOwnerFollowingSenderUser = await User.exists({
-        _id: postOwnerId,
-        following: senderId,
-      });
-      if (!isPostOwnerFollowingSenderUser) return null;
-
-      // check first like
-      const hasLiked = post.likes.includes(senderId);
-      if (hasLiked) {
+      const author = await User.findById(post.author,{following:1})
+      let following = author.following.filter((user)=>user._id.equals(senderId))
+      if (!(following)){
         return null;
       }
+      
+      // if (!isPostOwnerFollowingSenderUser) return null;
+
+      // check first like
+      // const hasLiked = post.likes.includes(senderId);
+      // if (hasLiked) {
+      //   return null;
+      // }
       const notification = new Notification({
-        userId: String(postOwnerId),
+        userId: postOwnerId,
         senderId,
         senderName: senderUser.displayname,
         senderAvatar: senderUser.avatar,
         type: "comments",
         message: `commented on your post.`,
+        category:"all",
         relatedEntityId: commentId,
         entityType: "Comments",
         extraData: comment.code,
       });
-
+      console.log(1)
       const savedNotification = await notification.save();
-
+     
       // Emit the notification to the user if they are online
       const socketId = onlineUsers.get(String(postOwnerId));
       if (socketId) {
@@ -192,7 +192,7 @@ const NotificationServices = {
         senderId,
         senderName: senderUser.displayname,
         senderAvatar: senderUser.avatar,
-        type: "update_profile",
+        type: "user_update_profile",
         message: `updated profile.`,
         relatedEntityId: senderId,
         entityType: "User",
@@ -213,7 +213,7 @@ const NotificationServices = {
       return savedNotifications;
     } catch (error) {
       console.error(`Error creating profile update notification: ${error.message}`);
-      throw new httpError("Failed to create profile update notification", 500);
+      throw new httpError("Failed to create following update profile notification", 500);
     }
   },
 

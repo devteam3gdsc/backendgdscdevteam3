@@ -309,7 +309,8 @@ const projectServices = {
               sections: sectionTree,
               joined: isJoined,
               canJoin,
-              role: userRole
+              role: userRole,
+              group:projectData.group
           };
       } catch (error) {
           console.error("Error fetching project data:", error);

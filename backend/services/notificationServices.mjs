@@ -153,6 +153,7 @@ const NotificationServices = {
       const notification = new Notification({
         userId: postOwnerId,
         senderId,
+        relatedEntityId:postId,
         senderName: senderUser.displayname,
         senderAvatar: senderUser.avatar,
         type: "comments",
@@ -160,7 +161,7 @@ const NotificationServices = {
         category:"all",
         relatedEntityId: commentId,
         entityType: "Comments",
-        extraData: comment.code,
+        extraData: "your post",
       });
       console.log(1)
       const savedNotification = await notification.save();
